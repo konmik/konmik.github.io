@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+<meta name="generator" content="Hugo 0.17" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<title>How to have 100% code coverage with tests and be sane - Konstantin Mikheev&#39;s programming blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://konmik.com">[Konstantin Mikheev&#39;s programming blog]</a>
+
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2015-09-19">September 19, 2015</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="tags/java">Java</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">How to have 100% code coverage with tests and be sane</h1>
+  <section class="body" itemprop="articleBody">
+    <p>In this article I will discuss unit testing approaches,
+show a quick and elegant solution to unit tests complexity,
+benefits of having 100% code coverage with tests
+and how achieve it easily.</p>
+
+<p></p>
+
+<h3 id="introduction">Introduction</h3>
+
+<p>After reading yet another article on unit testing I decided that I will create, just for an experiment,
+a project with 100% test coverage and see how it looks and feels like.</p>
+
+<p><img src="/images/100-coverage.png" alt="" /></p>
+
+<p>I never had such
+projects before and I discovered some interesting facts, that may be interesting to someone
+who is walking with us on the testing path or for someone who is just thinking.</p>
+
+<p>There are some people who argue that 100% coverage is bad and is a nearly unreachable
+target that is impractical and &ldquo;is not for the real life&rdquo;. There is also a popular idea about
+&ldquo;project maturity&rdquo; and coverage requirements for different project types.</p>
+
+<p>I disagree. Using techniques that I discovered
+during this experiment I will prefer to have a 100% coverage rather than any other number
+and it will be reached with less efforts than using the usual approach.</p>
+
+<h3 id="do-not-test-methods">Do not test methods</h3>
+
+<p>Yep, this is a common knowledge but it is not precise and is not accented hard enough.
+People write this fact as an advice that is nice to follow but the fact is that we
+will <em>never</em> come any close to a decent coverage within a reasonable amount of time
+by testing methods.</p>
+
+<p>Let&rsquo;s be engineers, let&rsquo;s count how we can have a reasonable amount of coverage
+within a reasonable amount of time. What good engineers do? They measure and <em>estimate</em>.</p>
+
+<p>Let&rsquo;s estimate how much code we need to test a unit with 5 methods, each of them will have
+2 <strong>if</strong> statements. Two <strong>if</strong> statements will normally give 3 possible cases.</p>
+
+<p>Every time we have an <strong>if</strong> statement we need to supply a different unit test environment
+(a combination of unit dependencies and commands issued to the unit)
+to make the code execute through the logical branch.
+How many environments we need to test the unit? 5 * 3 = we will need to setup 15 environments
+just for one freaking unit with 5 methods! Such a waste of time! No, this is a definitely bad idea.</p>
+
+<p><img src="/images/100-coverage-trap.png" alt="" /></p>
+
+<p>OK, now it should become very clear that testing methods is not the best idea.
+So probably we need to test <em>units</em>? We write <em>unit tests</em> after all, so this should be better, yeah?</p>
+
+<p>How about a little estimation? Let&rsquo;s count all logical cases within the entire unit.
+5 methods in the unit, each has 2 <strong>if</strong> statement, 5 methods * 3 cases = we need 15 test environments.
+Did you notice a difference? Why the hell there should be a difference at all? We can, <em>potentially</em> test with less environments number if our <strong>if</strong>s are repetitive, but this is a rare case that should normally be eliminated by the Strategy pattern.</p>
+
+<h3 id="unit-tests-are-sick">Unit tests are sick</h3>
+
+<p>When we test a unit we test the code that is <em>inside</em> of methods. But our code has a significant part that
+is <em>connection</em> between units. If there is a guarantee that two units work this does not mean that we have
+a guarantee that they will work <em>together</em>.</p>
+
+<p>There is also &ldquo;unit granularity&rdquo;. Someone will create a 10000 line unit with tons of interconnected
+variables and <strong>if</strong> statements and he will try to test it (god save him). Someone other will create a
+lots of three-line methods that operate on immutable data almost without <strong>if</strong> statements
+and each unit will have 1-5 methods.</p>
+
+<p>Should that two different guys use the same approach for testing? The first guy didn&rsquo;t
+get what &ldquo;decomposition&rdquo; word mean so let&rsquo;s let him alone, but the second guy will not benefit from unit testing
+as he could because most of his code consist of inter-unit connections and he will need to
+setup a testing environment for each line, which is not effective.</p>
+
+<p>Another thing that is sick is unit&rsquo;s internal dependencies. If, for example, unit <code>A</code> depends on unit <code>B</code> and unit <code>B</code> is not used in any other place of the application, then there is no reason to write <code>new A(new B())</code>. Especially if <code>B</code> internally depends on <code>C</code>, so we in fact must instantiate <code>A</code> by writing <code>new A(new B(new C(), new D()), new E())</code> to keep <code>A</code> testable. Imagine instantiation of some root class that depends on the entire application&rsquo;s object graph. Yes we have dependency injection pattern, we have static method constructors, but this is just another complication to handle our weak unit testing strategy.</p>
+
+<p>Formal unit tests:</p>
+
+<ul>
+<li><p>Are ineffective by coverage / time ratio.</p></li>
+
+<li><p>Do not guarantee a correct code behavior because they do not test inter-unit communications.</p></li>
+
+<li><p>Hinder refactoring. Once we wrote a test for a unit, the test will stick to the unit and we can&rsquo;t refactor the unit without refactoring the test. All unit dependencies also become written in the test, so we can&rsquo;t even change unit implementation details without touching its test.</p></li>
+
+<li><p>Overcomplicated when it comes to dealing with unit dependencies.</p></li>
+
+<li><p>A line-by-line reproduction of code in tests does not test anything. Do method-by-method tests test something? Do unit-by-unit tests test? What we&rsquo;re testing at all?</p></li>
+</ul>
+
+<p>So, there is a problem and there should be a solution.</p>
+
+<h3 id="do-test-features">Do test features</h3>
+
+<p>Yes, this is also a known idea. We can read it in some articles.
+But is this advice important? What people mean when they say &ldquo;test features&rdquo; (&ldquo;test use cases&rdquo;)?
+Do they mean &ldquo;test features of units&rdquo;?
+&ldquo;Feature&rdquo; in an abstraction without context, it is completely useless.</p>
+
+<p>Let&rsquo;s be engineers, let&rsquo;s estimate. I&rsquo;m taking my ruler again&hellip;
+How testing <em>features</em> can be more effective than testing methods? I finally came to this schema:</p>
+
+<p><img src="/images/100-coverage-feature-test.png" alt="" /></p>
+
+<p>If we will test <em>subsystem</em> features then each test will cover <em>several</em> <strong>if</strong> cases and the test coverage will be very effective. Given this <em>case map</em> we can even select specific features that will touch the maximum amount of code lines. The amount of test environments that need to be created for such testing type is minimal.</p>
+
+<p>When I say &ldquo;subsystem&rdquo; I mean a <em>group of units</em> that serve one purpose and can be taken as a separate part of an application. In example, a data access layer is one of such subsystems. While it should be tested without actual writes to a database it can, <em>internally</em> consist of tens of units.</p>
+
+<p>Assumption here is that if a subsystem satisfies given requirements this mean that subsystem&rsquo;s internal structure satisfies that requirements as well. If a test is a requirement then why require a specific line-by-line solution?</p>
+
+<p>Surprisingly, testing subsystem features also gives a total freedom for refactoring inside the subsystem.</p>
+
+<h3 id="cross-check">Cross-check</h3>
+
+<p>There is also a consideration about cross-checking.
+I think that tests should be cross-checks, not duplication-checks.
+Yes, I duplicated some code in a test.
+Does this guarantee something? No.</p>
+
+<ul>
+<li>A task: &ldquo;Get a ball into the basket.&rdquo;</li>
+<li>Code: &ldquo;Trowing a ball.&rdquo;</li>
+<li>Duplication test: &ldquo;Is the code throwing a ball?&rdquo;</li>
+<li>Functional test: &ldquo;Was a ball thrown?&rdquo;</li>
+<li>Cross-check test: &ldquo;Hey Joe, I don&rsquo;t believe my own eyes (my own code), could you please go and check if there is a ball <em>in the basket</em>?&rdquo;</li>
+</ul>
+
+<p>The duplication test can&rsquo;t prove that the code satisfies the task requirement.
+The functional test is better but it does not guarantee the task requirement satisfaction as well.
+The cross-check can give the guarantee.</p>
+
+<p>The strongest argument about writing classical unit tests I met was that they can go through
+all <strong>if</strong> cases while doing so with an integration test is too time-consuming.
+I agree. But there is a medium variant that <em>can</em> go through all cases fast,
+providing better guarantees the same time.</p>
+
+<p>It looks to me that feature tests are closer to cross-checks, they provide real guarantees to their user.
+And if their coverage is 100% then they are clearly winning the game.</p>
+
+<h3 id="benefits-of-having-100-test-coverage">Benefits of having 100% test coverage</h3>
+
+<p>If a codebase is built with 100% test coverage in mind then it leads to an interesting effect.
+Coverage tools show lines of code that are not touched by tests. That exactly lines are either
+not tested, not needed <em>or</em> not touched because of some mistake that should be fixed. So
+this is an additional tool that finds bugs and helps to optimize codebase!</p>
+
+<p>Unreached code can also be a sign of an ineffective test.</p>
+
+<p><img src="/images/100-coverage-run-coverage-tool.png" alt="" /></p>
+
+<p><img src="/images/100-coverage-not-covered-lines.png" alt="" /></p>
+
+<p><em>(Oops! A copy-pasted algorithm is too broad for the implementation! I never have <code>null</code> here!)</em></p>
+
+<p>100% test coverage may not guarantee the absence of bugs. But 99% test coverage
+<em>does</em> guarantee that 1% is either fragile or simply does not work. So, the 100% coverage value is a desirable target for any project by itself.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>During the experiment on a small project I completely threw away 2 units because
+test coverage showed that they are not needed to implement required features.
+There were also few methods that have been removed or optimized.</p>
+
+<p>I understood that having a 100% test code coverage is a reasonable goal by itself and
+it is also a good <em>tool</em> for keeping codebase clean.</p>
+
+<p>One should not stop testing when he sees a 100% test coverage. In example, <code>?:</code> operator, written in one
+line will be presented as &ldquo;covered line&rdquo; by a coverage tool, but in fact there are two cases that need to be tested.</p>
+
+<p>A good goal is to test each subsystem <em>feature</em> and (when it is required) edge cases. Feature test is a strict requirement to the subsystem. This is also a known idea, but rethinking old ideas is as important as learning new. Testing features rather than units gives more profit and requires less efforts. Such tests are also easier to support.</p>
+
+<p>P.S. If you&rsquo;re interested, the experiment project I was talking about is
+<a href="https://github.com/konmik/proxypref">ProxyPreferences</a>.
+It is not perfect when it comes to tests yet. I&rsquo;m too lazy
+to clean up all of them, so there are probably more tests than is actually needed.</p>
+  </section>
+</article>
+
+</main>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2015  Konstantin Mikheev&#39;s programming blog</span>
+  </div>
+</footer>
+
+</body>
+</html>
+

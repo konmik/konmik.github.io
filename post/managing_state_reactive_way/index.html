@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+<meta name="generator" content="Hugo 0.17" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<title>Managing state reactive way - Konstantin Mikheev&#39;s programming blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://konmik.com">[Konstantin Mikheev&#39;s programming blog]</a>
+
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2016-12-25">December 25, 2016</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="tags/java">Java</a>
+
+        <a href="tags/android">Android</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">Managing state reactive way</h1>
+  <section class="body" itemprop="articleBody">
+    <p>RxJava nice and easily covers our multithreading needs.
+But it provides only a half of the solution.
+While we can compose functions with RxJava, there is no safe way we can have
+our state (field variables) handled without race conditions and low-level synchronization blocks.</p>
+
+<p>This article describes a simple and practical way for solving multithreading issues
+that appear even when we&rsquo;re using such advanced technology as RxJava.</p>
+
+<p></p>
+
+<h2 id="state-what-is-it">State, what is it?</h2>
+
+<blockquote>
+<p>&ldquo;State - all the stored information, at a given instant in time,
+to which the program has access&rdquo;
+&ndash; Wikipedia</p>
+</blockquote>
+
+<p>For our needs we can say that state is the sum of all variables in the application memory.
+State can also be limited to a subsystem, an object, even a function can have state.</p>
+
+<h2 id="object-oriented-representation-of-state">Object-oriented representation of state</h2>
+
+<p>In a usual OO application its state is distributed over a graph of interconnected objects.
+When an external event happens, or when a background thread finishes
+its execution (at best), it simply mutates the graph.
+The downside of such approach is that complexity of such modifications is horrifying.</p>
+
+<p>You&rsquo;re calling <code>getUserProfile()</code> and you have no idea what will happen next
+and which variables will be changed during the call.
+It may read database and update profile,
+it may update your network token,
+it may download new list of unread messages,
+it may change user&rsquo;s age and so on.</p>
+
+<p>You didn&rsquo;t want all of that while composing &ldquo;Hello, %username%&rdquo; string isn&rsquo;t it?
+Especially if you was doing it while filling the profile view and you got an update
+callback while processing a previous callback?
+All these events happening concurrently can give gray heir to anyone!</p>
+
+<p>OOP model does not have any answers to all these issues.
+Programmer is expected to write callback spaghetti, <code>synchronized</code> blocks, constantly
+checking what is going on the other side of the application to avoid having conflicts.
+Passing data in OOP is like giving someone a live rat instead of a juggling ball.
+You want to juggle a bit, but
+your data can run away or even bite you, suddenly throwing <code>NullPointerException</code>.
+Multithreading issues in OOP code can not be reliably solved at all.</p>
+
+<h2 id="functional-state-model">Functional state model</h2>
+
+<p><a href="https://github.com/ReactiveX/RxJava">RxJava</a>
+is a library for Functional Reactive Programming.
+&ldquo;Functional&rdquo; here stands for composing functions.
+But functional programming is not limited only to composing functions.
+What about the other side - state?
+Can functional programming teach us more?
+Sure.</p>
+
+<p>In real functional languages like <a href="https://clojure.org/">Clojure</a>, state is immutable.</p>
+
+<p>That&rsquo;s it - if you have <code>Rect</code> data structure, you can&rsquo;t just change it&rsquo;s <code>x</code> and <code>width</code>.
+The only way you can have some state changed - is to make a copy of the
+data structure with new values of fields.
+Want to modify a list? Make a copy of it.</p>
+
+<p>It is a very simple and straightforward practice.
+When an event happens, new &ldquo;state&rdquo; graph is created by taking
+the old one with some fields changed.
+And the new graph is assigned to the <em>single</em> variable which holds the root of the graph.</p>
+
+<p>This sounds weird and very memory and performance consuming.
+But in practice the difference is not so big, and what we get in exchange for
+a negligible performance hit is outstanding reliability.
+And you still can use mutable data in performance-critical parts.
+Remember the Knuth&rsquo;s cite? It can totally be applied here.</p>
+
+<blockquote>
+<p>&ldquo;We should forget about small efficiencies, say about 97% of the time:
+premature optimization is the root of all evil.
+Yet we should not pass up our opportunities in that critical 3%.&rdquo;
+  &ndash; Donald Knuth</p>
+</blockquote>
+
+<p>Because data is immutable
+you don&rsquo;t have to make deep copy of the entire data graph.
+You&rsquo;re not copying <code>String</code> values while passing them around, isn&rsquo;t it?
+Because <code>String</code> is immutable, it is absolutely safe to pass it anywhere.
+So we only need to allocate the difference between the old and the new graphs.</p>
+
+<p>Let&rsquo;s take an example.
+Here is the representation of state in a currency selection dialog:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">class</span> <span class="nc">CurrencySelectionState</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">currencies</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">selected</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">networkError</span><span class="o">;</span>
+
+    <span class="n">CurrencySelectionState</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="n">emptyList</span><span class="o">(),</span> <span class="n">empty</span><span class="o">(),</span> <span class="n">empty</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="n">CurrencySelectionState</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">currencies</span><span class="o">,</span>
+            <span class="n">Optional</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">selected</span><span class="o">,</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">networkError</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">currencies</span> <span class="o">=</span> <span class="n">currencies</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">selected</span> <span class="o">=</span> <span class="n">selected</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">networkError</span> <span class="o">=</span> <span class="n">networkError</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="n">CurrencySelectionState</span> <span class="nf">withCurrencies</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">currencies</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">CurrencySelectionState</span><span class="o">(</span><span class="n">currencies</span><span class="o">,</span> <span class="n">selected</span><span class="o">,</span> <span class="n">networkError</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="n">CurrencySelectionState</span> <span class="nf">withSelected</span><span class="o">(</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">selected</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">CurrencySelectionState</span><span class="o">(</span><span class="n">currencies</span><span class="o">,</span> <span class="n">selected</span><span class="o">,</span> <span class="n">networkError</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>When user selects another currency, we only create a new instance
+of <code>CurrencySelectionState</code> with the old list and new <code>selected</code> field.
+We don&rsquo;t need to copy the currency list itself because it was not changed.
+The list is immutable so we can safely reference it from the new state instance.</p>
+
+<p>It can look tedious to write lots of <code>with-</code> methods, but in practice it does
+not take too much time. If you&rsquo;re free in selection of libraries for your
+project, you can try automatic code generators for such purposes, for example
+<a href="https://github.com/gabrielittner/auto-value-with">AutoValue: With Extension</a>.</p>
+
+<p>We can also stack such &ldquo;modifications&rdquo; by calling them in a chain:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">CurrencySelectionState</span> <span class="n">newViewState</span> <span class="o">=</span> <span class="n">oldViewState</span>
+    <span class="o">.</span><span class="na">withCurrencies</span><span class="o">(</span><span class="n">newList</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">withSelected</span><span class="o">(</span><span class="n">selectedItem</span><span class="o">);</span>
+</code></pre></div>
+
+<p>After getting a new <code>CurrencySelectionState</code> instance,
+all we need is to call our <code>currencySelectionDialog.update(newViewState)</code>
+to refresh view and the job is done.</p>
+
+<p>This solution with immutable state and separation
+of state and its representation also becomes very popular
+in web development.</p>
+
+<p>When we&rsquo;re creating the new immutable
+data structure which represents some state,
+there are just no places where unpredictable things can happen.
+Your jugging ball does not suddenly turn into a rat or a bird,
+it does not try to bite you or to fly away.</p>
+
+<h2 id="adding-some-rocket-science">Adding some rocket science</h2>
+
+<p>The article says &ldquo;reactive&rdquo;, was it just do draw attention to some weird stuff
+from functional languages? Of course not!
+All the previous discussion was just to prepare you,
+dear reader, to hit the next episode with some ideas about what &ldquo;reliable&rdquo;, &ldquo;predictable&rdquo;
+words mean when we&rsquo;re talking about state.</p>
+
+<p>Let&rsquo;s adopt this model to our reactive multithreading environment,
+so we could have a reliable and predictable state management for our
+lovely RxJava.</p>
+
+<p>What we really want is to have these things:</p>
+
+<ul>
+<li>Avoid deadlocks, race conditions, and all the fears of multithreading programming</li>
+<li>Make state modification sequential because it usually fits our requirements</li>
+<li>Observe state changes in the same sequence as we actually do them</li>
+<li>Of course, our solution must be dead simple</li>
+<li>Reusable</li>
+</ul>
+
+<p>Let&rsquo;s take the example we already have with the selection of currency.
+While user is scrolling we want to get next page of currencies from server
+in background and when we receive it, we want it to be added to our list of already displayed
+currencies. And when we do this we want to have a callback to update our view.</p>
+
+<p>In RxJava we have a similar feature &ndash; <code>BehaviorSubject</code>.
+Unfortunately, it does not guarantee sequential emission of items on one thread.
+(What if you call it&rsquo;s <code>onNext</code> on different threads? Hint: a race condition.)
+It does not have thread-safe way to get current value and to emit a new - everything
+is in hands of the user.</p>
+
+<p>Why race conditions and wrong emission order is an issue?</p>
+
+<p>Say, we have 10 currencies,
+and when user scrolls down, we want to show a progress bar instead of the last item
+on the bottom, and when we get the next page of items, we want to add them to the list.</p>
+
+<p>In case of a race condition we can get items first and then progress bar without new items next.
+This is not the most frequent case, but it will happen sometimes, especially
+if you&rsquo;re using some tricky caching mechanics.</p>
+
+<p>There can be much worse cases. Say if we&rsquo;re creating a messaging app
+where items can be paged up and down, cached in a database, modified, animated, updated -
+we must be very precise and should always get the updated list of items in the right sequence.</p>
+
+<h2 id="usage-example">Usage example</h2>
+
+<p>Here is how we&rsquo;re going to use it:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">class</span> <span class="nc">CurrencySelection</span> <span class="o">{</span>
+
+    <span class="c1">// The state itself.</span>
+    <span class="c1">// We&#39;re providing the initial value for it.</span>
+    <span class="c1">// We also need to specify a scheduler where we want to observe</span>
+    <span class="c1">// emitted values.</span>
+    <span class="n">RxState</span><span class="o">&lt;</span><span class="n">CurrencySelectionState</span><span class="o">&gt;</span> <span class="n">state</span> <span class="o">=</span>
+         <span class="k">new</span> <span class="n">RxState</span><span class="o">&lt;&gt;(</span><span class="k">new</span> <span class="n">CurrencySelectionState</span><span class="o">(),</span> <span class="n">mainThread</span><span class="o">());</span>
+
+    <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">state</span><span class="o">.</span><span class="na">observable</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">updateView</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="c1">// Call it from any thread, all the multithreading</span>
+    <span class="c1">// will be handled by RxState.</span>
+    <span class="kt">void</span> <span class="nf">onPagingUp</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newItems</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">state</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">old</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="c1">// Do not modify the old state, create a new one!</span>
+            <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+            <span class="n">newList</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">newItems</span><span class="o">);</span>
+            <span class="n">newList</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">old</span><span class="o">.</span><span class="na">currencies</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">old</span><span class="o">.</span><span class="na">withCurrencies</span><span class="o">(</span><span class="n">unmodifiableList</span><span class="o">(</span><span class="n">newList</span><span class="o">));</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>This pattern perfectly fits into any architecture.
+You can keep <code>RxState</code> in a view if you&rsquo;re adhering to &ldquo;I don&rsquo;t care&rdquo; architecture,
+you can put it into a presenter when doing MVP,
+it can represent ViewModel when you&rsquo;re on MVVM,
+and it can be put into any singleton to represent
+a service state, etc.</p>
+
+<p>Hint: all these <code>addAll</code>, <code>unmodifiableList</code> can be too boring to type, so it is OK to write
+your own utility functions like <code>List concat(List, List)</code> or use a functional
+library with all the primitive functions and immutable collections included:
+<a href="https://github.com/konmik/solid">Solid</a>.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>Here is some implementation reasoning:</p>
+
+<ul>
+<li>We do state modification in a lock to prevent multiple modifications
+of state happening concurrently</li>
+<li>Each new state is being put into a queue</li>
+<li>Our emissions should always happen in one thread,
+this is the only way we can guarantee their sequence</li>
+</ul>
+
+<p>I&rsquo;m not sure yet if I need to release it as a library.
+For now you can just copy/paste the code (see below).</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RxState</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Subject</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">subject</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SerializedSubject</span><span class="o">&lt;&gt;(</span><span class="n">BehaviorSubject</span><span class="o">.</span><span class="na">create</span><span class="o">());</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ConcurrentLinkedQueue</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">queue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentLinkedQueue</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">T</span> <span class="n">value</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">volatile</span> <span class="kt">boolean</span> <span class="n">emitting</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * While sequential emission of items is guaranteed,</span>
+<span class="cm">     * race conditions can happen outside RxState if provided scheduler</span>
+<span class="cm">     * is not single threaded.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="nf">RxState</span><span class="o">(</span><span class="n">T</span> <span class="n">initialValue</span><span class="o">,</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">initialValue</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">scheduler</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">initialValue</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Sequential values on the given scheduler.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">values</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">subject</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Apply a state `modification` function in a lock.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Func1</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">func</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+            <span class="n">queue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="n">Scheduler</span><span class="o">.</span><span class="na">Worker</span> <span class="n">worker</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="na">createWorker</span><span class="o">();</span>
+        <span class="n">worker</span><span class="o">.</span><span class="na">schedule</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="n">emitLoop</span><span class="o">();</span>
+            <span class="n">worker</span><span class="o">.</span><span class="na">unsubscribe</span><span class="o">();</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Current value. Only access it if you&#39;re not afraid of concurrency issues.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">T</span> <span class="nf">value</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * This quick check can be useful in tests.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmitting</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">emitting</span> <span class="o">||</span> <span class="o">!</span><span class="n">queue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">emitLoop</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">emitting</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="n">emitting</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">T</span> <span class="n">next</span><span class="o">;</span>
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">queue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="n">emitting</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                    <span class="k">return</span><span class="o">;</span>
+                <span class="o">}</span>
+                <span class="n">next</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">next</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+  </section>
+</article>
+
+</main>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2016  Konstantin Mikheev&#39;s programming blog</span>
+  </div>
+</footer>
+
+</body>
+</html>
+

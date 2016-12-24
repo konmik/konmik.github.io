@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+<meta name="generator" content="Hugo 0.17" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<title>RxJava magic (finally) goes away - Konstantin Mikheev&#39;s programming blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://konmik.com">[Konstantin Mikheev&#39;s programming blog]</a>
+
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2015-12-08">December 08, 2015</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="tags/java">Java</a>
+
+        <a href="tags/android">Android</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">RxJava magic (finally) goes away</h1>
+  <section class="body" itemprop="articleBody">
+    <p>There is too much &ldquo;magic&rdquo; inside of RxJava.</p>
+
+<p>Docs and tutorials are either too shallow or too complicated.</p>
+
+<p>Here is the middle ground that is <em>essential</em> to know before playing with RxJava.</p>
+
+<p>In these tests we will take each RxJava part&hellip; apart and explore how exactly it works.</p>
+
+<p></p>
+
+<p>Inspired by:</p>
+
+<ul>
+<li><a href="https://blog.8thlight.com/uncle-bob/2015/08/06/let-the-magic-die.html">Make the Magic go away.</a></li>
+<li><a href="https://www.youtube.com/watch?v=3bAQXTVsEiQ">Reactive Programming</a></li>
+</ul>
+
+<h3 id="basic-usage-pattern">Basic usage pattern</h3>
+
+<p>Let&rsquo;s start from a familiar example. We will take it apart later.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+<span class="n">Observable</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">received</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+</code></pre></div>
+
+<h3 id="implementing-own-observable-and-subscriber">Implementing own <code>Observable</code> and <code>Subscriber</code></h3>
+
+<p>We will now implement our own <code>just(1)</code> <code>Observable</code> and take a brief look at <code>Observable.subscribe</code>.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">AtomicBoolean</span> <span class="n">emitted</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicBoolean</span><span class="o">();</span>
+
+<span class="c1">// Creating Observable the usual way:</span>
+<span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">observable</span> <span class="o">=</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+        <span class="n">emitted</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+
+<span class="n">assertFalse</span><span class="o">(</span><span class="n">emitted</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// Nothing happens at this point! Observable does not emit values by itself,</span>
+<span class="c1">// we need to subscribe first.</span>
+
+<span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+<span class="c1">// First, Observable.unsafeSubscribe is a simplified version of Observable.subscribe,</span>
+<span class="c1">// so we will use it instead.</span>
+<span class="c1">// Second, Observable.subscribe(Action1) is just a shortcut for</span>
+<span class="c1">// Observable.subscribe(Subscriber), here we will use Subscriber directly.</span>
+
+<span class="n">observable</span>
+    <span class="o">.</span><span class="na">unsafeSubscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// We will rethrow the exception to not ignore asserts.</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">it</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">it</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+
+<span class="n">assertTrue</span><span class="o">(</span><span class="n">emitted</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="n">assertEquals</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">received</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// The value has been emitted and received after the subscription.</span>
+</code></pre></div>
+
+<h3 id="observable-create-and-observable-unsafesubscribe"><code>Observable.create</code> and <code>Observable.unsafeSubscribe</code></h3>
+
+<p>We will now take apart <code>Observable.create</code> and <code>Observable.unsafeSubscribe</code>.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">onSubscribe</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="c1">// This is how Observable.create(OnSubscribe&lt;T&gt; f) looks like (simplified),</span>
+<span class="c1">// so we don&#39;t need to &quot;implement&quot; it:</span>
+<span class="c1">//  protected Observable(OnSubscribe &lt; T &gt; f) {</span>
+<span class="c1">//      this.onSubscribe = f;</span>
+<span class="c1">//  }</span>
+
+<span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+<span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">it</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">it</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="c1">// This is how Observable.unsafeSubscribe looks like (simplified):</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">onSubscribe</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">subscriber</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">subscriber</span><span class="o">.</span><span class="na">onError</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">received</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// onNext still works!</span>
+</code></pre></div>
+
+<p>A little resume: <code>OnSubscribe</code> function sends data directly to a given <code>Subscriber</code> by
+calling it&rsquo;s methods.</p>
+
+<p>Note: <code>Observable</code> was not used in this test at all.</p>
+
+<h3 id="what-subscription-is">What <code>Subscription</code> is</h3>
+
+<p><code>Subscription</code> is a simple interface with just two methods:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">void</span> <span class="nf">unsubscribe</span><span class="o">();</span>
+<span class="kt">boolean</span> <span class="nf">isUnsubscribed</span><span class="o">();</span>
+</code></pre></div>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+<span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">observable</span> <span class="o">=</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">targetSubscriber</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">subscriber</span><span class="o">,</span> <span class="n">targetSubscriber</span><span class="o">);</span> 
+        <span class="c1">// subscriber and targetSubscriber are the same object.</span>
+
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">subscriber</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">());</span>
+        <span class="c1">// subscriber is subscribed, this is OK.</span>
+        <span class="c1">// All subscriptions are created in the subscribed state.</span>
+
+        <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+
+<span class="n">Subscription</span> <span class="n">subscription</span> <span class="o">=</span> <span class="n">observable</span><span class="o">.</span><span class="na">unsafeSubscribe</span><span class="o">(</span><span class="n">subscriber</span><span class="o">);</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="n">subscription</span><span class="o">,</span> <span class="n">subscriber</span><span class="o">);</span>
+<span class="c1">// Surprise! Subscription and Subscriber are the same object.</span>
+<span class="c1">// Subscriber implements Subscription interface.</span>
+
+<span class="n">assertFalse</span><span class="o">(</span><span class="n">subscriber</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">());</span>
+<span class="c1">// ...and it is still subscribed even after the onCompleted() call... wait, WHY???</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">received</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// onNext still works!</span>
+</code></pre></div>
+
+<h3 id="regular-observable-subscribe-and-safesubscriber">Regular <code>Observable.subscribe</code> and <code>SafeSubscriber</code></h3>
+
+<p>The regular version of <code>Observable.subscribe(...)</code> wraps <code>Subscriber</code>
+into <code>SafeSubscriber</code> and automatically enforces the lifecycle event order.</p>
+
+<p>For example, <code>SafeSubscriber</code> automatically calls <code>unsubscribe()</code> after <code>onComplete()</code> has been received.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+<span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">observable</span> <span class="o">=</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">targetSubscriber</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">targetSubscriber</span> <span class="k">instanceof</span> <span class="n">SafeSubscriber</span><span class="o">);</span>
+        <span class="c1">// The regular subscribe() gave us a SafeSubscriber instance.</span>
+
+        <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+
+<span class="c1">// This time we will use the regular subscribe():</span>
+<span class="n">Subscription</span> <span class="n">subscription</span> <span class="o">=</span> <span class="n">observable</span><span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="n">subscriber</span><span class="o">);</span>
+
+<span class="n">assertNotEquals</span><span class="o">(</span><span class="n">subscription</span><span class="o">,</span> <span class="n">subscriber</span><span class="o">);</span>
+<span class="c1">// Subscription and Subscriber are NOT the same object now.</span>
+
+<span class="n">assertTrue</span><span class="o">(</span><span class="n">subscriber</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">());</span>
+<span class="c1">// ...SafeSubscriber in action.</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">received</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// onNext still works! :)</span>
+</code></pre></div>
+
+<h3 id="chaining-operators">Chaining operators</h3>
+
+<p>This is a simple exploration of chaining operators.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">observable</span> <span class="o">=</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="c1">// the received subscriber is some internal class inside of OperatorTake.</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">subscriber</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getName</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;OperatorTake&quot;</span><span class="o">));</span>
+
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">3</span><span class="o">);</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">received</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;());</span>
+
+<span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">it</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">received</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">it</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="n">Subscription</span> <span class="n">subscription</span> <span class="o">=</span> <span class="n">observable</span>
+    <span class="o">.</span><span class="na">take</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">skip</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">mergeWith</span><span class="o">(</span><span class="n">Observable</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">unsafeSubscribe</span><span class="o">(</span><span class="n">subscriber</span><span class="o">);</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="n">subscription</span><span class="o">,</span> <span class="n">subscriber</span><span class="o">);</span>
+<span class="c1">// subscription is still subscriber - it is just returned by unsafeSubscriber as-is!</span>
+
+<span class="n">assertArrayEquals</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">[]{</span><span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">},</span> <span class="n">received</span><span class="o">.</span><span class="na">toArray</span><span class="o">());</span>
+<span class="c1">// It works, surprisingly!</span>
+</code></pre></div>
+
+<h3 id="but-how-does-operator-chaining-work">But&hellip; <em>how</em> does operator chaining work?</h3>
+
+<p>We will now look inside <code>take()</code> function and see how one observable gets transformed into another after applying the operator.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">observable</span> <span class="o">=</span> <span class="n">Observable</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">);</span>
+<span class="n">OperatorTake</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">operatorTake</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OperatorTake</span><span class="o">&lt;&gt;(</span><span class="mi">2</span><span class="o">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">received1</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;());</span>
+
+<span class="c1">// Operator is a function that takes one subscriber and returns another:</span>
+<span class="c1">// public interface Operator&lt;R, T&gt; extends Func1&lt;Subscriber&lt;R&gt;, Subscriber&lt;T&gt;&gt; {</span>
+<span class="n">observable</span>
+    <span class="o">.</span><span class="na">lift</span><span class="o">(</span><span class="n">operatorTake</span><span class="o">)</span> <span class="c1">// this is what happens inside of .take(2)</span>
+    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">received1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+
+<span class="n">assertArrayEquals</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">},</span> <span class="n">received1</span><span class="o">.</span><span class="na">toArray</span><span class="o">());</span>
+<span class="c1">// Works as expected.</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">received2</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;());</span>
+
+<span class="c1">// We will now decompose the lift(Operator) function.</span>
+<span class="c1">// It just returns a new Observable like this:</span>
+<span class="k">new</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">childSubscriber</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// This is where operator is called to create a new subscriber.</span>
+            <span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">operatorSubscriber</span> <span class="o">=</span>
+                <span class="n">operatorTake</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">childSubscriber</span><span class="o">);</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">operatorSubscriber</span><span class="o">.</span><span class="na">onStart</span><span class="o">();</span>
+                <span class="n">observable</span><span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="n">operatorSubscriber</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">operatorSubscriber</span><span class="o">.</span><span class="na">onError</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">childSubscriber</span><span class="o">.</span><span class="na">onError</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">})</span> <span class="o">{}</span> <span class="c1">// Observable`s constructor is protected, so we call</span>
+      <span class="c1">// it here by creating an anonymous class</span>
+    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">received2</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+<span class="c1">// The chain of observables is constructed first.</span>
+<span class="c1">// When subscribe() is called, a chain of subscribers gets created from operators.</span>
+
+<span class="n">assertArrayEquals</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">},</span> <span class="n">received2</span><span class="o">.</span><span class="na">toArray</span><span class="o">());</span>
+<span class="c1">// Works!</span>
+</code></pre></div>
+
+<h3 id="asynchronous-subscription">Asynchronous subscription</h3>
+
+<p>Here we will see how <code>Observable.subscribeOn</code> works.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">onSubscribeThreadName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+<span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">observable</span> <span class="o">=</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">onSubscribeThreadName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">subscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+
+<span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+<span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">subscriberThreadName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+<span class="n">Subscription</span> <span class="n">subscription</span> <span class="o">=</span> <span class="n">observable</span>
+    <span class="o">.</span><span class="na">subscribeOn</span><span class="o">(</span><span class="n">Schedulers</span><span class="o">.</span><span class="na">io</span><span class="o">())</span>
+    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">subscriberThreadName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+            <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+
+<span class="k">while</span> <span class="o">(!</span><span class="n">subscription</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">assertTrue</span><span class="o">(</span><span class="n">onSubscribeThreadName</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;RxCachedThreadScheduler&quot;</span><span class="o">));</span>
+<span class="c1">// OnSubscribe is called on some internal Rx thread, as expected.</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="n">onSubscribeThreadName</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">subscriberThreadName</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// But values has been received on the same thread where subscription happened!</span>
+<span class="c1">// This is because we control only subscription with subscribeOn.</span>
+<span class="c1">// If we want to receive values on a specific thread we need to use observeOn.</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;main&quot;</span><span class="o">,</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+<span class="c1">// We&#39;re still safe here.</span>
+</code></pre></div>
+
+<h3 id="observing-values-on-a-custom-thread">Observing values on a custom thread</h3>
+
+<p>This time we will use <code>Observable.observerOn</code> operator to receive values on a given thread.
+We will also create our own simple <code>Scheduler</code> to understand how it works line.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">onSubscribeThreadName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+<span class="n">AtomicInteger</span> <span class="n">received</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+<span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">subscriberThreadName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+<span class="c1">// We will add scheduled actions from the background thread here</span>
+<span class="c1">// and run them on the current thread.</span>
+<span class="n">CopyOnWriteArrayList</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;</span> <span class="n">commandQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CopyOnWriteArrayList</span><span class="o">&lt;&gt;();</span>
+
+<span class="n">Subscription</span> <span class="n">subscription</span> <span class="o">=</span> <span class="n">Observable</span>
+    <span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">doOnSubscribe</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">onSubscribeThreadName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">()))</span>
+    <span class="o">.</span><span class="na">subscribeOn</span><span class="o">(</span><span class="n">Schedulers</span><span class="o">.</span><span class="na">io</span><span class="o">())</span>
+    <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">Schedulers</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="k">new</span> <span class="n">Executor</span><span class="o">()</span> <span class="o">{</span> <span class="c1">// Schedulers.from just wraps Executor.</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">command</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">commandQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">command</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}))</span>
+    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">subscriberThreadName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+            <span class="n">received</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+
+<span class="k">while</span> <span class="o">(!</span><span class="n">subscription</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">()</span> <span class="o">||</span> <span class="n">commandQueue</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">commandQueue</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">commandQueue</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">run</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">assertTrue</span><span class="o">(</span><span class="n">onSubscribeThreadName</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;RxCachedThreadScheduler&quot;</span><span class="o">));</span>
+<span class="c1">// OnSubscribe is still called on the given io() thread.</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;main&quot;</span><span class="o">,</span> <span class="n">subscriberThreadName</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// But we observe values on the given observeOn thread (which is &quot;main&quot;).</span>
+</code></pre></div>
+
+<h3 id="backpressure">Backpressure</h3>
+
+<p>Backpressure is the ability of <code>Observable</code> to <em>not</em> emit more values than it is requested by <code>Subscriber</code>.</p>
+
+<p>Let&rsquo;s see how it works.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">received</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;());</span>
+
+<span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span> <span class="c1">// #1</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onStart</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onStart</span><span class="o">();</span>
+        <span class="c1">// Start from requesting one value.</span>
+        <span class="n">request</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> 
+
+        <span class="c1">// request() is Subscriber&#39;s method that just calls Producer`s request().</span>
+        <span class="c1">// (more about Producer a few lines below)</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">received</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">integer</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="o">)</span> <span class="c1">// We want to get only 5 items.</span>
+            <span class="n">request</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// #3</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="n">Observable</span>
+    <span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">targetSubscriber</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="n">AtomicInteger</span> <span class="n">lastSent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+            <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">setProducer</span><span class="o">(</span><span class="k">new</span> <span class="n">Producer</span><span class="o">()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">request</span><span class="o">(</span><span class="kt">long</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">lastSent</span><span class="o">.</span><span class="na">incrementAndGet</span><span class="o">());</span> <span class="c1">// #2</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+        <span class="o">}</span>
+    <span class="o">})</span>
+    <span class="o">.</span><span class="na">unsafeSubscribe</span><span class="o">(</span><span class="n">subscriber</span><span class="o">);</span>
+
+<span class="n">assertArrayEquals</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">},</span> <span class="n">received</span><span class="o">.</span><span class="na">toArray</span><span class="o">());</span>
+</code></pre></div>
+
+<p>A careful reader could notice that <code>Subscriber</code> and <code>OnSubscribe</code> are calling each other recursively.
+What will happen if we will change <code>(integer &lt; 5)</code> to <code>(integer &lt; 3000)</code>?</p>
+
+<p>A-ha!</p>
+
+<pre>
+ java.lang.StackOverflowError
+ at ...MakeTheMagicGoAway$7.onNext(MakeTheMagicGoAway.java:201) // #1
+ at ...MakeTheMagicGoAway$8$1.request(MakeTheMagicGoAway.java:232) // #2
+ at rx.Subscriber.request(Subscriber.java:157)
+ at ...MakeTheMagicGoAway$7.onNext(MakeTheMagicGoAway.java:218) // #3
+ at ...MakeTheMagicGoAway$7.onNext(MakeTheMagicGoAway.java:201) // #1
+ etc.
+</pre>
+
+<p>In the real life we&rsquo;re not going to use backpressure in a single thread chain, so don&rsquo;t be scared by this exception.</p>
+
+<h3 id="asynchronous-backpressure">Asynchronous backpressure</h3>
+
+<p>Sending requests and values, back and forth, through different threads. Amazing!</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">received</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;());</span>
+
+<span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onStart</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onStart</span><span class="o">();</span>
+        <span class="n">request</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">Integer</span> <span class="n">integer</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">received</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">integer</span><span class="o">);</span>
+
+        <span class="c1">// We can use large backpressure numbers now because</span>
+        <span class="c1">// each scheduled action&#39;s stack starts from the scheduler&#39;s thread root.</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">integer</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="o">)</span>
+            <span class="n">request</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="k">else</span>
+            <span class="n">unsubscribe</span><span class="o">();</span> <span class="c1">// We need to unsubscribe to exit background thread loop later.</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+
+<span class="n">Subscription</span> <span class="n">subscription</span> <span class="o">=</span> <span class="n">Observable</span>
+    <span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="k">new</span> <span class="n">Observable</span><span class="o">.</span><span class="na">OnSubscribe</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Subscriber</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">targetSubscriber</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="n">AtomicInteger</span> <span class="n">lastSent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+
+            <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">setProducer</span><span class="o">(</span><span class="k">new</span> <span class="n">Producer</span><span class="o">()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">request</span><span class="o">(</span><span class="kt">long</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">targetSubscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">lastSent</span><span class="o">.</span><span class="na">incrementAndGet</span><span class="o">());</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+        <span class="o">}</span>
+    <span class="o">})</span>
+    <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">Schedulers</span><span class="o">.</span><span class="na">io</span><span class="o">())</span>
+    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="n">subscriber</span><span class="o">);</span>
+
+<span class="k">while</span> <span class="o">(!</span><span class="n">subscription</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">assertEquals</span><span class="o">(</span><span class="mi">5000</span><span class="o">,</span> <span class="n">received</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+<span class="c1">// We can now receive any amount of requested items.</span>
+</code></pre></div>
+  </section>
+</article>
+
+</main>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2015  Konstantin Mikheev&#39;s programming blog</span>
+  </div>
+</footer>
+
+</body>
+</html>
+

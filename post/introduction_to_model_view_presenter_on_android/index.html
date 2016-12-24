@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+<meta name="generator" content="Hugo 0.17" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<title>Introduction to Model View Presenter on Android - Konstantin Mikheev&#39;s programming blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://konmik.com">[Konstantin Mikheev&#39;s programming blog]</a>
+
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2015-03-23">March 23, 2015</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="tags/android">Android</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">Introduction to Model View Presenter on Android</h1>
+  <section class="body" itemprop="articleBody">
+    <p>This article is a step-by-step introduction to MVP on Android, from a simplest possible
+example to best practices. The article also introduces a new library
+that makes MVP on Android extremely simple.</p>
+
+<p></p>
+
+<h1 id="is-it-simple-how-can-i-benefit-of-using-it">Is it simple? How can I benefit of using it?</h1>
+
+<h2 id="what-is-mvp">What is MVP</h2>
+
+<ul>
+<li><strong>View</strong> is a layer that displays data and reacts to user actions.
+On Android, this could be an Activity, a Fragment, an android.view.View or a Dialog.</li>
+<li><strong>Model</strong> is a data access layer such as database API or remote server API.</li>
+<li><strong>Presenter</strong> is a layer that provides View with data from Model.
+Presenter also handles background tasks.</li>
+</ul>
+
+<p>On Android MVP is a way to separate background tasks from activities/views/fragments
+to make them independent of most lifecycle-related events. This way an
+application becomes simpler, overall application reliability increases up to 10 times,
+application code becomes shorter, code maintainability becomes better
+and developer&rsquo;s life becomes happier.</p>
+
+<h2 id="why-mvp-on-android">Why MVP on Android</h2>
+
+<h3 id="reason-1-keep-it-stupid-simple">Reason 1: Keep It Stupid Simple</h3>
+
+<p>If you haven&rsquo;t read this article yet, do it: <a href="http://web.archive.org/web/20160206225831/https://people.apache.org/~fhanik/kiss.html">The Kiss Principle</a></p>
+
+<ul>
+<li>Most of the modern Android applications just use View-Model architecture.</li>
+<li>Programmers are involved into fight with View complexities instead of solving business tasks.</li>
+</ul>
+
+<p>Using only Model-View in your application you usually end up with &ldquo;everything is connected with everything&rdquo;.</p>
+
+<p><img src="/images/mvp_everything_is_connected_with_everything.png" alt="" /></p>
+
+<p>If this diagram does not look complex, then think about each View
+can disappear and appear at random time. Do not forget about saving/restoring of Views.
+Attach a couple of background tasks to that temporary Views, and the cake is ready!</p>
+
+<p>An alternative to the &ldquo;everything is connected with everything&rdquo; is a god object.</p>
+
+<p><img src="/images/mvp_a_god_object.png" alt="" /></p>
+
+<p>A god object is overcomplicated; its parts cannot be reused, tested or easily debugged and refactored.</p>
+
+<p>With MVP</p>
+
+<p><img src="/images/mvp_mvp.png" alt="" /></p>
+
+<ul>
+<li>Complex tasks are split into simpler tasks and are easier to solve.</li>
+<li>Smaller objects, less bugs, easier to debug.</li>
+<li>Testable.</li>
+</ul>
+
+<p>View layer with MVP becomes so simple, so it does not even need to have callbacks
+when requesting for data. View logic becomes very linear.</p>
+
+<h3 id="reason-2-background-tasks">Reason 2: Background tasks</h3>
+
+<p>Whenever you write an Activity, a Fragment or a custom View, you can put all
+methods that are connected with
+background tasks to a different external or static class. This way your background tasks will not be
+connected with an Activity, will not leak memory and will not depend on Activity&rsquo;s
+recreation. We call such object &ldquo;Presenter&rdquo;.</p>
+
+<p>There are few different approaches to handle background tasks,
+a properly implemented MVP library is one of the most reliable.</p>
+
+<h4 id="why-this-works"><strong>Why this works</strong></h4>
+
+<p>Here is a little diagram that shows what happens with different application parts
+during a configuration change or during an out-of-memory event. Every Android developer should know
+this data, however this data is surprisingly hard to find.</p>
+
+<pre><code>                                          |    Case 1     |   Case 2     |    Case 3
+                                          |A configuration| An activity  |  A process
+                                          |   change      |   restart    |   restart
+ ---------------------------------------- | ------------- | ------------ | ------------
+ Dialog                                   |     reset     |    reset     |    reset
+ Activity, View, Fragment                 | save/restore  | save/restore | save/restore
+ Fragment with setRetainInstance(true)    |   no change   | save/restore | save/restore
+ Static variables and threads             |   no change   |   no change  |    reset
+</code></pre>
+
+<p><strong>Case 1</strong>: A configuration change normally happens when a user flips the screen,
+changes language settings, attaches an external monitor, etc. More on this event you can read
+here: <a href="http://developer.android.com/reference/android/R.attr.html#configChanges">configChanges</a>.</p>
+
+<p><strong>Case 2</strong>: An Activity restart happens when a user has set &ldquo;Don&rsquo;t keep activities&rdquo; checkbox in Developer&rsquo;s settings
+and another activity becomes topmost.</p>
+
+<p><strong>Case 3</strong>: A process restart happens if there is not enough memory and the application is in the background.</p>
+
+<p><strong>Conclusion</strong></p>
+
+<p>Now you can see, a Fragment with setRetainInstance(true) does not help here - we need
+to save/restore such fragment&rsquo;s state anyway. So we can simply throw away retained fragments
+to limit the number of problems.</p>
+
+<pre><code>                                          |A configuration|
+                                          |   change,     |
+                                          | An activity   |  A process
+                                          |   restart     |   restart
+ ---------------------------------------- | ------------- | -------------
+ Activity, View, Fragment, DialogFragment | save/restore  | save/restore
+ Static variables and threads             |   no change   |    reset
+</code></pre>
+
+<p>Now it looks much better. We only need to write two pieces of code to <em>completely</em> restore an application
+in any possible case:</p>
+
+<ul>
+<li><p>save/restore for Activity, View, Fragment, DialogFragment;</p></li>
+
+<li><p>restart background requests in case of a process restart.</p></li>
+</ul>
+
+<p>The first part can done by usual means of Android API. The second part is a job for Presenter.
+Presenter just remembers which requests it should execute, and if a process restarts during execution,
+Presenter will execute them again.</p>
+
+<h1 id="a-simple-example">A simple example</h1>
+
+<p>This example will load and display some items from remote server. If an error occurs
+a little toast will be shown.</p>
+
+<p>I recommend <a href="https://github.com/ReactiveX/RxJava">RxJava</a> usage to build presenters because this library
+allows to control data flows easily.</p>
+
+<p>I would like to thank the guy who created a simple api that I use for my examples: <a href="http://www.icndb.com/">The Internet Chuck Norris Database</a></p>
+
+<h2 id="without-mvp-example-00-https-github-com-konmik-mvpexamples-tree-master-example00">Without MVP <a href="https://github.com/konmik/MVPExamples/tree/master/example00">example 00</a>:</h2>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;Chuck Norris&quot;</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">&gt;</span> <span class="n">adapter</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Subscription</span> <span class="n">subscription</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+        <span class="n">ListView</span> <span class="n">listView</span> <span class="o">=</span> <span class="o">(</span><span class="n">ListView</span><span class="o">)</span><span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listView</span><span class="o">);</span>
+        <span class="n">listView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayAdapter</span><span class="o">&lt;&gt;(</span><span class="k">this</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">item</span><span class="o">));</span>
+        <span class="n">requestItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onDestroy</span><span class="o">();</span>
+        <span class="n">unsubscribe</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestItems</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">unsubscribe</span><span class="o">();</span>
+        <span class="n">subscription</span> <span class="o">=</span> <span class="n">App</span><span class="o">.</span><span class="na">getServerAPI</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">name</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">],</span> <span class="n">name</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">])</span>
+            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">AndroidSchedulers</span><span class="o">.</span><span class="na">mainThread</span><span class="o">())</span>
+            <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">onItemsNext</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">items</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">},</span> <span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Throwable</span><span class="o">&gt;()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">onItemsError</span><span class="o">(</span><span class="n">error</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsNext</span><span class="o">(</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">[]</span> <span class="n">items</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">adapter</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+        <span class="n">adapter</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">items</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">throwable</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_LONG</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">unsubscribe</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">subscription</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">subscription</span><span class="o">.</span><span class="na">unsubscribe</span><span class="o">();</span>
+            <span class="n">subscription</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>An experienced developer will notice that this simple example has some
+critical defects in it:</p>
+
+<ul>
+<li><p>A request starts every time a user flips the screen - an app makes more requests
+than needed and the user observes an empty screen for a moment after each screen flip.</p></li>
+
+<li><p>If a user flips the screen often this will cause memory leaks - every callback
+keeps a reference to MainActivity and will keep it in memory while a request is running.
+It is absolutely possible to get an application crash because of out-of-memory error or
+a significant application slowdown.</p></li>
+</ul>
+
+<h2 id="with-mvp-example-01-https-github-com-konmik-mvpexamples-tree-master-example01">With MVP <a href="https://github.com/konmik/MVPExamples/tree/master/example01">example 01</a>:</h2>
+
+<p>Please, do not try this at home! :) This example is for demonstration purposes only.
+In the real life you&rsquo;re not going to use a static variable to hold your presenter.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;Chuck Norris&quot;</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">[]</span> <span class="n">items</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Throwable</span> <span class="n">error</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">MainActivity</span> <span class="n">view</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">MainPresenter</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">App</span><span class="o">.</span><span class="na">getServerAPI</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">],</span> <span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">])</span>
+            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">AndroidSchedulers</span><span class="o">.</span><span class="na">mainThread</span><span class="o">())</span>
+            <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">items</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">items</span><span class="o">;</span>
+                    <span class="n">publish</span><span class="o">();</span>
+                <span class="o">}</span>
+            <span class="o">},</span> <span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Throwable</span><span class="o">&gt;()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="n">throwable</span><span class="o">;</span>
+                    <span class="n">publish</span><span class="o">();</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onTakeView</span><span class="o">(</span><span class="n">MainActivity</span> <span class="n">view</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">view</span> <span class="o">=</span> <span class="n">view</span><span class="o">;</span>
+        <span class="n">publish</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">publish</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">view</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">items</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                <span class="n">view</span><span class="o">.</span><span class="na">onItemsNext</span><span class="o">(</span><span class="n">items</span><span class="o">);</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">error</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                <span class="n">view</span><span class="o">.</span><span class="na">onItemsError</span><span class="o">(</span><span class="n">error</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>Technically speaking, MainPresenter has three &ldquo;streams&rdquo; of events: <em>onNext</em>, <em>onError</em>, <em>onTakeView</em>.
+They join in <code>publish()</code> method and <em>onNext</em> or <em>onError</em> values become published to a MainActivity instance
+that has been supplied with <em>onTakeView</em>.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">&gt;</span> <span class="n">adapter</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">MainPresenter</span> <span class="n">presenter</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+
+        <span class="n">ListView</span> <span class="n">listView</span> <span class="o">=</span> <span class="o">(</span><span class="n">ListView</span><span class="o">)</span><span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listView</span><span class="o">);</span>
+        <span class="n">listView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayAdapter</span><span class="o">&lt;&gt;(</span><span class="k">this</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">item</span><span class="o">));</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">presenter</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">presenter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MainPresenter</span><span class="o">();</span>
+        <span class="n">presenter</span><span class="o">.</span><span class="na">onTakeView</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onDestroy</span><span class="o">();</span>
+        <span class="n">presenter</span><span class="o">.</span><span class="na">onTakeView</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">isChangingConfigurations</span><span class="o">())</span>
+            <span class="n">presenter</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsNext</span><span class="o">(</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">[]</span> <span class="n">items</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">adapter</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+        <span class="n">adapter</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">items</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">throwable</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_LONG</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>MainActivity creates MainPresenter and keeps it outside of reach of onCreate/onDestroy cycle. MainActivity uses
+a static variable to reference MainPresenter, so every time a process restarts due to out-of-memory event,
+MainActivity should check if the presenter is still here and create it if needed.</p>
+
+<p>Yes, this looks a little bit bloated with checks and uses a static variable, but later I will show
+how to make this look much better. :)</p>
+
+<p>The main idea is:</p>
+
+<ul>
+<li><p>The example application does not start a request every time a user flips the screen.</p></li>
+
+<li><p>If a process has been restarted the example loads data again.</p></li>
+
+<li><p>MainPresenter does not keep a reference to a MainActivity instance while MainActivity is destroyed,
+so there is no memory leak on a screen flip, and there is no need to unsubscribe the request.</p></li>
+</ul>
+
+<h1 id="nucleus-https-github-com-konmik-nucleus"><a href="https://github.com/konmik/nucleus">Nucleus</a></h1>
+
+<p>Nucleus is a library I created while was inspired by <a href="https://github.com/square/mortar">Mortar</a> library
+and <a href="https://people.apache.org/~fhanik/kiss.html">Keep It Stupid Simple</a> article.</p>
+
+<p>Here is a list of features:</p>
+
+<ul>
+<li><p>It supports save/restore Presenter&rsquo;s state in a View/Fragment/Activity&rsquo;s state Bundle. A Presenter can save request arguments
+into that bundles to restart them later.</p></li>
+
+<li><p>It provides a facility to direct request results and errors right into a view
+with just one line of code, so you don&rsquo;t have to write all that <code>!= null</code> checks.</p></li>
+
+<li><p>It allows you to have more than one instance of a view that requires a presenter.
+You can&rsquo;t do this if you&rsquo;re instantiating a presenter with <a href="http://square.github.io/dagger/">Dagger</a> (a traditional way).</p></li>
+
+<li><p>It provides a shortcut for binding a presenter to a view with just one line.</p></li>
+
+<li><p>It provides base View classes: <code>NucleusView</code>, <code>NucleusFragment</code>, <code>NucleusSupportFragment</code>, <code>NucleusActivity</code>. You can also copy/paste code from one
+of them to make any class you use to utilize presenters of Nucleus.</p></li>
+
+<li><p>It can automatically restart requests after a process restart and automatically unsubscribe RxJava subscriptions during <code>onDestroy</code>.</p></li>
+
+<li><p>And finally, it is plain simple, so any developer can understand it. (I recommend to spend some time diving into RxJava though.)
+There are just about 180 lines of code to drive Presenter and 230 lines of code for RxJava support.</p></li>
+</ul>
+
+<h2 id="example-with-nucleus-https-github-com-konmik-nucleus-example-02-https-github-com-konmik-mvpexamples-tree-master-example02">Example with <a href="https://github.com/konmik/nucleus">Nucleus</a> <a href="https://github.com/konmik/MVPExamples/tree/master/example02">example 02</a></h2>
+
+<p>Note: since the moment of writing this article, a new version of Nucleus was released. You can find updated examples in the <a href="https://github.com/konmik/nucleus">Nucleus project repository</a>.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;Chuck Norris&quot;</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedState</span><span class="o">);</span>
+
+        <span class="n">App</span><span class="o">.</span><span class="na">getServerAPI</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">],</span> <span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">])</span>
+            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">AndroidSchedulers</span><span class="o">.</span><span class="na">mainThread</span><span class="o">())</span>
+            <span class="o">.</span><span class="na">compose</span><span class="o">(</span><span class="k">this</span><span class="o">.&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;</span><span class="n">deliverLatestCache</span><span class="o">())</span>
+            <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">getView</span><span class="o">().</span><span class="na">onItemsNext</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">items</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">},</span> <span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">Throwable</span><span class="o">&gt;()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">getView</span><span class="o">().</span><span class="na">onItemsError</span><span class="o">(</span><span class="n">throwable</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nd">@RequiresPresenter</span><span class="o">(</span><span class="n">MainPresenter</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">NucleusActivity</span><span class="o">&lt;</span><span class="n">MainPresenter</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">&gt;</span> <span class="n">adapter</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+
+        <span class="n">ListView</span> <span class="n">listView</span> <span class="o">=</span> <span class="o">(</span><span class="n">ListView</span><span class="o">)</span><span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listView</span><span class="o">);</span>
+        <span class="n">listView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayAdapter</span><span class="o">&lt;&gt;(</span><span class="k">this</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">item</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsNext</span><span class="o">(</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">[]</span> <span class="n">items</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">adapter</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+        <span class="n">adapter</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">items</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">throwable</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_LONG</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>As you can see, this example is significantly shorter and cleaner than the previous one. Nucleus creates/destroys/saves presenter,
+attaches/detaches a View to it and sends request results right into an attached view automatically.</p>
+
+<p><code>MainPresenter</code>&rsquo;s code is shorter because
+it uses <code>deliverLatestCache()</code> operation that delays all data and errors that has been emitted by a data source
+until a view becomes available. It also caches data in memory so it can be reused on configuration change.</p>
+
+<p><code>MainActivity</code>&rsquo;s code is shorter because presenter&rsquo;s creation is managed by <code>NucleusActivity</code>. All you need to
+bind a presenter is to write <code>@RequiresPresenter(MainPresenter.class)</code> annotation.</p>
+
+<p>Warning! An annotation! In Android world, if you use annotations, it is a good practice to check that this
+will not degrade performance. The benchmark I&rsquo;ve made on <em>Galaxy S</em> (year 2010 device) says that processing this annotation
+takes less that 0.3 ms. This happens only during instantiation of a view, so the annotation is considered to be free.</p>
+
+<h2 id="more-examples">More examples</h2>
+
+<p>An extended example with request arguments persistence is here: <a href="https://github.com/konmik/nucleus/tree/master/nucleus-example">Nucleus Example</a>.</p>
+
+<p>An example with unit tests: <a href="https://github.com/konmik/nucleus/tree/master/nucleus-example-with-tests">Nucleus Example With Tests</a></p>
+
+<h2 id="deliverlatestcache-method"><code>deliverLatestCache()</code> method</h2>
+
+<p>This RxPresenter helping method has three variants:</p>
+
+<ul>
+<li><p><code>deliver()</code> will just delay all onNext, onError and onComplete emissions until a View becomes available.
+Use it for cases when you&rsquo;re doing a one-time request, like logging in to a web service.</p></li>
+
+<li><p><code>deliverLatest()</code> will drop the older onNext value if a new onNext value is available. If you have an updatable source
+of data this will allow you to not accumulate data that is not necessary.</p></li>
+
+<li><p><code>deliverLatestCache()</code> is the same as <code>deliverLatest()</code> but in addition it will keep the latest result in memory
+and will re-deliver it when another instance of a view becomes available (i.e. on configuration change). If you don&rsquo;t want to
+organize save/restore of a request result in your view (in case if a result is big or it can not be easily saved into Bundle) this
+method will allow you to make user experience better.</p></li>
+</ul>
+
+<h2 id="presenter-s-lifecycle">Presenter&rsquo;s lifecycle</h2>
+
+<p>Presenter&rsquo;s lifecycle is significantly shorter that a lifecycle of other Android components.</p>
+
+<ul>
+<li><p><code>void onCreate(Bundle savedState)</code> - is called on every presenter&rsquo;s creation.</p></li>
+
+<li><p><code>void onDestroy()</code> - is called when user a View becomes destroyed not because of configuration change.</p></li>
+
+<li><p><code>void onSave(Bundle state)</code> - is called during View&rsquo;s <code>onSaveInstanceState</code> to persist Presenter&rsquo;s state as well.</p></li>
+
+<li><p><code>void onTakeView(ViewType view)</code> - is called during Activity&rsquo;s or Fragment&rsquo;s <code>onResume()</code>, or during <code>android.view.View#onAttachedToWindow()</code>.</p></li>
+
+<li><p><code>void onDropView()</code> - is called during Activity&rsquo;s <code>onDestroy()</code> or Fragment&rsquo;s <code>onDestroyView()</code>, or during <code>android.view.View#onDetachedFromWindow()</code>.</p></li>
+</ul>
+
+<h2 id="view-recycling-and-view-stack">View recycling and view stack</h2>
+
+<p>Normally your views (i.e. fragments and custom views) are attached and detached randomly during user interactions.
+This could be a good idea to not destroy a presenter every time a view is detached. You can detach and attach
+views any time and presenters will outlive all this actions, continuing background work.</p>
+
+<h1 id="best-practices">Best practices</h1>
+
+<h2 id="save-your-request-arguments-inside-presenter">Save your request arguments inside Presenter</h2>
+
+<p>The rule is simple: the presenter&rsquo;s main purpose is to manage requests. So View should not handle or restart requests itself.
+From a View&rsquo;s perspective, background tasks are something that never disappear and will always return a result or an error <em>without
+any callbacks</em>.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">DEFAULT_NAME</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedState</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">savedState</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">savedState</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">NAME_KEY</span><span class="o">);</span>
+        <span class="o">...</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onSave</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="n">Bundle</span> <span class="n">state</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onSave</span><span class="o">(</span><span class="n">state</span><span class="o">);</span>
+        <span class="n">state</span><span class="o">.</span><span class="na">putString</span><span class="o">(</span><span class="n">NAME_KEY</span><span class="o">,</span> <span class="n">name</span><span class="o">);</span>
+    <span class="o">}</span>
+</code></pre></div>
+
+<p>I recommend using awesome <a href="https://github.com/frankiesardo/icepick">Icepick</a> library. It reduces code size and simplifies
+application logic without using runtime annotations - everything happens during compilation. This library is
+a good partner for <a href="http://jakewharton.github.io/butterknife">ButterKnife</a>.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@State</span> <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">DEFAULT_NAME</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedState</span><span class="o">);</span>
+        <span class="n">Icepick</span><span class="o">.</span><span class="na">restoreInstanceState</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">savedState</span><span class="o">);</span>
+        <span class="o">...</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onSave</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="n">Bundle</span> <span class="n">state</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onSave</span><span class="o">(</span><span class="n">state</span><span class="o">);</span>
+        <span class="n">Icepick</span><span class="o">.</span><span class="na">saveInstanceState</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">state</span><span class="o">);</span>
+    <span class="o">}</span>
+</code></pre></div>
+
+<p>If you have more than a couple of request arguments this library naturally saves life. You can create <code>BasePresenter</code> and put <em>Icepick</em>
+into that class once and all subclasses will automatically get the ability to save their fields that are annotated
+with <code>@State</code> and you will never need to implement <code>onSave</code> again. This also works for saving Activity&rsquo;s, Fragment&rsquo;s or View&rsquo;s state.</p>
+
+<h2 id="execute-instant-queries-on-the-main-thread-in-ontakeview">Execute instant queries on the main thread in <code>onTakeView</code></h2>
+
+<p>Sometimes you have a short data query, such as reading a small amount of data from a database. While you can easily
+create a restartable request with Nucleus, you don&rsquo;t have to use this powerful tool everywhere. If you&rsquo;re
+initiating a background request during a fragment&rsquo;s creation, a user will see a blank screen for a moment, even if the query will take just
+a couple of milliseconds. So, to make code shorter and users happier, use the main thread.</p>
+
+<h2 id="do-not-try-to-make-your-presenter-control-your-view">Do not try to make your Presenter control your View</h2>
+
+<p>This does not work well - the application logic becomes too complex because it goes in an unnatural way.</p>
+
+<p>The natural way is to make a flow of control to go from a user, through view, presenter and model to data. In the end a user
+will use the application and the user is a source of control for the application. So control should go from a user rather than from
+a some internal application structure.</p>
+
+<p>When control goes from View to Presenter and then from Presenter to Model it is just a direct flow, it is easy to write code
+like this. You get an easy <strong>user -&gt; view -&gt; presenter -&gt; model -&gt; data</strong> sequence.
+But when control goes like this: <strong>user -&gt; view -&gt; presenter -&gt; view -&gt; presenter -&gt; model -&gt; data</strong>, it is
+just violates KISS principle. Don&rsquo;t play ping-pong between your view and presenter.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Give MVP a try, tell a friend. :)</p>
+  </section>
+</article>
+
+</main>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2015  Konstantin Mikheev&#39;s programming blog</span>
+  </div>
+</footer>
+
+</body>
+</html>
+
