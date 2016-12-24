@@ -1,0 +1,15 @@
+# theme.toml template for a Hugo theme
+# See https://github.com/spf13/hugoThemes#themetoml for an example
+
+name = "Base16"
+license = "MIT"
+licenselink = "http://htdvisser.mit-license.org/"
+description = "Base16 is a simple and colorful theme with the base16 eighties colorscheme"
+homepage = "https://htdvisser.github.io/hugo-base16-theme/"
+tags = ["blog", "syntax highlighting"]
+features = ["blog", "syntax highlighting"]
+min_version = 0.14
+
+[author]
+  name = "Hylke Visser"
+  homepage = "https://github.com/htdvisser"

@@ -1,0 +1,44 @@
+{{ $baseurl := .Site.BaseURL }}
+<main role="main" class="homepage">
+
+  {{ partial "hero.html" . }}
+
+  <h1 class="headline">Recent Posts</h1>
+
+  <div class="article-list">
+    {{ range first 10 (where .Data.Pages "Section" "post") }}
+      {{ partial "article-list-item.html" . }}
+    {{ end }}
+  </div>
+
+{{ with .Site.Taxonomies.categories }}
+
+  <h1 class="headline">Categories</h1>
+
+  <section class="categories">
+    {{ range $name, $value := . }}
+    <h2 class="category">
+      <a href="{{ $baseurl }}categories/{{ $name | urlize }}">{{ title $name }}</a>
+      <small>({{ .Count }})</small>
+    </h2>
+    {{ end }}
+  </section>
+
+{{ end }}
+
+{{ with .Site.Taxonomies.tags }}
+
+  <h1 class="headline">Tags</h1>
+
+  <section class="tags">
+    {{ range $name, $value := . }}
+    <span class="tag">
+      <a href="{{ $baseurl }}tags/{{ $name | urlize }}">{{ $name }}</a>
+      <small>({{ .Count }})</small>
+    </span>
+    {{ end }}
+  </section>
+
+{{ end }}
+
+</main>

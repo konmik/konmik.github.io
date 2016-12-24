@@ -1,0 +1,11 @@
+{{ $dateMissing := eq .Date.Year 1}}
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; {{ if eq $dateMissing true }}{{ .Site.LastChange.Format "2006" }}{{ else }}{{ .Date.Format "2006" }} {{ end }} {{ .Site.Title }}</span>
+  </div>
+</footer>
+
+</body>
+</html>

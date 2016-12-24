@@ -1,0 +1,13 @@
+{{ $dateMissing := eq .Date.Year 1}}
+<article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="{{ .RelPermalink }}">{{ .Title }}{{ if .Draft }} (Draft){{ end }}</a></h2>
+  <div class="meta">
+{{ if eq $dateMissing false }}
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 02, 2006" }}</time></span>
+{{ end }}
+  </div>
+  <section class="summary">
+    {{ .Summary }} {{ if .Truncated }} <a href="{{ .RelPermalink }}">Read More...</a>{{ end }}
+  </section>
+</article>
