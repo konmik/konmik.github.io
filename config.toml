@@ -1,0 +1,6 @@
+baseurl = "http://konmik.com/"
+title = "Konstantin Mikheev's programming blog"
+languageCode = "en-us"
+pygmentsuseclasses = true
+PygmentsCodeFences = true
+theme = "hugo-base16-theme"
