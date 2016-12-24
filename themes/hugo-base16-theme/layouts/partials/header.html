@@ -16,8 +16,8 @@
 
 <header>
   <div class="container clearfix">
-    <a class="path" href="{{ .Site.BaseURL }}">[{{ .Site.Title }}]</a>
-    
+    <a class="path" href="http://konmik.com">[{{ .Site.Title }}]</a>
+
     <div class="right">
       {{ range $i, $page := (where .Site.Pages "Section" "pages") }}
         {{ if not (eq $i 0) }}|{{ end }}
