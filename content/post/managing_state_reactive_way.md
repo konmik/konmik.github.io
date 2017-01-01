@@ -41,7 +41,7 @@ it may change user's age and so on.
 You didn't want all of that while composing "Hello, %username%" string isn't it?
 Especially if you was doing it while filling the profile view and you got an update
 callback while processing a previous callback?
-All these events happening concurrently can give gray heir to anyone!
+All these events, especially while happening concurrently, can give gray heir to anyone!
 
 OOP model does not have any answers to all these issues.
 Programmer is expected to write callback spaghetti, `synchronized` blocks, constantly
@@ -247,6 +247,8 @@ library with all the primitive functions and immutable collections included:
 
 Here is some implementation reasoning:
 
+- We're making modification sequence strict by
+   taking the old state to produce the new one
 - We do state modification in a lock to prevent multiple modifications
    of state happening concurrently
 - Each new state is being put into a queue
@@ -255,6 +257,8 @@ Here is some implementation reasoning:
 
 I'm not sure yet if I need to release it as a library.
 For now you can just copy/paste the code (see below).
+
+#### RxJava1
 
 ```java
 public class RxState<T> {
@@ -334,6 +338,81 @@ public class RxState<T> {
                 }
                 next = queue.poll();
             }
+            subject.onNext(next);
+        }
+    }
+}
+```
+
+#### RxJava2
+
+```java
+public class RxState<T> {
+
+    private final Scheduler scheduler;
+    private final Subject<T> subject = BehaviorSubject.<T>create().toSerialized();
+    private final ConcurrentLinkedQueue<T> queue = new ConcurrentLinkedQueue<>();
+
+    private volatile T value;
+    private volatile boolean emitting;
+
+    public RxState(T initialValue, Scheduler scheduler) {
+        this.value = initialValue;
+        this.scheduler = scheduler;
+        this.subject.onNext(initialValue);
+    }
+
+    public void apply(Function<T, T> func) {
+
+        synchronized (this) {
+            try {
+                value = func.apply(value);
+                queue.add(value);
+            } catch (Exception e) {
+                throw propagate(e);
+            }
+        }
+
+        Scheduler.Worker worker = scheduler.createWorker();
+        worker.schedule(() -> {
+            emitLoop();
+            worker.dispose();
+        });
+    }
+
+    public Observable<T> values() {
+        return subject;
+    }
+
+    public boolean isEmitting() {
+        synchronized (this) {
+            return emitting || !queue.isEmpty();
+        }
+    }
+
+    public T value() {
+        return value;
+    }
+
+    private void emitLoop() {
+
+        synchronized (this) {
+            if (emitting) {
+                return;
+            }
+            emitting = true;
+        }
+
+        for (; ; ) {
+            T next;
+            synchronized (this) {
+                if (queue.isEmpty()) {
+                    emitting = false;
+                    return;
+                }
+                next = queue.poll();
+            }
+
             subject.onNext(next);
         }
     }
