@@ -91,7 +91,7 @@ it may change user&rsquo;s age and so on.</p>
 <p>You didn&rsquo;t want all of that while composing &ldquo;Hello, %username%&rdquo; string isn&rsquo;t it?
 Especially if you was doing it while filling the profile view and you got an update
 callback while processing a previous callback?
-All these events happening concurrently can give gray heir to anyone!</p>
+All these events, especially while happening concurrently, can give gray heir to anyone!</p>
 
 <p>OOP model does not have any answers to all these issues.
 Programmer is expected to write callback spaghetti, <code>synchronized</code> blocks, constantly
@@ -296,6 +296,8 @@ library with all the primitive functions and immutable collections included:
 <p>Here is some implementation reasoning:</p>
 
 <ul>
+<li>We&rsquo;re making modification sequence strict by
+taking the old state to produce the new one</li>
 <li>We do state modification in a lock to prevent multiple modifications
 of state happening concurrently</li>
 <li>Each new state is being put into a queue</li>
@@ -305,6 +307,8 @@ this is the only way we can guarantee their sequence</li>
 
 <p>I&rsquo;m not sure yet if I need to release it as a library.
 For now you can just copy/paste the code (see below).</p>
+
+<h4 id="rxjava1">RxJava1</h4>
 <div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RxState</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="kd">final</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">;</span>
@@ -382,6 +386,79 @@ For now you can just copy/paste the code (see below).</p>
                 <span class="o">}</span>
                 <span class="n">next</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
             <span class="o">}</span>
+            <span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">next</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<h4 id="rxjava2">RxJava2</h4>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RxState</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Subject</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">subject</span> <span class="o">=</span> <span class="n">BehaviorSubject</span><span class="o">.&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="n">create</span><span class="o">().</span><span class="na">toSerialized</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ConcurrentLinkedQueue</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">queue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentLinkedQueue</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">T</span> <span class="n">value</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">volatile</span> <span class="kt">boolean</span> <span class="n">emitting</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">RxState</span><span class="o">(</span><span class="n">T</span> <span class="n">initialValue</span><span class="o">,</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">initialValue</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">scheduler</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">initialValue</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">func</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+                <span class="n">queue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="n">propagate</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="n">Scheduler</span><span class="o">.</span><span class="na">Worker</span> <span class="n">worker</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="na">createWorker</span><span class="o">();</span>
+        <span class="n">worker</span><span class="o">.</span><span class="na">schedule</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="n">emitLoop</span><span class="o">();</span>
+            <span class="n">worker</span><span class="o">.</span><span class="na">dispose</span><span class="o">();</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">values</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">subject</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmitting</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">emitting</span> <span class="o">||</span> <span class="o">!</span><span class="n">queue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">T</span> <span class="nf">value</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">emitLoop</span><span class="o">()</span> <span class="o">{</span>
+
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">emitting</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="n">emitting</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="k">for</span> <span class="o">(;</span> <span class="o">;</span> <span class="o">)</span> <span class="o">{</span>
+            <span class="n">T</span> <span class="n">next</span><span class="o">;</span>
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">queue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="n">emitting</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                    <span class="k">return</span><span class="o">;</span>
+                <span class="o">}</span>
+                <span class="n">next</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
+            <span class="o">}</span>
+
             <span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">next</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
