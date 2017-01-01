@@ -153,6 +153,12 @@ there are just no places where unpredictable things can happen.
 Your jugging ball does not suddenly turn into a rat or a bird,
 it does not try to bite you or to fly away.
 
+#### Single source of truth
+
+The idea of having a single source of truth fits nicely into this approach.
+You have some state and when it changes you get notified. Nice!
+And it is better to have the truth immutable, just to avoid having some grey hairs.
+
 ## Adding some rocket science
 
 The article says "reactive", was it just do draw attention to some weird stuff
