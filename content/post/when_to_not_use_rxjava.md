@@ -121,7 +121,7 @@ will NOT return any value and your app will just hang.
 And it will happen with 10% of all of your users.
 And you will not even get a stacktrace because nothing crashes.
 Or you will get a stacktrace, but it will not change anything,
-because RxJava stacktraces is something special.
+because RxJava stacktraces are something special.
 
 ## DO NOT
 
@@ -194,9 +194,9 @@ create side-effects. This is useful when you're trying to
 understand someone's code, and it can also save you from having
 more bugs.
 
-Use `do*` operators for creating side effects:
-`doOnNext`, `doOnError`, etc. 
-You can also use `subscribe` function callbacks.
+Use `subscribe` function callbacks -- they are intentionally designed for doing this.
+You can also use `do*` operators (`doOnNext`, `doOnError`, etc) in case you
+need to create a side-effect during chain execution.
 
 It is wrong to use other functions (`Observable.map` for example)
 for creating side-effects
