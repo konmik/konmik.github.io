@@ -229,7 +229,7 @@ event dispatching loops, and so on.</p>
 or makes I/O. Side effects should normally be executed in a specific order,
 for example <code>print</code> that prints information to console creates a side-effect
 and if you will call several <code>print</code> in wrong order you will get wrong output.
-You you modify variables in wrong order you will also likely have bugs.</p>
+If you modify variables in wrong order you will also likely have bugs.</p>
 
 <p>RxJava has very clear semantic for using it with functions which
 create side-effects. This is useful when you&rsquo;re trying to
@@ -275,7 +275,7 @@ on a specific scheduler inside the function.</p>
 <p>Unpredictable things can happen if the caller does not expect
 to get multithreading from the returned observable.</p>
 
-<p>Let the called decide where it wants to schedule it.</p>
+<p>Let the caller decide where it wants to schedule it.</p>
 
 <h2 id="have-safe-rx-ing">Have safe rx-ing! :)</h2>
   </section>
