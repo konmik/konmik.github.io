@@ -163,7 +163,7 @@ will NOT return any value and your app will just hang.
 And it will happen with 10% of all of your users.
 And you will not even get a stacktrace because nothing crashes.
 Or you will get a stacktrace, but it will not change anything,
-because RxJava stacktraces is something special.</p>
+because RxJava stacktraces are something special.</p>
 
 <h2 id="do-not">DO NOT</h2>
 
@@ -236,9 +236,9 @@ create side-effects. This is useful when you&rsquo;re trying to
 understand someone&rsquo;s code, and it can also save you from having
 more bugs.</p>
 
-<p>Use <code>do*</code> operators for creating side effects:
-<code>doOnNext</code>, <code>doOnError</code>, etc.
-You can also use <code>subscribe</code> function callbacks.</p>
+<p>Use <code>subscribe</code> function callbacks &ndash; they are intentionally designed for doing this.
+You can also use <code>do*</code> operators (<code>doOnNext</code>, <code>doOnError</code>, etc) in case you
+need to create a side-effect during chain execution.</p>
 
 <p>It is wrong to use other functions (<code>Observable.map</code> for example)
 for creating side-effects
