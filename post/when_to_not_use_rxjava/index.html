@@ -167,7 +167,7 @@ because RxJava stacktraces are something special.</p>
 
 <h2 id="do-not">DO NOT</h2>
 
-<h4 id="the-absence-of-event">The absence of event</h4>
+<h4 id="the-absence-of-events">The absence of events</h4>
 
 <p><strong>Do not</strong> use RxJava if there is no &ldquo;event&rdquo;. Just don&rsquo;t.
 If something does not say: &ldquo;this will happen at some point in time&rdquo;,
@@ -192,15 +192,73 @@ It also consumes additional resources to make multithreading safe.</p>
 just take a third-party library or write a couple of utility functions.
 Your code will be much simpler and there will be less possibilities for bugs.</p>
 
-<h4 id="the-absence-of-subscription">The absence of subscription</h4>
+<h4 id="same-life-duration">Same life duration</h4>
 
-<p>If you do not need to keep track of subscriptions, <strong>do not</strong> use RxJava.</p>
+<p>Say, you have <code>Screen</code> and <code>Button</code> objects.
+Both operate on one thread, both have the same life duration.</p>
 
-<p>Subscription means that there is an entity
-that emits values and it <em>knows</em> that you&rsquo;re listening.
-And it will likely dispose itself if listeners are gone.</p>
+<p>There are two general ways to pass events between them in OOP.
+You can either set a callback or pass one object into another&rsquo;s
+constructor arguments.</p>
 
-<p>Without having subscriptions it is simpler to have usual callbacks.</p>
+<p>Passing an object into constructor is usually simpler because
+this way you&rsquo;re strictly saying that the passed object&rsquo;s life duration
+is at least as long as the object&rsquo;s that is being created.</p>
+
+<pre><code>class Screen {
+    
+    Button logoutButton;
+    
+    Screen(Button logoutButton) {
+        this.logoutButton = logoutButton;    
+    }
+    
+    onProfileReceived(Profile profile) {
+        logoutButton.setVisibility(profile.isLoggedIn ? VISIBLE : GONE);
+    }
+}
+</code></pre>
+
+<p>A callback without the possibility to uninstall it
+is another technique that can be used if you need to
+propagate events into another direction.</p>
+
+<pre><code>class Screen {
+
+    Screen(Button logoutButton) {
+        logoutButton.setCallback(() -&gt; doLogout());    
+    }
+
+    doLogout() {
+        network.logout();
+        profile.update();
+    }
+}
+</code></pre>
+
+<p>However, if <code>Button</code> already exposes an observable for click notifications,
+it is OK to use it as it will not require any
+additional lines of code to implement.</p>
+
+<pre><code>logoutButton.clicks()
+    .subscribe(() -&gt; doLogout());
+</code></pre>
+
+<h4 id="returning-lambdas-implementing-functional-interfaces-by-objects">Returning lambdas, implementing functional interfaces by objects</h4>
+
+<p>If you&rsquo;re doing something the title says,
+there is a very high chance that there are simpler ways
+implementing the required functionality.</p>
+
+<p>We <em>can</em> replace <em>all</em> methods in OOP using RxJava.
+It is doable but it complicates understanding.</p>
+
+<p>Java is not a functional language &ndash; it is an OOP language
+with some functional capabilities.
+Java functional capabilities are verbose,
+they are also prone to accidentally making bugs.</p>
+
+<p>Clean and understandable code design matters.</p>
 
 <h2 id="do">DO</h2>
 
@@ -216,9 +274,10 @@ is priceless.</p>
 
 <h4 id="subscriptions">Subscriptions</h4>
 
-<p>Having a simple way to unsubscribe from an event source
-is the feature that is hard to overestimate.
-Forget about writing callback interfaces, lists of subscribers,
+<p>When your objects have different life duration, having
+a simple way to manage their communication is very important.</p>
+
+<p>Forget about writing callback interfaces, lists of subscribers,
 event dispatching loops, and so on.</p>
 
 <h2 id="good-practices">Good practices</h2>
@@ -275,7 +334,10 @@ on a specific scheduler inside the function.</p>
 <p>Unpredictable things can happen if the caller does not expect
 to get multithreading from the returned observable.</p>
 
-<p>Let the caller decide where it wants to schedule it.</p>
+<p>Excessive jumps from one thread to another can also
+be slower than you can afford.</p>
+
+<p>Let the caller decide where it wants to schedule actions.</p>
 
 <h2 id="have-safe-rx-ing">Have safe rx-ing! :)</h2>
   </section>

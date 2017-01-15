@@ -129,7 +129,7 @@ because RxJava stacktraces are something special.&lt;/p&gt;
 
 &lt;h2 id=&#34;do-not&#34;&gt;DO NOT&lt;/h2&gt;
 
-&lt;h4 id=&#34;the-absence-of-event&#34;&gt;The absence of event&lt;/h4&gt;
+&lt;h4 id=&#34;the-absence-of-events&#34;&gt;The absence of events&lt;/h4&gt;
 
 &lt;p&gt;&lt;strong&gt;Do not&lt;/strong&gt; use RxJava if there is no &amp;ldquo;event&amp;rdquo;. Just don&amp;rsquo;t.
 If something does not say: &amp;ldquo;this will happen at some point in time&amp;rdquo;,
@@ -154,15 +154,73 @@ It also consumes additional resources to make multithreading safe.&lt;/p&gt;
 just take a third-party library or write a couple of utility functions.
 Your code will be much simpler and there will be less possibilities for bugs.&lt;/p&gt;
 
-&lt;h4 id=&#34;the-absence-of-subscription&#34;&gt;The absence of subscription&lt;/h4&gt;
+&lt;h4 id=&#34;same-life-duration&#34;&gt;Same life duration&lt;/h4&gt;
 
-&lt;p&gt;If you do not need to keep track of subscriptions, &lt;strong&gt;do not&lt;/strong&gt; use RxJava.&lt;/p&gt;
+&lt;p&gt;Say, you have &lt;code&gt;Screen&lt;/code&gt; and &lt;code&gt;Button&lt;/code&gt; objects.
+Both operate on one thread, both have the same life duration.&lt;/p&gt;
 
-&lt;p&gt;Subscription means that there is an entity
-that emits values and it &lt;em&gt;knows&lt;/em&gt; that you&amp;rsquo;re listening.
-And it will likely dispose itself if listeners are gone.&lt;/p&gt;
+&lt;p&gt;There are two general ways to pass events between them in OOP.
+You can either set a callback or pass one object into another&amp;rsquo;s
+constructor arguments.&lt;/p&gt;
 
-&lt;p&gt;Without having subscriptions it is simpler to have usual callbacks.&lt;/p&gt;
+&lt;p&gt;Passing an object into constructor is usually simpler because
+this way you&amp;rsquo;re strictly saying that the passed object&amp;rsquo;s life duration
+is at least as long as the object&amp;rsquo;s that is being created.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Screen {
+    
+    Button logoutButton;
+    
+    Screen(Button logoutButton) {
+        this.logoutButton = logoutButton;    
+    }
+    
+    onProfileReceived(Profile profile) {
+        logoutButton.setVisibility(profile.isLoggedIn ? VISIBLE : GONE);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A callback without the possibility to uninstall it
+is another technique that can be used if you need to
+propagate events into another direction.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Screen {
+
+    Screen(Button logoutButton) {
+        logoutButton.setCallback(() -&amp;gt; doLogout());    
+    }
+
+    doLogout() {
+        network.logout();
+        profile.update();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However, if &lt;code&gt;Button&lt;/code&gt; already exposes an observable for click notifications,
+it is OK to use it as it will not require any
+additional lines of code to implement.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;logoutButton.clicks()
+    .subscribe(() -&amp;gt; doLogout());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;returning-lambdas-implementing-functional-interfaces-by-objects&#34;&gt;Returning lambdas, implementing functional interfaces by objects&lt;/h4&gt;
+
+&lt;p&gt;If you&amp;rsquo;re doing something the title says,
+there is a very high chance that there are simpler ways
+implementing the required functionality.&lt;/p&gt;
+
+&lt;p&gt;We &lt;em&gt;can&lt;/em&gt; replace &lt;em&gt;all&lt;/em&gt; methods in OOP using RxJava.
+It is doable but it complicates understanding.&lt;/p&gt;
+
+&lt;p&gt;Java is not a functional language &amp;ndash; it is an OOP language
+with some functional capabilities.
+Java functional capabilities are verbose,
+they are also prone to accidentally making bugs.&lt;/p&gt;
+
+&lt;p&gt;Clean and understandable code design matters.&lt;/p&gt;
 
 &lt;h2 id=&#34;do&#34;&gt;DO&lt;/h2&gt;
 
@@ -178,9 +236,10 @@ is priceless.&lt;/p&gt;
 
 &lt;h4 id=&#34;subscriptions&#34;&gt;Subscriptions&lt;/h4&gt;
 
-&lt;p&gt;Having a simple way to unsubscribe from an event source
-is the feature that is hard to overestimate.
-Forget about writing callback interfaces, lists of subscribers,
+&lt;p&gt;When your objects have different life duration, having
+a simple way to manage their communication is very important.&lt;/p&gt;
+
+&lt;p&gt;Forget about writing callback interfaces, lists of subscribers,
 event dispatching loops, and so on.&lt;/p&gt;
 
 &lt;h2 id=&#34;good-practices&#34;&gt;Good practices&lt;/h2&gt;
@@ -237,7 +296,10 @@ on a specific scheduler inside the function.&lt;/p&gt;
 &lt;p&gt;Unpredictable things can happen if the caller does not expect
 to get multithreading from the returned observable.&lt;/p&gt;
 
-&lt;p&gt;Let the caller decide where it wants to schedule it.&lt;/p&gt;
+&lt;p&gt;Excessive jumps from one thread to another can also
+be slower than you can afford.&lt;/p&gt;
+
+&lt;p&gt;Let the caller decide where it wants to schedule actions.&lt;/p&gt;
 
 &lt;h2 id=&#34;have-safe-rx-ing&#34;&gt;Have safe rx-ing! :)&lt;/h2&gt;</description>
     </item>
