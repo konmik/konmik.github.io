@@ -1,5 +1,4 @@
 title = "Konstantin Mikheev's programming blog"
-baseurl = "konmik.com"
 languageCode = "en-us"
 pygmentsuseclasses = true
 PygmentsCodeFences = true
