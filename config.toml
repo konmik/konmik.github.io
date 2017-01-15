@@ -1,5 +1,8 @@
 title = "Konstantin Mikheev's programming blog"
+baseURL = "http://konmik.com/"
 languageCode = "en-us"
 pygmentsuseclasses = true
 PygmentsCodeFences = true
 theme = "hugo-base16-theme"
+canonifyURLs = true
+relativeURLs = true
