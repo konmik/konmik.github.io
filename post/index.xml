@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Post-rsses on Konstantin Mikheev&#39;s programming blog</title>
-    <link>konmik.com/post/index.xml</link>
+    <link>/post/index.xml</link>
     <description>Recent content in Post-rsses on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 10 Jan 2017 00:00:00 +0000</lastBuildDate>
-    <atom:link href="konmik.com/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>When to NOT use RxJava</title>
-      <link>/konmik.com/post/when_to_not_use_rxjava/</link>
+      <link>/post/when_to_not_use_rxjava/</link>
       <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/when_to_not_use_rxjava/</guid>
+      <guid>/post/when_to_not_use_rxjava/</guid>
       <description>&lt;p&gt;RxJava is very powerful.
 It solves a great amount of tasks easily.
 But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.
@@ -306,10 +306,10 @@ be slower than you can afford.&lt;/p&gt;
     
     <item>
       <title>Managing state reactive way</title>
-      <link>/konmik.com/post/managing_state_reactive_way/</link>
+      <link>/post/managing_state_reactive_way/</link>
       <pubDate>Sun, 25 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/managing_state_reactive_way/</guid>
+      <guid>/post/managing_state_reactive_way/</guid>
       <description>&lt;p&gt;RxJava nice and easily covers our multithreading needs.
 But it provides only a half of the solution.
 While we can compose functions with RxJava, there is no safe way we can have
@@ -580,10 +580,10 @@ For now you can just copy/paste the code (see below).&lt;/p&gt;
     
     <item>
       <title>Why lambdas matter (even on Android)</title>
-      <link>/konmik.com/post/why_lambdas_matter_even_on_android/</link>
+      <link>/post/why_lambdas_matter_even_on_android/</link>
       <pubDate>Wed, 06 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/why_lambdas_matter_even_on_android/</guid>
+      <guid>/post/why_lambdas_matter_even_on_android/</guid>
       <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;
@@ -1049,10 +1049,10 @@ I hope that we will get Clojure sooner or later.&lt;/p&gt;
     
     <item>
       <title>RxJava magic (finally) goes away</title>
-      <link>/konmik.com/post/rxjava_magic_finally_goes_away/</link>
+      <link>/post/rxjava_magic_finally_goes_away/</link>
       <pubDate>Tue, 08 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/rxjava_magic_finally_goes_away/</guid>
+      <guid>/post/rxjava_magic_finally_goes_away/</guid>
       <description>&lt;p&gt;There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.&lt;/p&gt;
 
 &lt;p&gt;Docs and tutorials are either too shallow or too complicated.&lt;/p&gt;
@@ -1615,10 +1615,10 @@ What will happen if we will change &lt;code&gt;(integer &amp;lt; 5)&lt;/code&gt;
     
     <item>
       <title>How to have 100% code coverage with tests and be sane</title>
-      <link>/konmik.com/post/how_to_have_100_percent_code_coverage/</link>
+      <link>/post/how_to_have_100_percent_code_coverage/</link>
       <pubDate>Sat, 19 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/how_to_have_100_percent_code_coverage/</guid>
+      <guid>/post/how_to_have_100_percent_code_coverage/</guid>
       <description>&lt;p&gt;In this article I will discuss unit testing approaches,
 show a quick and elegant solution to unit tests complexity,
 benefits of having 100% code coverage with tests
@@ -1631,7 +1631,7 @@ and how achieve it easily.&lt;/p&gt;
 &lt;p&gt;After reading yet another article on unit testing I decided that I will create, just for an experiment,
 a project with 100% test coverage and see how it looks and feels like.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/100-coverage.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/100-coverage.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;I never had such
 projects before and I discovered some interesting facts, that may be interesting to someone
@@ -1664,7 +1664,7 @@ to make the code execute through the logical branch.
 How many environments we need to test the unit? 5 * 3 = we will need to setup 15 environments
 just for one freaking unit with 5 methods! Such a waste of time! No, this is a definitely bad idea.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/100-coverage-trap.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/100-coverage-trap.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;OK, now it should become very clear that testing methods is not the best idea.
 So probably we need to test &lt;em&gt;units&lt;/em&gt;? We write &lt;em&gt;unit tests&lt;/em&gt; after all, so this should be better, yeah?&lt;/p&gt;
@@ -1717,7 +1717,7 @@ Do they mean &amp;ldquo;test features of units&amp;rdquo;?
 &lt;p&gt;Let&amp;rsquo;s be engineers, let&amp;rsquo;s estimate. I&amp;rsquo;m taking my ruler again&amp;hellip;
 How testing &lt;em&gt;features&lt;/em&gt; can be more effective than testing methods? I finally came to this schema:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/100-coverage-feature-test.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/100-coverage-feature-test.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If we will test &lt;em&gt;subsystem&lt;/em&gt; features then each test will cover &lt;em&gt;several&lt;/em&gt; &lt;strong&gt;if&lt;/strong&gt; cases and the test coverage will be very effective. Given this &lt;em&gt;case map&lt;/em&gt; we can even select specific features that will touch the maximum amount of code lines. The amount of test environments that need to be created for such testing type is minimal.&lt;/p&gt;
 
@@ -1763,9 +1763,9 @@ this is an additional tool that finds bugs and helps to optimize codebase!&lt;/p
 
 &lt;p&gt;Unreached code can also be a sign of an ineffective test.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/100-coverage-run-coverage-tool.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/100-coverage-run-coverage-tool.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/100-coverage-not-covered-lines.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/100-coverage-not-covered-lines.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;(Oops! A copy-pasted algorithm is too broad for the implementation! I never have &lt;code&gt;null&lt;/code&gt; here!)&lt;/em&gt;&lt;/p&gt;
 
@@ -1794,10 +1794,10 @@ to clean up all of them, so there are probably more tests than is actually neede
     
     <item>
       <title>Introduction to Model View Presenter on Android</title>
-      <link>/konmik.com/post/introduction_to_model_view_presenter_on_android/</link>
+      <link>/post/introduction_to_model_view_presenter_on_android/</link>
       <pubDate>Mon, 23 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/introduction_to_model_view_presenter_on_android/</guid>
+      <guid>/post/introduction_to_model_view_presenter_on_android/</guid>
       <description>&lt;p&gt;This article is a step-by-step introduction to MVP on Android, from a simplest possible
 example to best practices. The article also introduces a new library
 that makes MVP on Android extremely simple.&lt;/p&gt;
@@ -1835,7 +1835,7 @@ and developer&amp;rsquo;s life becomes happier.&lt;/p&gt;
 
 &lt;p&gt;Using only Model-View in your application you usually end up with &amp;ldquo;everything is connected with everything&amp;rdquo;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/mvp_everything_is_connected_with_everything.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/mvp_everything_is_connected_with_everything.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If this diagram does not look complex, then think about each View
 can disappear and appear at random time. Do not forget about saving/restoring of Views.
@@ -1843,13 +1843,13 @@ Attach a couple of background tasks to that temporary Views, and the cake is rea
 
 &lt;p&gt;An alternative to the &amp;ldquo;everything is connected with everything&amp;rdquo; is a god object.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/mvp_a_god_object.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/mvp_a_god_object.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;A god object is overcomplicated; its parts cannot be reused, tested or easily debugged and refactored.&lt;/p&gt;
 
 &lt;p&gt;With MVP&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/mvp_mvp.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/mvp_mvp.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Complex tasks are split into simpler tasks and are easier to solve.&lt;/li&gt;
@@ -2332,10 +2332,10 @@ just violates KISS principle. Don&amp;rsquo;t play ping-pong between your view a
     
     <item>
       <title>Snorkeling with Dagger 2</title>
-      <link>/konmik.com/post/snorkeling_with_dagger_2/</link>
+      <link>/post/snorkeling_with_dagger_2/</link>
       <pubDate>Sun, 01 Feb 2015 00:00:00 +0000</pubDate>
       
-      <guid>/konmik.com/post/snorkeling_with_dagger_2/</guid>
+      <guid>/post/snorkeling_with_dagger_2/</guid>
       <description>&lt;p&gt;Dagger is a popular library for Java, it makes writing code much easier and more structured.
 In this article I will describe how can we benefit of using it,
 show some simple use cases and explore the generated code.
@@ -2542,7 +2542,7 @@ is quite stupid but we will make &lt;code&gt;SharedPreferences&lt;/code&gt; to b
 
 &lt;p&gt;Are you curious how &lt;code&gt;MyApplication.inject&lt;/code&gt; looks like? No, you can&amp;rsquo;t see it right now. :D At first you need to see a little picture.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/dagger_2_diagram_1.png&#34; alt=&#34;Dagger 2 diagram 1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/dagger_2_diagram_1.png&#34; alt=&#34;Dagger 2 diagram 1&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;While working with Dagger 2, we need to keep in mind how it is composed. You know about &lt;code&gt;@Inject&lt;/code&gt; constructor, so next
 thing to know about is &lt;code&gt;@Component&lt;/code&gt;. Component is an interface marked with &lt;code&gt;@Component&lt;/code&gt; annotation that shows
@@ -2728,7 +2728,7 @@ We obviously can not mark it&amp;rsquo;s constructor with &lt;code&gt;@Inject&lt
 
 &lt;p&gt;Here is a little diagram of how &lt;strong&gt;Module&lt;/strong&gt; is being used by Dagger 2:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;konmik.com/images/dagger_2_diagram_2.png&#34; alt=&#34;Dagger 2 diagram 2&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/dagger_2_diagram_2.png&#34; alt=&#34;Dagger 2 diagram 2&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;new-preferenceslogger&#34;&gt;New &lt;code&gt;PreferencesLogger&lt;/code&gt;&lt;/h2&gt;
 
