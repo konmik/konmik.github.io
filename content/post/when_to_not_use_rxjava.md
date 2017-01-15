@@ -125,7 +125,7 @@ because RxJava stacktraces are something special.
 
 ## DO NOT
 
-#### The absence of event
+#### The absence of events
 
 **Do not** use RxJava if there is no "event". Just don't.
 If something does not say: "this will happen at some point in time",
@@ -150,15 +150,76 @@ If you want to use functional programming while you do not have Java 8 streams,
 just take a third-party library or write a couple of utility functions.
 Your code will be much simpler and there will be less possibilities for bugs.
 
-#### The absence of subscription
+#### Same life duration
 
-If you do not need to keep track of subscriptions, **do not** use RxJava.
+Say, you have `Screen` and `Button` objects.
+Both operate on one thread, both have the same life duration.
 
-Subscription means that there is an entity
-that emits values and it *knows* that you're listening.
-And it will likely dispose itself if listeners are gone.
+There are two general ways to pass events between them in OOP.
+You can either set a callback or pass one object into another's
+constructor arguments.
 
-Without having subscriptions it is simpler to have usual callbacks.
+Passing an object into constructor is usually simpler because
+this way you're strictly saying that the passed object's life duration
+is at least as long as the object's that is being created.
+
+```
+class Screen {
+    
+    Button logoutButton;
+    
+    Screen(Button logoutButton) {
+        this.logoutButton = logoutButton;    
+    }
+    
+    onProfileReceived(Profile profile) {
+        logoutButton.setVisibility(profile.isLoggedIn ? VISIBLE : GONE);
+    }
+}
+```
+
+A callback without the possibility to uninstall it
+is another technique that can be used if you need to
+propagate events into another direction.
+
+```
+class Screen {
+
+    Screen(Button logoutButton) {
+        logoutButton.setCallback(() -> doLogout());    
+    }
+
+    doLogout() {
+        network.logout();
+        profile.update();
+    }
+}
+```
+
+However, if `Button` already exposes an observable for click notifications,
+it is OK to use it as it will not require any
+additional lines of code to implement.
+
+```
+logoutButton.clicks()
+    .subscribe(() -> doLogout());
+```
+
+#### Returning lambdas, implementing functional interfaces by objects
+
+If you're doing something the title says,
+there is a very high chance that there are simpler ways
+implementing the required functionality.
+
+We *can* replace *all* methods in OOP using RxJava.
+It is doable but it complicates understanding.
+
+Java is not a functional language -- it is an OOP language
+with some functional capabilities.
+Java functional capabilities are verbose,
+they are also prone to accidentally making bugs.
+
+Clean and understandable code design matters.
 
 ## DO
 
@@ -174,8 +235,9 @@ is priceless.
 
 #### Subscriptions
 
-Having a simple way to unsubscribe from an event source
-is the feature that is hard to overestimate.
+When your objects have different life duration, having
+a simple way to manage their communication is very important.
+
 Forget about writing callback interfaces, lists of subscribers,
 event dispatching loops, and so on.
 
@@ -233,7 +295,10 @@ on a specific scheduler inside the function.
 Unpredictable things can happen if the caller does not expect
 to get multithreading from the returned observable.
 
-Let the caller decide where it wants to schedule it.
+Excessive jumps from one thread to another can also
+be slower than you can afford.
+
+Let the caller decide where it wants to schedule actions.
 
 ## Have safe rx-ing! :)
 
