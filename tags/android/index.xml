@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Konstantin Mikheev&#39;s programming blog</title>
-    <link>/tags/android/index.xml</link>
+    <link>konmik.com/tags/android/index.xml</link>
     <description>Recent content on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="konmik.com/tags/android/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>When to NOT use RxJava</title>
-      <link>/post/when_to_not_use_rxjava/</link>
+      <link>/konmik.com/post/when_to_not_use_rxjava/</link>
       <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
       
-      <guid>/post/when_to_not_use_rxjava/</guid>
+      <guid>/konmik.com/post/when_to_not_use_rxjava/</guid>
       <description>&lt;p&gt;RxJava is very powerful.
 It solves a great amount of tasks easily.
 But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.
@@ -305,10 +305,10 @@ be slower than you can afford.&lt;/p&gt;
     
     <item>
       <title>Managing state reactive way</title>
-      <link>/post/managing_state_reactive_way/</link>
+      <link>/konmik.com/post/managing_state_reactive_way/</link>
       <pubDate>Sun, 25 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>/post/managing_state_reactive_way/</guid>
+      <guid>/konmik.com/post/managing_state_reactive_way/</guid>
       <description>&lt;p&gt;RxJava nice and easily covers our multithreading needs.
 But it provides only a half of the solution.
 While we can compose functions with RxJava, there is no safe way we can have
@@ -579,10 +579,10 @@ For now you can just copy/paste the code (see below).&lt;/p&gt;
     
     <item>
       <title>Why lambdas matter (even on Android)</title>
-      <link>/post/why_lambdas_matter_even_on_android/</link>
+      <link>/konmik.com/post/why_lambdas_matter_even_on_android/</link>
       <pubDate>Wed, 06 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>/post/why_lambdas_matter_even_on_android/</guid>
+      <guid>/konmik.com/post/why_lambdas_matter_even_on_android/</guid>
       <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;
@@ -1048,10 +1048,10 @@ I hope that we will get Clojure sooner or later.&lt;/p&gt;
     
     <item>
       <title>RxJava magic (finally) goes away</title>
-      <link>/post/rxjava_magic_finally_goes_away/</link>
+      <link>/konmik.com/post/rxjava_magic_finally_goes_away/</link>
       <pubDate>Tue, 08 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>/post/rxjava_magic_finally_goes_away/</guid>
+      <guid>/konmik.com/post/rxjava_magic_finally_goes_away/</guid>
       <description>&lt;p&gt;There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.&lt;/p&gt;
 
 &lt;p&gt;Docs and tutorials are either too shallow or too complicated.&lt;/p&gt;
@@ -1614,10 +1614,10 @@ What will happen if we will change &lt;code&gt;(integer &amp;lt; 5)&lt;/code&gt;
     
     <item>
       <title>Introduction to Model View Presenter on Android</title>
-      <link>/post/introduction_to_model_view_presenter_on_android/</link>
+      <link>/konmik.com/post/introduction_to_model_view_presenter_on_android/</link>
       <pubDate>Mon, 23 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>/post/introduction_to_model_view_presenter_on_android/</guid>
+      <guid>/konmik.com/post/introduction_to_model_view_presenter_on_android/</guid>
       <description>&lt;p&gt;This article is a step-by-step introduction to MVP on Android, from a simplest possible
 example to best practices. The article also introduces a new library
 that makes MVP on Android extremely simple.&lt;/p&gt;
@@ -1655,7 +1655,7 @@ and developer&amp;rsquo;s life becomes happier.&lt;/p&gt;
 
 &lt;p&gt;Using only Model-View in your application you usually end up with &amp;ldquo;everything is connected with everything&amp;rdquo;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/mvp_everything_is_connected_with_everything.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;konmik.com/images/mvp_everything_is_connected_with_everything.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If this diagram does not look complex, then think about each View
 can disappear and appear at random time. Do not forget about saving/restoring of Views.
@@ -1663,13 +1663,13 @@ Attach a couple of background tasks to that temporary Views, and the cake is rea
 
 &lt;p&gt;An alternative to the &amp;ldquo;everything is connected with everything&amp;rdquo; is a god object.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/mvp_a_god_object.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;konmik.com/images/mvp_a_god_object.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;A god object is overcomplicated; its parts cannot be reused, tested or easily debugged and refactored.&lt;/p&gt;
 
 &lt;p&gt;With MVP&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/mvp_mvp.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;konmik.com/images/mvp_mvp.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Complex tasks are split into simpler tasks and are easier to solve.&lt;/li&gt;
@@ -2152,10 +2152,10 @@ just violates KISS principle. Don&amp;rsquo;t play ping-pong between your view a
     
     <item>
       <title>Snorkeling with Dagger 2</title>
-      <link>/post/snorkeling_with_dagger_2/</link>
+      <link>/konmik.com/post/snorkeling_with_dagger_2/</link>
       <pubDate>Sun, 01 Feb 2015 00:00:00 +0000</pubDate>
       
-      <guid>/post/snorkeling_with_dagger_2/</guid>
+      <guid>/konmik.com/post/snorkeling_with_dagger_2/</guid>
       <description>&lt;p&gt;Dagger is a popular library for Java, it makes writing code much easier and more structured.
 In this article I will describe how can we benefit of using it,
 show some simple use cases and explore the generated code.
@@ -2362,7 +2362,7 @@ is quite stupid but we will make &lt;code&gt;SharedPreferences&lt;/code&gt; to b
 
 &lt;p&gt;Are you curious how &lt;code&gt;MyApplication.inject&lt;/code&gt; looks like? No, you can&amp;rsquo;t see it right now. :D At first you need to see a little picture.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/dagger_2_diagram_1.png&#34; alt=&#34;Dagger 2 diagram 1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;konmik.com/images/dagger_2_diagram_1.png&#34; alt=&#34;Dagger 2 diagram 1&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;While working with Dagger 2, we need to keep in mind how it is composed. You know about &lt;code&gt;@Inject&lt;/code&gt; constructor, so next
 thing to know about is &lt;code&gt;@Component&lt;/code&gt;. Component is an interface marked with &lt;code&gt;@Component&lt;/code&gt; annotation that shows
@@ -2548,7 +2548,7 @@ We obviously can not mark it&amp;rsquo;s constructor with &lt;code&gt;@Inject&lt
 
 &lt;p&gt;Here is a little diagram of how &lt;strong&gt;Module&lt;/strong&gt; is being used by Dagger 2:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/dagger_2_diagram_2.png&#34; alt=&#34;Dagger 2 diagram 2&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;konmik.com/images/dagger_2_diagram_2.png&#34; alt=&#34;Dagger 2 diagram 2&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;new-preferenceslogger&#34;&gt;New &lt;code&gt;PreferencesLogger&lt;/code&gt;&lt;/h2&gt;
 

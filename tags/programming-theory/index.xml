@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Konstantin Mikheev&#39;s programming blog</title>
-    <link>/tags/programming-theory/index.xml</link>
+    <link>konmik.com/tags/programming-theory/index.xml</link>
     <description>Recent content on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="/tags/programming-theory/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="konmik.com/tags/programming-theory/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Why lambdas matter (even on Android)</title>
-      <link>/post/why_lambdas_matter_even_on_android/</link>
+      <link>/konmik.com/post/why_lambdas_matter_even_on_android/</link>
       <pubDate>Wed, 06 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>/post/why_lambdas_matter_even_on_android/</guid>
+      <guid>/konmik.com/post/why_lambdas_matter_even_on_android/</guid>
       <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;
