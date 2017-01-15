@@ -7,9 +7,9 @@
 <meta name="author" content="">
 <meta name="generator" content="Hugo 0.17" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
-<link rel="alternate" href="/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
 <title>How to have 100% code coverage with tests and be sane - Konstantin Mikheev&#39;s programming blog</title>
 </head>
 <body>
@@ -44,7 +44,7 @@
     <span class="key">tags:</span>
     <span class="val">
 
-        <a href="tags/java">Java</a>
+        <a href="http://konmik.com/tags/java">Java</a>
 
     </span>
 
@@ -63,7 +63,7 @@ and how achieve it easily.</p>
 <p>After reading yet another article on unit testing I decided that I will create, just for an experiment,
 a project with 100% test coverage and see how it looks and feels like.</p>
 
-<p><img src="/images/100-coverage.png" alt="" /></p>
+<p><img src="../../images/100-coverage.png" alt="" /></p>
 
 <p>I never had such
 projects before and I discovered some interesting facts, that may be interesting to someone
@@ -96,7 +96,7 @@ to make the code execute through the logical branch.
 How many environments we need to test the unit? 5 * 3 = we will need to setup 15 environments
 just for one freaking unit with 5 methods! Such a waste of time! No, this is a definitely bad idea.</p>
 
-<p><img src="/images/100-coverage-trap.png" alt="" /></p>
+<p><img src="../../images/100-coverage-trap.png" alt="" /></p>
 
 <p>OK, now it should become very clear that testing methods is not the best idea.
 So probably we need to test <em>units</em>? We write <em>unit tests</em> after all, so this should be better, yeah?</p>
@@ -149,7 +149,7 @@ Do they mean &ldquo;test features of units&rdquo;?
 <p>Let&rsquo;s be engineers, let&rsquo;s estimate. I&rsquo;m taking my ruler again&hellip;
 How testing <em>features</em> can be more effective than testing methods? I finally came to this schema:</p>
 
-<p><img src="/images/100-coverage-feature-test.png" alt="" /></p>
+<p><img src="../../images/100-coverage-feature-test.png" alt="" /></p>
 
 <p>If we will test <em>subsystem</em> features then each test will cover <em>several</em> <strong>if</strong> cases and the test coverage will be very effective. Given this <em>case map</em> we can even select specific features that will touch the maximum amount of code lines. The amount of test environments that need to be created for such testing type is minimal.</p>
 
@@ -195,9 +195,9 @@ this is an additional tool that finds bugs and helps to optimize codebase!</p>
 
 <p>Unreached code can also be a sign of an ineffective test.</p>
 
-<p><img src="/images/100-coverage-run-coverage-tool.png" alt="" /></p>
+<p><img src="../../images/100-coverage-run-coverage-tool.png" alt="" /></p>
 
-<p><img src="/images/100-coverage-not-covered-lines.png" alt="" /></p>
+<p><img src="../../images/100-coverage-not-covered-lines.png" alt="" /></p>
 
 <p><em>(Oops! A copy-pasted algorithm is too broad for the implementation! I never have <code>null</code> here!)</em></p>
 
