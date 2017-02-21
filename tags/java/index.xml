@@ -527,7 +527,7 @@ we must be very precise and should always get the updated list of items in the r
             &lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;subscribe&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;updateView&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
     &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
 
-    &lt;span class=&#34;c1&#34;&gt;// Call it from any thread, all the multithreading&lt;/span&gt;
+    &lt;span class=&#34;c1&#34;&gt;// Call it from ANY thread, all the multithreading&lt;/span&gt;
     &lt;span class=&#34;c1&#34;&gt;// will be handled by RxState.&lt;/span&gt;
     &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;onPagingUp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;List&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Currency&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;newItems&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
         &lt;span class=&#34;n&#34;&gt;state&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;apply&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;old&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
@@ -553,6 +553,40 @@ your own utility functions like &lt;code&gt;List concat(List, List)&lt;/code&gt;
 library with all the primitive functions and immutable collections included:
 &lt;a href=&#34;https://github.com/konmik/solid&#34;&gt;Solid&lt;/a&gt;.&lt;/p&gt;
 
+&lt;h2 id=&#34;it-looks-familiar&#34;&gt;It looks familiar!&lt;/h2&gt;
+
+&lt;p&gt;There are currently two approaches I know about that provide similar functionality:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;You can go with plain RxJava and use &lt;code&gt;BehaviorSubject&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Or you can use Jake Wharton&amp;rsquo;s
+&lt;a href=&#34;https://github.com/JakeWharton/RxRelay&#34;&gt;RxRelay&lt;/a&gt;
+library to make it a little bit easier.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A) Both approaches do not give any guarantees about making emissions on one scheduler.
+They will simply emit values on one of threads where they received one
+of values instead of emitting all of them where you need it.
+Welcome to writing &lt;code&gt;subscribeOn(mainThread())&lt;/code&gt; and spaghetti of
+operators to connect other operators together.&lt;/p&gt;
+
+&lt;p&gt;B) There is also no guarantee that emitted values will be sequential relatively to each other.&lt;/p&gt;
+
+&lt;p&gt;Say, you want to change values like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;currentValue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getValue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;onNext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;currentValue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In a concurrent environment something can change subject value between &lt;code&gt;getValue()&lt;/code&gt; and &lt;code&gt;onNext()&lt;/code&gt; calls
+and the classical race condition will happen - you will get repeating numbers sometimes.
+So you need to write poor man&amp;rsquo;s &lt;code&gt;synchronized&lt;/code&gt; blocks to prevent this
+or you can also limit yourself to one thread and write &lt;code&gt;subscribeOn(mainThread())&lt;/code&gt;
+everywhere &amp;ldquo;just to be sure&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Not the best solutions in my opinion.
+I just want to write: &lt;code&gt;state.apply(it -&amp;gt; it + 1)&lt;/code&gt;
+and stop constantly thinking about all the multithreading issues.&lt;/p&gt;
+
 &lt;h2 id=&#34;implementation&#34;&gt;Implementation&lt;/h2&gt;
 
 &lt;p&gt;Here is some implementation reasoning:&lt;/p&gt;
@@ -567,11 +601,8 @@ of state happening concurrently&lt;/li&gt;
 this is the only way we can guarantee their sequence&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;I&amp;rsquo;m not sure yet if I need to release it as a library.
-For now you can just copy/paste the code (see below).&lt;/p&gt;
-
 &lt;p&gt;Here is the implementation for RxJava 1:
-&lt;a href=&#34;https://github.com/konmik/rxstate/tree/master/rxstate/src/main/java/util/rx&#34;&gt;RxState&lt;/a&gt;.&lt;/p&gt;
+&lt;a href=&#34;https://github.com/konmik/rxstate/tree/master/rxstate1/src/main/java/util/rx&#34;&gt;RxState&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Here is the implementation for RxJava 2:
 &lt;a href=&#34;https://github.com/konmik/rxstate/tree/master/rxstate2/src/main/java/util/rx2&#34;&gt;RxState&lt;/a&gt;.&lt;/p&gt;</description>

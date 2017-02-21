@@ -271,7 +271,7 @@ we must be very precise and should always get the updated list of items in the r
             <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">updateView</span><span class="o">);</span>
     <span class="o">}</span>
 
-    <span class="c1">// Call it from any thread, all the multithreading</span>
+    <span class="c1">// Call it from ANY thread, all the multithreading</span>
     <span class="c1">// will be handled by RxState.</span>
     <span class="kt">void</span> <span class="nf">onPagingUp</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newItems</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">state</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">old</span> <span class="o">-&gt;</span> <span class="o">{</span>
@@ -297,6 +297,40 @@ your own utility functions like <code>List concat(List, List)</code> or use a fu
 library with all the primitive functions and immutable collections included:
 <a href="https://github.com/konmik/solid">Solid</a>.</p>
 
+<h2 id="it-looks-familiar">It looks familiar!</h2>
+
+<p>There are currently two approaches I know about that provide similar functionality:</p>
+
+<ul>
+<li>You can go with plain RxJava and use <code>BehaviorSubject</code>.</li>
+<li>Or you can use Jake Wharton&rsquo;s
+<a href="https://github.com/JakeWharton/RxRelay">RxRelay</a>
+library to make it a little bit easier.</li>
+</ul>
+
+<p>A) Both approaches do not give any guarantees about making emissions on one scheduler.
+They will simply emit values on one of threads where they received one
+of values instead of emitting all of them where you need it.
+Welcome to writing <code>subscribeOn(mainThread())</code> and spaghetti of
+operators to connect other operators together.</p>
+
+<p>B) There is also no guarantee that emitted values will be sequential relatively to each other.</p>
+
+<p>Say, you want to change values like this:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">int</span> <span class="n">currentValue</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+<span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">currentValue</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+</code></pre></div>
+
+<p>In a concurrent environment something can change subject value between <code>getValue()</code> and <code>onNext()</code> calls
+and the classical race condition will happen - you will get repeating numbers sometimes.
+So you need to write poor man&rsquo;s <code>synchronized</code> blocks to prevent this
+or you can also limit yourself to one thread and write <code>subscribeOn(mainThread())</code>
+everywhere &ldquo;just to be sure&rdquo;.</p>
+
+<p>Not the best solutions in my opinion.
+I just want to write: <code>state.apply(it -&gt; it + 1)</code>
+and stop constantly thinking about all the multithreading issues.</p>
+
 <h2 id="implementation">Implementation</h2>
 
 <p>Here is some implementation reasoning:</p>
@@ -311,11 +345,8 @@ of state happening concurrently</li>
 this is the only way we can guarantee their sequence</li>
 </ul>
 
-<p>I&rsquo;m not sure yet if I need to release it as a library.
-For now you can just copy/paste the code (see below).</p>
-
 <p>Here is the implementation for RxJava 1:
-<a href="https://github.com/konmik/rxstate/tree/master/rxstate/src/main/java/util/rx">RxState</a>.</p>
+<a href="https://github.com/konmik/rxstate/tree/master/rxstate1/src/main/java/util/rx">RxState</a>.</p>
 
 <p>Here is the implementation for RxJava 2:
 <a href="https://github.com/konmik/rxstate/tree/master/rxstate2/src/main/java/util/rx2">RxState</a>.</p>
