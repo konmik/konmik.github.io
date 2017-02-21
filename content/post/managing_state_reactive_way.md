@@ -223,7 +223,7 @@ class CurrencySelection {
             .subscribe(this::updateView);
     }
 
-    // Call it from any thread, all the multithreading
+    // Call it from ANY thread, all the multithreading
     // will be handled by RxState.
     void onPagingUp(List<Currency> newItems) {
         state.apply(old -> {
@@ -249,6 +249,40 @@ your own utility functions like `List concat(List, List)` or use a functional
 library with all the primitive functions and immutable collections included:
 [Solid](https://github.com/konmik/solid).
 
+## It looks familiar!
+
+There are currently two approaches I know about that provide similar functionality:
+
+- You can go with plain RxJava and use `BehaviorSubject`.
+- Or you can use Jake Wharton's
+[RxRelay](https://github.com/JakeWharton/RxRelay)
+library to make it a little bit easier.
+
+A) Both approaches do not give any guarantees about making emissions on one scheduler.
+They will simply emit values on one of threads where they received one
+of values instead of emitting all of them where you need it.
+Welcome to writing `subscribeOn(mainThread())` and spaghetti of
+operators to connect other operators together.
+
+B) There is also no guarantee that emitted values will be sequential relatively to each other.
+
+Say, you want to change values like this:
+
+```java
+int currentValue = subject.getValue();
+subject.onNext(currentValue + 1);
+```
+
+In a concurrent environment something can change subject value between `getValue()` and `onNext()` calls
+and the classical race condition will happen - you will get repeating numbers sometimes.
+So you need to write poor man's `synchronized` blocks to prevent this
+or you can also limit yourself to one thread and write `subscribeOn(mainThread())`
+everywhere "just to be sure".
+
+Not the best solutions in my opinion.
+I just want to write: `state.apply(it -> it + 1)`
+and stop constantly thinking about all the multithreading issues.
+
 ## Implementation
 
 Here is some implementation reasoning:
@@ -261,11 +295,8 @@ Here is some implementation reasoning:
 - Our emissions should always happen in one thread,
    this is the only way we can guarantee their sequence
 
-I'm not sure yet if I need to release it as a library.
-For now you can just copy/paste the code (see below).
-
 Here is the implementation for RxJava 1:
-[RxState](https://github.com/konmik/rxstate/tree/master/rxstate/src/main/java/util/rx).
+[RxState](https://github.com/konmik/rxstate/tree/master/rxstate1/src/main/java/util/rx).
 
 Here is the implementation for RxJava 2:
 [RxState](https://github.com/konmik/rxstate/tree/master/rxstate2/src/main/java/util/rx2).
