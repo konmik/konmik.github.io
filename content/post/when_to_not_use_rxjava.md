@@ -210,27 +210,27 @@ logoutButton.clicks()
 Don't do like this (simplified example):
 
 ```
-    .switchMap(it -> serverApi.login(name, password)
-        .switchMap(loginResult -> serverApi.requestChatToken(loginResult.loginToken)
-            .switchMap(chatToken -> serverApi.doOtherThingsAfter(chatToken))))
+.switchMap(it -> serverApi.login(name, password)
+    .switchMap(loginResult -> serverApi.requestChatToken(loginResult.loginToken)
+        .switchMap(chatToken -> serverApi.doOtherThingsAfter(chatToken))))
 ```
 
 Do like this:
 
 ```
-    LoginResult loginResult = serverApi.login(name, password);
-    String chatToken = serverApi.requestChatToken(loginResult.loginToken);
-    return serverApi.doOtherThingsAfter(chatToken);
+LoginResult loginResult = serverApi.login(name, password);
+String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+return serverApi.doOtherThingsAfter(chatToken);
 ```
 
-Why better?
+Why the second way is better?
 Because we're not trading ONE event into FOUR.
 When we're developing software we want to simplify things, not to complicate them.
 Events are more complex than linear code execution.
 
 It is easier to modify linear code as well.
 Imagine you decided to wrap `login` and `requestChatToken` into `synchronized` block
-to stop any network interaction in-between.
+to stop some other network interaction in-between.
 It is trivial to do when you have linear code
 but it is crazy hard to do when every your network call can be triggered by something
 you can't control.
