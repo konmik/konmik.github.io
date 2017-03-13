@@ -248,26 +248,26 @@ additional lines of code to implement.</p>
 
 <p>Don&rsquo;t do like this (simplified example):</p>
 
-<pre><code>    .switchMap(it -&gt; serverApi.login(name, password)
-        .switchMap(loginResult -&gt; serverApi.requestChatToken(loginResult.loginToken)
-            .switchMap(chatToken -&gt; serverApi.doOtherThingsAfter(chatToken))))
+<pre><code>.switchMap(it -&gt; serverApi.login(name, password)
+    .switchMap(loginResult -&gt; serverApi.requestChatToken(loginResult.loginToken)
+        .switchMap(chatToken -&gt; serverApi.doOtherThingsAfter(chatToken))))
 </code></pre>
 
 <p>Do like this:</p>
 
-<pre><code>    LoginResult loginResult = serverApi.login(name, password);
-    String chatToken = serverApi.requestChatToken(loginResult.loginToken);
-    return serverApi.doOtherThingsAfter(chatToken);
+<pre><code>LoginResult loginResult = serverApi.login(name, password);
+String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+return serverApi.doOtherThingsAfter(chatToken);
 </code></pre>
 
-<p>Why better?
+<p>Why the second way is better?
 Because we&rsquo;re not trading ONE event into FOUR.
 When we&rsquo;re developing software we want to simplify things, not to complicate them.
 Events are more complex than linear code execution.</p>
 
 <p>It is easier to modify linear code as well.
 Imagine you decided to wrap <code>login</code> and <code>requestChatToken</code> into <code>synchronized</code> block
-to stop any network interaction in-between.
+to stop some other network interaction in-between.
 It is trivial to do when you have linear code
 but it is crazy hard to do when every your network call can be triggered by something
 you can&rsquo;t control.</p>

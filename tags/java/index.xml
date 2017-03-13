@@ -209,26 +209,26 @@ additional lines of code to implement.&lt;/p&gt;
 
 &lt;p&gt;Don&amp;rsquo;t do like this (simplified example):&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;    .switchMap(it -&amp;gt; serverApi.login(name, password)
-        .switchMap(loginResult -&amp;gt; serverApi.requestChatToken(loginResult.loginToken)
-            .switchMap(chatToken -&amp;gt; serverApi.doOtherThingsAfter(chatToken))))
+&lt;pre&gt;&lt;code&gt;.switchMap(it -&amp;gt; serverApi.login(name, password)
+    .switchMap(loginResult -&amp;gt; serverApi.requestChatToken(loginResult.loginToken)
+        .switchMap(chatToken -&amp;gt; serverApi.doOtherThingsAfter(chatToken))))
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Do like this:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;    LoginResult loginResult = serverApi.login(name, password);
-    String chatToken = serverApi.requestChatToken(loginResult.loginToken);
-    return serverApi.doOtherThingsAfter(chatToken);
+&lt;pre&gt;&lt;code&gt;LoginResult loginResult = serverApi.login(name, password);
+String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+return serverApi.doOtherThingsAfter(chatToken);
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Why better?
+&lt;p&gt;Why the second way is better?
 Because we&amp;rsquo;re not trading ONE event into FOUR.
 When we&amp;rsquo;re developing software we want to simplify things, not to complicate them.
 Events are more complex than linear code execution.&lt;/p&gt;
 
 &lt;p&gt;It is easier to modify linear code as well.
 Imagine you decided to wrap &lt;code&gt;login&lt;/code&gt; and &lt;code&gt;requestChatToken&lt;/code&gt; into &lt;code&gt;synchronized&lt;/code&gt; block
-to stop any network interaction in-between.
+to stop some other network interaction in-between.
 It is trivial to do when you have linear code
 but it is crazy hard to do when every your network call can be triggered by something
 you can&amp;rsquo;t control.&lt;/p&gt;
