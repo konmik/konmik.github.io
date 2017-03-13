@@ -205,6 +205,38 @@ logoutButton.clicks()
     .subscribe(() -> doLogout());
 ```
 
+#### Reactive spaghetti
+
+Don't do like this (simplified example):
+
+```
+    .switchMap(it -> serverApi.login(name, password)
+        .switchMap(loginResult -> serverApi.requestChatToken(loginResult.loginToken)
+            .switchMap(chatToken -> serverApi.doOtherThingsAfter(chatToken))))
+```
+
+Do like this:
+
+```
+    LoginResult loginResult = serverApi.login(name, password);
+    String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+    return serverApi.doOtherThingsAfter(chatToken);
+```
+
+Why better?
+Because we're not trading ONE event into FOUR.
+When we're developing software we want to simplify things, not to complicate them.
+Events are more complex than linear code execution.
+
+It is easier to modify linear code as well.
+Imagine you decided to wrap `login` and `requestChatToken` into `synchronized` block
+to stop any network interaction in-between.
+It is trivial to do when you have linear code
+but it is crazy hard to do when every your network call can be triggered by something
+you can't control.
+
+Write spaghetti only when there are no other ways.
+
 #### Returning lambdas, implementing functional interfaces by objects
 
 If you're doing something the title says,
@@ -260,6 +292,11 @@ Use `subscribe` function callbacks -- they are intentionally designed for doing 
 You can also use `do*` operators (`doOnNext`, `doOnError`, etc) in case you
 need to create a side-effect during chain execution.
 
+The default way to go is you need to pass data INTO the chain from a side:
+`flatMap`, `switchMap`, `concatMap`.
+There are more functions which fit this purpose,
+look at `Observable` definition.
+
 It is wrong to use other functions (`Observable.map` for example)
 for creating side-effects
 because it assumes that you're just transforming one value into another.
@@ -267,7 +304,7 @@ A developer who will try to modify your code
 will think that it is OK to place this transformation into
 a different place, put it into another thread
 or even completely remove it while refactoring.
-If your `map` was saving the values into the database
+If your `map` was saving the values into a database
 or was showing them on the screen
 then the refactoring will cause bugs.
 
