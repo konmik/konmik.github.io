@@ -244,6 +244,36 @@ additional lines of code to implement.</p>
     .subscribe(() -&gt; doLogout());
 </code></pre>
 
+<h4 id="reactive-spaghetti">Reactive spaghetti</h4>
+
+<p>Don&rsquo;t do like this (simplified example):</p>
+
+<pre><code>    .switchMap(it -&gt; serverApi.login(name, password)
+        .switchMap(loginResult -&gt; serverApi.requestChatToken(loginResult.loginToken)
+            .switchMap(chatToken -&gt; serverApi.doOtherThingsAfter(chatToken))))
+</code></pre>
+
+<p>Do like this:</p>
+
+<pre><code>    LoginResult loginResult = serverApi.login(name, password);
+    String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+    return serverApi.doOtherThingsAfter(chatToken);
+</code></pre>
+
+<p>Why better?
+Because we&rsquo;re not trading ONE event into FOUR.
+When we&rsquo;re developing software we want to simplify things, not to complicate them.
+Events are more complex than linear code execution.</p>
+
+<p>It is easier to modify linear code as well.
+Imagine you decided to wrap <code>login</code> and <code>requestChatToken</code> into <code>synchronized</code> block
+to stop any network interaction in-between.
+It is trivial to do when you have linear code
+but it is crazy hard to do when every your network call can be triggered by something
+you can&rsquo;t control.</p>
+
+<p>Write spaghetti only when there are no other ways.</p>
+
 <h4 id="returning-lambdas-implementing-functional-interfaces-by-objects">Returning lambdas, implementing functional interfaces by objects</h4>
 
 <p>If you&rsquo;re doing something the title says,
@@ -299,6 +329,11 @@ more bugs.</p>
 You can also use <code>do*</code> operators (<code>doOnNext</code>, <code>doOnError</code>, etc) in case you
 need to create a side-effect during chain execution.</p>
 
+<p>The default way to go is you need to pass data INTO the chain from a side:
+<code>flatMap</code>, <code>switchMap</code>, <code>concatMap</code>.
+There are more functions which fit this purpose,
+look at <code>Observable</code> definition.</p>
+
 <p>It is wrong to use other functions (<code>Observable.map</code> for example)
 for creating side-effects
 because it assumes that you&rsquo;re just transforming one value into another.
@@ -306,7 +341,7 @@ A developer who will try to modify your code
 will think that it is OK to place this transformation into
 a different place, put it into another thread
 or even completely remove it while refactoring.
-If your <code>map</code> was saving the values into the database
+If your <code>map</code> was saving the values into a database
 or was showing them on the screen
 then the refactoring will cause bugs.</p>
 

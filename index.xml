@@ -206,6 +206,36 @@ additional lines of code to implement.&lt;/p&gt;
     .subscribe(() -&amp;gt; doLogout());
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;h4 id=&#34;reactive-spaghetti&#34;&gt;Reactive spaghetti&lt;/h4&gt;
+
+&lt;p&gt;Don&amp;rsquo;t do like this (simplified example):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    .switchMap(it -&amp;gt; serverApi.login(name, password)
+        .switchMap(loginResult -&amp;gt; serverApi.requestChatToken(loginResult.loginToken)
+            .switchMap(chatToken -&amp;gt; serverApi.doOtherThingsAfter(chatToken))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Do like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    LoginResult loginResult = serverApi.login(name, password);
+    String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+    return serverApi.doOtherThingsAfter(chatToken);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Why better?
+Because we&amp;rsquo;re not trading ONE event into FOUR.
+When we&amp;rsquo;re developing software we want to simplify things, not to complicate them.
+Events are more complex than linear code execution.&lt;/p&gt;
+
+&lt;p&gt;It is easier to modify linear code as well.
+Imagine you decided to wrap &lt;code&gt;login&lt;/code&gt; and &lt;code&gt;requestChatToken&lt;/code&gt; into &lt;code&gt;synchronized&lt;/code&gt; block
+to stop any network interaction in-between.
+It is trivial to do when you have linear code
+but it is crazy hard to do when every your network call can be triggered by something
+you can&amp;rsquo;t control.&lt;/p&gt;
+
+&lt;p&gt;Write spaghetti only when there are no other ways.&lt;/p&gt;
+
 &lt;h4 id=&#34;returning-lambdas-implementing-functional-interfaces-by-objects&#34;&gt;Returning lambdas, implementing functional interfaces by objects&lt;/h4&gt;
 
 &lt;p&gt;If you&amp;rsquo;re doing something the title says,
@@ -261,6 +291,11 @@ more bugs.&lt;/p&gt;
 You can also use &lt;code&gt;do*&lt;/code&gt; operators (&lt;code&gt;doOnNext&lt;/code&gt;, &lt;code&gt;doOnError&lt;/code&gt;, etc) in case you
 need to create a side-effect during chain execution.&lt;/p&gt;
 
+&lt;p&gt;The default way to go is you need to pass data INTO the chain from a side:
+&lt;code&gt;flatMap&lt;/code&gt;, &lt;code&gt;switchMap&lt;/code&gt;, &lt;code&gt;concatMap&lt;/code&gt;.
+There are more functions which fit this purpose,
+look at &lt;code&gt;Observable&lt;/code&gt; definition.&lt;/p&gt;
+
 &lt;p&gt;It is wrong to use other functions (&lt;code&gt;Observable.map&lt;/code&gt; for example)
 for creating side-effects
 because it assumes that you&amp;rsquo;re just transforming one value into another.
@@ -268,7 +303,7 @@ A developer who will try to modify your code
 will think that it is OK to place this transformation into
 a different place, put it into another thread
 or even completely remove it while refactoring.
-If your &lt;code&gt;map&lt;/code&gt; was saving the values into the database
+If your &lt;code&gt;map&lt;/code&gt; was saving the values into a database
 or was showing them on the screen
 then the refactoring will cause bugs.&lt;/p&gt;
 

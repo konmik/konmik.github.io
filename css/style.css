@@ -135,6 +135,7 @@ h6 { font-size: 12px; font-size: .75rem }
 pre, code {
   font-family: inherit;
   font-size: inherit;
+  background: #e8e0e8;
 }
 
 /* Header Layout */
