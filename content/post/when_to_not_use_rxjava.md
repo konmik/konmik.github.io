@@ -88,7 +88,7 @@ I hope that at this point it is pretty obvious by itself. ;)
 The entire rant is about simplicity.
 
 **Figure B.** says:
-"take two ints and return one of them that if bigger" 
+"take two ints and return one of them that is bigger" 
 
 **Figure A.** says:
 "Take two streams of integers, they will emit values once in a while, and there
