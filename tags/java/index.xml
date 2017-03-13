@@ -91,7 +91,7 @@ I hope that at this point it is pretty obvious by itself. ;)&lt;/p&gt;
 &lt;p&gt;The entire rant is about simplicity.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Figure B.&lt;/strong&gt; says:
-&amp;ldquo;take two ints and return one of them that if bigger&amp;rdquo;&lt;/p&gt;
+&amp;ldquo;take two ints and return one of them that is bigger&amp;rdquo;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Figure A.&lt;/strong&gt; says:
 &amp;ldquo;Take two streams of integers, they will emit values once in a while, and there
