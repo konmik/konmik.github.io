@@ -2,18 +2,348 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Konstantin Mikheev&#39;s programming blog</title>
-    <link>/tags/android/index.xml</link>
+    <link>http://konmik.com/tags/android/index.xml</link>
     <description>Recent content on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://konmik.com/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>When to NOT use RxJava</title>
+      <link>http://konmik.com/post/when_to_not_use_rxjava/</link>
+      <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/post/when_to_not_use_rxjava/</guid>
+      <description>&lt;p&gt;RxJava is very powerful.
+It solves a great amount of tasks easily.
+But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.
+Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;basic-example&#34;&gt;Basic example&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s take a very simple and obvious example of a wrong RxJava
+usage and go into theoretical details later.&lt;/p&gt;
+
+&lt;p&gt;It is often can be found that people inspired with RxJava
+start turning everything into a stream.
+We even got a new mantra - &amp;ldquo;Everything is a stream&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Say, you need to implement &lt;code&gt;int max(int, int)&lt;/code&gt; function (let&amp;rsquo;s pretend it does not exist yet).
+What will you think if you will discover an implementation like this
+that was proudly created for you by a newbie who can&amp;rsquo;t wait to apply the new magical hammer?&lt;/p&gt;
+
+&lt;h4 id=&#34;figure-a&#34;&gt;Figure A.&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;zip&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Interesting, yeah?&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;When you have a hammer everything looks like a nail.&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A sane developer will probably say &amp;ldquo;WFT??!&amp;rdquo; and implement something
+less shiny and inspiring but more practical:&lt;/p&gt;
+
+&lt;h4 id=&#34;figure-b&#34;&gt;Figure B.&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;There is even an option to refactor the old code like this:&lt;/p&gt;
+
+&lt;h4 id=&#34;figure-c&#34;&gt;Figure C.&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;zip&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MyMath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;But in practice such a weird &lt;code&gt;max&lt;/code&gt; implementation is just a consequence of other
+weird functions that for some reason will look better if &lt;code&gt;max&lt;/code&gt; works with observables.&lt;/p&gt;
+
+&lt;p&gt;This example can be easily scaled into any
+size &amp;ndash; people turn into stream &lt;em&gt;everything&lt;/em&gt; literally.&lt;/p&gt;
+
+&lt;p&gt;You can easily discover code like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getId&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;just&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In a large codebase it happens all the time.&lt;/p&gt;
+
+&lt;p&gt;Or you can find a 20-line function of operators
+that is doing the job that can easily be done without RxJava
+with the same amount of code!
+Try debugging a flow of events while the person who wrote it
+did not even think about events.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m not telling that mantras do not work.
+I hope that at this point it is pretty obvious by itself. ;)&lt;/p&gt;
+
+&lt;h2 id=&#34;so-what-is-exactly-wrong-here&#34;&gt;So what is exactly wrong here?&lt;/h2&gt;
+
+&lt;p&gt;The entire rant is about simplicity.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Figure B.&lt;/strong&gt; says:
+&amp;ldquo;take two ints and return one of them that is bigger&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Figure A.&lt;/strong&gt; says:
+&amp;ldquo;Take two streams of integers, they will emit values once in a while, and there
+will probably be not equal amount of values in these streams, and these streams
+will probably will never emit any values, but just take these two streams
+and create another one that will wait unless both streams will emit at least one value,
+and return a value every time this happens, and the value should be
+the maximum of these two values, but if one of streams will return less values then
+you should wait unless it will emit something and you should buffer
+items of another stream while you&amp;rsquo;re waiting.
+Keep in mind that I
+can subscribe any number of times and you need to create the new sequence every time.
+There is also a possibility to unsubscribe at any moment, so you will also need
+to unsubscribe from these two streams.
+Both streams can emit new values on different threads
+so you will need to emit the next value on the thread of the latest emission.
+Propagate all exceptions and stop stream once it happens.
+Stop returned stream if one of incoming streams stops.&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;The enthusiastic developer will probably say:
+&amp;ldquo;But we will never have such conditions!
+Both streams will always have exact amount of values,
+and I&amp;rsquo;m not going to use multithreading here,
+and&amp;hellip; and&amp;hellip;&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;C&amp;rsquo;mon, tell this to your mother.&lt;/p&gt;
+
+&lt;p&gt;Bugs happen all the time and one day one of these observables
+will NOT return any value and your app will just hang.
+And it will happen with 10% of all of your users.
+And you will not even get a stacktrace because nothing crashes.
+Or you will get a stacktrace, but it will not change anything,
+because RxJava stacktraces are something special.&lt;/p&gt;
+
+&lt;h2 id=&#34;do-not&#34;&gt;DO NOT&lt;/h2&gt;
+
+&lt;h4 id=&#34;the-absence-of-events&#34;&gt;The absence of events&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;Do not&lt;/strong&gt; use RxJava if there is no &amp;ldquo;event&amp;rdquo;. Just don&amp;rsquo;t.
+If something does not say: &amp;ldquo;this will happen at some point in time&amp;rdquo;,
+do not create observables.&lt;/p&gt;
+
+&lt;p&gt;RxJava is not a &lt;em&gt;data processing&lt;/em&gt; library.
+It is an &lt;em&gt;event processing&lt;/em&gt; library.&lt;/p&gt;
+
+&lt;p&gt;Events are more complex than data
+because in addition to data events have &lt;em&gt;time&lt;/em&gt; or &lt;em&gt;order of execution&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you need to process a list of items, do not turn it into an observable.&lt;/p&gt;
+
+&lt;p&gt;In addition to the complexity that will increase
+for the person who will try to understand
+the code there are additional downsides.
+Have you seen RxJava source code?
+It contains quite complex logic, so it is hard to debug.
+It also consumes additional resources to make multithreading safe.&lt;/p&gt;
+
+&lt;p&gt;If you want to use functional programming while you do not have Java 8 streams,
+just take a third-party library or write a couple of utility functions.
+Your code will be much simpler and there will be less possibilities for bugs.&lt;/p&gt;
+
+&lt;h4 id=&#34;same-life-duration&#34;&gt;Same life duration&lt;/h4&gt;
+
+&lt;p&gt;Say, you have &lt;code&gt;Screen&lt;/code&gt; and &lt;code&gt;Button&lt;/code&gt; objects.
+Both operate on one thread, both have the same life duration.&lt;/p&gt;
+
+&lt;p&gt;There are two general ways to pass events between them in OOP.
+You can either set a callback or pass one object into another&amp;rsquo;s
+constructor arguments.&lt;/p&gt;
+
+&lt;p&gt;Passing an object into constructor is usually simpler because
+this way you&amp;rsquo;re strictly saying that the passed object&amp;rsquo;s life duration
+is at least as long as the object&amp;rsquo;s that is being created.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Screen {
+    
+    Button logoutButton;
+    
+    Screen(Button logoutButton) {
+        this.logoutButton = logoutButton;    
+    }
+    
+    onProfileReceived(Profile profile) {
+        logoutButton.setVisibility(profile.isLoggedIn ? VISIBLE : GONE);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A callback without the possibility to uninstall it
+is another technique that can be used if you need to
+propagate events into another direction.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Screen {
+
+    Screen(Button logoutButton) {
+        logoutButton.setCallback(() -&amp;gt; doLogout());    
+    }
+
+    doLogout() {
+        network.logout();
+        profile.update();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However, if &lt;code&gt;Button&lt;/code&gt; already exposes an observable for click notifications,
+it is OK to use it as it will not require any
+additional lines of code to implement.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;logoutButton.clicks()
+    .subscribe(() -&amp;gt; doLogout());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;reactive-spaghetti&#34;&gt;Reactive spaghetti&lt;/h4&gt;
+
+&lt;p&gt;Don&amp;rsquo;t do like this (simplified example):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.switchMap(it -&amp;gt; serverApi.login(name, password)
+    .switchMap(loginResult -&amp;gt; serverApi.requestChatToken(loginResult.loginToken)
+        .switchMap(chatToken -&amp;gt; serverApi.doOtherThingsAfter(chatToken))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Do like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LoginResult loginResult = serverApi.login(name, password);
+String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+return serverApi.doOtherThingsAfter(chatToken);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Why the second way is better?
+Because we&amp;rsquo;re not trading ONE event into FOUR.
+When we&amp;rsquo;re developing software we want to simplify things, not to complicate them.
+Events are more complex than linear code execution.&lt;/p&gt;
+
+&lt;p&gt;It is easier to modify linear code as well.
+Imagine you decided to wrap &lt;code&gt;login&lt;/code&gt; and &lt;code&gt;requestChatToken&lt;/code&gt; into &lt;code&gt;synchronized&lt;/code&gt; block
+to stop some other network interaction in-between.
+It is trivial to do when you have linear code
+but it is crazy hard to do when every your network call can be triggered by something
+you can&amp;rsquo;t control.&lt;/p&gt;
+
+&lt;p&gt;Write spaghetti only when there are no other ways.&lt;/p&gt;
+
+&lt;h4 id=&#34;returning-lambdas-implementing-functional-interfaces-by-objects&#34;&gt;Returning lambdas, implementing functional interfaces by objects&lt;/h4&gt;
+
+&lt;p&gt;If you&amp;rsquo;re doing something the title says,
+there is a very high chance that there are simpler ways
+implementing the required functionality.&lt;/p&gt;
+
+&lt;p&gt;We &lt;em&gt;can&lt;/em&gt; replace &lt;em&gt;all&lt;/em&gt; methods in OOP using RxJava.
+It is doable but it complicates understanding.&lt;/p&gt;
+
+&lt;p&gt;Java is not a functional language &amp;ndash; it is an OOP language
+with some functional capabilities.
+Java functional capabilities are verbose,
+they are also prone to accidentally making bugs.&lt;/p&gt;
+
+&lt;p&gt;Clean and understandable code design matters.&lt;/p&gt;
+
+&lt;h2 id=&#34;do&#34;&gt;DO&lt;/h2&gt;
+
+&lt;p&gt;If it seems to you at this point that using RxJava is an entirely bad idea,
+there &lt;em&gt;are&lt;/em&gt; very good use cases where RxJava really shines.&lt;/p&gt;
+
+&lt;h4 id=&#34;multithreading&#34;&gt;Multithreading&lt;/h4&gt;
+
+&lt;p&gt;Not much libraries compare to RxJava when it comes
+to dealing with multithreading code.
+Having a simple way to schedule function calls on different threads
+is priceless.&lt;/p&gt;
+
+&lt;h4 id=&#34;subscriptions&#34;&gt;Subscriptions&lt;/h4&gt;
+
+&lt;p&gt;When your objects have different life duration, having
+a simple way to manage their communication is very important.&lt;/p&gt;
+
+&lt;p&gt;Forget about writing callback interfaces, lists of subscribers,
+event dispatching loops, and so on.&lt;/p&gt;
+
+&lt;h2 id=&#34;good-practices&#34;&gt;Good practices&lt;/h2&gt;
+
+&lt;h4 id=&#34;side-effects&#34;&gt;Side effects&lt;/h4&gt;
+
+&lt;p&gt;&lt;em&gt;Side effect&lt;/em&gt; &amp;ndash; is when function modifies variables outside of its scope
+or makes I/O. Side effects should normally be executed in a specific order,
+for example &lt;code&gt;print&lt;/code&gt; that prints information to console creates a side-effect
+and if you will call several &lt;code&gt;print&lt;/code&gt; in wrong order you will get wrong output.
+If you modify variables in wrong order you will also likely have bugs.&lt;/p&gt;
+
+&lt;p&gt;RxJava has very clear semantic for using it with functions which
+create side-effects. This is useful when you&amp;rsquo;re trying to
+understand someone&amp;rsquo;s code, and it can also save you from having
+more bugs.&lt;/p&gt;
+
+&lt;p&gt;Use &lt;code&gt;subscribe&lt;/code&gt; function callbacks &amp;ndash; they are intentionally designed for doing this.
+You can also use &lt;code&gt;do*&lt;/code&gt; operators (&lt;code&gt;doOnNext&lt;/code&gt;, &lt;code&gt;doOnError&lt;/code&gt;, etc) in case you
+need to create a side-effect during chain execution.&lt;/p&gt;
+
+&lt;p&gt;The default way to go is you need to pass data INTO the chain from a side:
+&lt;code&gt;flatMap&lt;/code&gt;, &lt;code&gt;switchMap&lt;/code&gt;, &lt;code&gt;concatMap&lt;/code&gt;.
+There are more functions which fit this purpose,
+look at &lt;code&gt;Observable&lt;/code&gt; definition.&lt;/p&gt;
+
+&lt;p&gt;It is wrong to use other functions (&lt;code&gt;Observable.map&lt;/code&gt; for example)
+for creating side-effects
+because it assumes that you&amp;rsquo;re just transforming one value into another.
+A developer who will try to modify your code
+will think that it is OK to place this transformation into
+a different place, put it into another thread
+or even completely remove it while refactoring.
+If your &lt;code&gt;map&lt;/code&gt; was saving the values into a database
+or was showing them on the screen
+then the refactoring will cause bugs.&lt;/p&gt;
+
+&lt;h4 id=&#34;simple-first&#34;&gt;Simple first&lt;/h4&gt;
+
+&lt;p&gt;Once you need to execute some action in background, it is
+better to implement it as a simple function first,
+and only then wrap it into an observable in case you need it.&lt;/p&gt;
+
+&lt;p&gt;In some cases you will discover that composition of
+non-rx code is &lt;em&gt;easier&lt;/em&gt; than having an observable that
+does hell knows what else.&lt;/p&gt;
+
+&lt;p&gt;Simple code can be turned into complex very easy.
+It is hard to do the opposite.&lt;/p&gt;
+
+&lt;h4 id=&#34;single-thread-first&#34;&gt;Single thread first&lt;/h4&gt;
+
+&lt;p&gt;This is a sub-rule for &amp;ldquo;Simple first&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Once your function returns an observable,
+it is better to not schedule the returned observable
+on a specific scheduler inside the function.&lt;/p&gt;
+
+&lt;p&gt;Unpredictable things can happen if the caller does not expect
+to get multithreading from the returned observable.&lt;/p&gt;
+
+&lt;p&gt;Excessive jumps from one thread to another can also
+be slower than you can afford.&lt;/p&gt;
+
+&lt;p&gt;Let the caller decide where it wants to schedule actions.&lt;/p&gt;
+
+&lt;h2 id=&#34;have-safe-rx-ing&#34;&gt;Have safe rx-ing! :)&lt;/h2&gt;</description>
+    </item>
     
     <item>
       <title>Managing state reactive way</title>
-      <link>/post/managing_state_reactive_way/</link>
+      <link>http://konmik.com/post/managing_state_reactive_way/</link>
       <pubDate>Sun, 25 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>/post/managing_state_reactive_way/</guid>
+      <guid>http://konmik.com/post/managing_state_reactive_way/</guid>
       <description>&lt;p&gt;RxJava nice and easily covers our multithreading needs.
 But it provides only a half of the solution.
 While we can compose functions with RxJava, there is no safe way we can have
@@ -52,7 +382,7 @@ it may change user&amp;rsquo;s age and so on.&lt;/p&gt;
 &lt;p&gt;You didn&amp;rsquo;t want all of that while composing &amp;ldquo;Hello, %username%&amp;rdquo; string isn&amp;rsquo;t it?
 Especially if you was doing it while filling the profile view and you got an update
 callback while processing a previous callback?
-All these events happening concurrently can give gray heir to anyone!&lt;/p&gt;
+All these events, especially while happening concurrently, can give grey heir to anyone!&lt;/p&gt;
 
 &lt;p&gt;OOP model does not have any answers to all these issues.
 Programmer is expected to write callback spaghetti, &lt;code&gt;synchronized&lt;/code&gt; blocks, constantly
@@ -162,6 +492,12 @@ there are just no places where unpredictable things can happen.
 Your jugging ball does not suddenly turn into a rat or a bird,
 it does not try to bite you or to fly away.&lt;/p&gt;
 
+&lt;h4 id=&#34;single-source-of-truth&#34;&gt;Single source of truth&lt;/h4&gt;
+
+&lt;p&gt;The idea of having a single source of truth fits nicely into this approach.
+You have some state and when it changes you get notified. Nice!
+And it is better to have the truth immutable, just to avoid having some grey hairs.&lt;/p&gt;
+
 &lt;h2 id=&#34;adding-some-rocket-science&#34;&gt;Adding some rocket science&lt;/h2&gt;
 
 &lt;p&gt;The article says &amp;ldquo;reactive&amp;rdquo;, was it just do draw attention to some weird stuff
@@ -226,7 +562,7 @@ we must be very precise and should always get the updated list of items in the r
             &lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;subscribe&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;updateView&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
     &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
 
-    &lt;span class=&#34;c1&#34;&gt;// Call it from any thread, all the multithreading&lt;/span&gt;
+    &lt;span class=&#34;c1&#34;&gt;// Call it from ANY thread, all the multithreading&lt;/span&gt;
     &lt;span class=&#34;c1&#34;&gt;// will be handled by RxState.&lt;/span&gt;
     &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;onPagingUp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;List&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Currency&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;newItems&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
         &lt;span class=&#34;n&#34;&gt;state&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;apply&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;old&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
@@ -252,11 +588,47 @@ your own utility functions like &lt;code&gt;List concat(List, List)&lt;/code&gt;
 library with all the primitive functions and immutable collections included:
 &lt;a href=&#34;https://github.com/konmik/solid&#34;&gt;Solid&lt;/a&gt;.&lt;/p&gt;
 
+&lt;h2 id=&#34;it-looks-familiar&#34;&gt;It looks familiar!&lt;/h2&gt;
+
+&lt;p&gt;There are currently two approaches I know about that provide similar functionality:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;You can go with plain RxJava and use &lt;code&gt;BehaviorSubject&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Or you can use Jake Wharton&amp;rsquo;s
+&lt;a href=&#34;https://github.com/JakeWharton/RxRelay&#34;&gt;RxRelay&lt;/a&gt;
+library to make it a little bit easier.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A) Both approaches do not give any guarantees about making emissions on one scheduler.
+They will simply emit values on one of threads where they received one
+of values instead of emitting all of them where you need it.
+Welcome to writing &lt;code&gt;subscribeOn(mainThread())&lt;/code&gt; and spaghetti of
+operators to connect other operators together.&lt;/p&gt;
+
+&lt;p&gt;B) There is also no guarantee that emitted values will be sequential relatively to each other.&lt;/p&gt;
+
+&lt;p&gt;Say, you want to change values like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;currentValue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getValue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;onNext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;currentValue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In a concurrent environment something can change subject value between &lt;code&gt;getValue()&lt;/code&gt; and &lt;code&gt;onNext()&lt;/code&gt; calls
+and the classical race condition will happen - you will get repeating numbers sometimes.
+So you need to write poor man&amp;rsquo;s &lt;code&gt;synchronized&lt;/code&gt; blocks to prevent this
+or you can also limit yourself to one thread and write &lt;code&gt;subscribeOn(mainThread())&lt;/code&gt;
+everywhere &amp;ldquo;just to be sure&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Not the best solutions in my opinion.
+I just want to write: &lt;code&gt;state.apply(it -&amp;gt; it + 1)&lt;/code&gt;
+and stop constantly thinking about all the multithreading issues.&lt;/p&gt;
+
 &lt;h2 id=&#34;implementation&#34;&gt;Implementation&lt;/h2&gt;
 
 &lt;p&gt;Here is some implementation reasoning:&lt;/p&gt;
 
 &lt;ul&gt;
+&lt;li&gt;We&amp;rsquo;re making modification sequence strict by
+taking the old state to produce the new one&lt;/li&gt;
 &lt;li&gt;We do state modification in a lock to prevent multiple modifications
 of state happening concurrently&lt;/li&gt;
 &lt;li&gt;Each new state is being put into a queue&lt;/li&gt;
@@ -264,98 +636,19 @@ of state happening concurrently&lt;/li&gt;
 this is the only way we can guarantee their sequence&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;I&amp;rsquo;m not sure yet if I need to release it as a library.
-For now you can just copy/paste the code (see below).&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;RxState&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;p&gt;Here is the implementation for RxJava 1:
+&lt;a href=&#34;https://github.com/konmik/rxstate/tree/master/rxstate1/src/main/java/util/rx&#34;&gt;RxState&lt;/a&gt;.&lt;/p&gt;
 
-    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;final&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Scheduler&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;scheduler&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;final&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SerializedSubject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;BehaviorSubject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;create&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;());&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;final&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ConcurrentLinkedQueue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;queue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ConcurrentLinkedQueue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
-
-    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;volatile&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;volatile&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;boolean&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;emitting&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-
-    &lt;span class=&#34;cm&#34;&gt;/**&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * While sequential emission of items is guaranteed,&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * race conditions can happen outside RxState if provided scheduler&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * is not single threaded.&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     */&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;RxState&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;initialValue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Scheduler&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;scheduler&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;initialValue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;scheduler&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;scheduler&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;onNext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;initialValue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
-    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-    &lt;span class=&#34;cm&#34;&gt;/**&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * Sequential values on the given scheduler.&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     */&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Observable&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;values&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-    &lt;span class=&#34;cm&#34;&gt;/**&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * Apply a state `modification` function in a lock.&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     */&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;apply&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Func1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;func&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-
-        &lt;span class=&#34;kd&#34;&gt;synchronized&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;func&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;call&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;queue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;add&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
-        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-        &lt;span class=&#34;n&#34;&gt;Scheduler&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Worker&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;worker&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;scheduler&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;createWorker&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
-        &lt;span class=&#34;n&#34;&gt;worker&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;schedule&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;emitLoop&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;worker&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;unsubscribe&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
-        &lt;span class=&#34;o&#34;&gt;});&lt;/span&gt;
-    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-    &lt;span class=&#34;cm&#34;&gt;/**&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * Current value. Only access it if you&amp;#39;re not afraid of concurrency issues.&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     */&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-    &lt;span class=&#34;cm&#34;&gt;/**&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     * This quick check can be useful in tests.&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;     */&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;boolean&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;isEmitting&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;kd&#34;&gt;synchronized&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;emitting&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;queue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;isEmpty&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
-        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;emitLoop&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;kd&#34;&gt;synchronized&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;emitting&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-                &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-            &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;emitting&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-
-        &lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;next&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-            &lt;span class=&#34;kd&#34;&gt;synchronized&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-                &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;queue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;isEmpty&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;())&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-                    &lt;span class=&#34;n&#34;&gt;emitting&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-                    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
-                &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-                &lt;span class=&#34;n&#34;&gt;next&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;queue&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;poll&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
-            &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-            &lt;span class=&#34;n&#34;&gt;subject&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;onNext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;next&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
-        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;p&gt;Here is the implementation for RxJava 2:
+&lt;a href=&#34;https://github.com/konmik/rxstate/tree/master/rxstate2/src/main/java/util/rx2&#34;&gt;RxState&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Why lambdas matter (even on Android)</title>
-      <link>/post/why_lambdas_matter_even_on_android/</link>
+      <link>http://konmik.com/post/why_lambdas_matter_even_on_android/</link>
       <pubDate>Wed, 06 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>/post/why_lambdas_matter_even_on_android/</guid>
+      <guid>http://konmik.com/post/why_lambdas_matter_even_on_android/</guid>
       <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;
@@ -821,10 +1114,10 @@ I hope that we will get Clojure sooner or later.&lt;/p&gt;
     
     <item>
       <title>RxJava magic (finally) goes away</title>
-      <link>/post/rxjava_magic_finally_goes_away/</link>
+      <link>http://konmik.com/post/rxjava_magic_finally_goes_away/</link>
       <pubDate>Tue, 08 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>/post/rxjava_magic_finally_goes_away/</guid>
+      <guid>http://konmik.com/post/rxjava_magic_finally_goes_away/</guid>
       <description>&lt;p&gt;There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.&lt;/p&gt;
 
 &lt;p&gt;Docs and tutorials are either too shallow or too complicated.&lt;/p&gt;
@@ -1387,10 +1680,10 @@ What will happen if we will change &lt;code&gt;(integer &amp;lt; 5)&lt;/code&gt;
     
     <item>
       <title>Introduction to Model View Presenter on Android</title>
-      <link>/post/introduction_to_model_view_presenter_on_android/</link>
+      <link>http://konmik.com/post/introduction_to_model_view_presenter_on_android/</link>
       <pubDate>Mon, 23 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>/post/introduction_to_model_view_presenter_on_android/</guid>
+      <guid>http://konmik.com/post/introduction_to_model_view_presenter_on_android/</guid>
       <description>&lt;p&gt;This article is a step-by-step introduction to MVP on Android, from a simplest possible
 example to best practices. The article also introduces a new library
 that makes MVP on Android extremely simple.&lt;/p&gt;
@@ -1428,7 +1721,7 @@ and developer&amp;rsquo;s life becomes happier.&lt;/p&gt;
 
 &lt;p&gt;Using only Model-View in your application you usually end up with &amp;ldquo;everything is connected with everything&amp;rdquo;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/mvp_everything_is_connected_with_everything.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../images/mvp_everything_is_connected_with_everything.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If this diagram does not look complex, then think about each View
 can disappear and appear at random time. Do not forget about saving/restoring of Views.
@@ -1436,13 +1729,13 @@ Attach a couple of background tasks to that temporary Views, and the cake is rea
 
 &lt;p&gt;An alternative to the &amp;ldquo;everything is connected with everything&amp;rdquo; is a god object.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/mvp_a_god_object.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../images/mvp_a_god_object.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;A god object is overcomplicated; its parts cannot be reused, tested or easily debugged and refactored.&lt;/p&gt;
 
 &lt;p&gt;With MVP&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/mvp_mvp.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../images/mvp_mvp.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Complex tasks are split into simpler tasks and are easier to solve.&lt;/li&gt;
@@ -1925,10 +2218,10 @@ just violates KISS principle. Don&amp;rsquo;t play ping-pong between your view a
     
     <item>
       <title>Snorkeling with Dagger 2</title>
-      <link>/post/snorkeling_with_dagger_2/</link>
+      <link>http://konmik.com/post/snorkeling_with_dagger_2/</link>
       <pubDate>Sun, 01 Feb 2015 00:00:00 +0000</pubDate>
       
-      <guid>/post/snorkeling_with_dagger_2/</guid>
+      <guid>http://konmik.com/post/snorkeling_with_dagger_2/</guid>
       <description>&lt;p&gt;Dagger is a popular library for Java, it makes writing code much easier and more structured.
 In this article I will describe how can we benefit of using it,
 show some simple use cases and explore the generated code.
@@ -2135,7 +2428,7 @@ is quite stupid but we will make &lt;code&gt;SharedPreferences&lt;/code&gt; to b
 
 &lt;p&gt;Are you curious how &lt;code&gt;MyApplication.inject&lt;/code&gt; looks like? No, you can&amp;rsquo;t see it right now. :D At first you need to see a little picture.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/dagger_2_diagram_1.png&#34; alt=&#34;Dagger 2 diagram 1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../images/dagger_2_diagram_1.png&#34; alt=&#34;Dagger 2 diagram 1&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;While working with Dagger 2, we need to keep in mind how it is composed. You know about &lt;code&gt;@Inject&lt;/code&gt; constructor, so next
 thing to know about is &lt;code&gt;@Component&lt;/code&gt;. Component is an interface marked with &lt;code&gt;@Component&lt;/code&gt; annotation that shows
@@ -2321,7 +2614,7 @@ We obviously can not mark it&amp;rsquo;s constructor with &lt;code&gt;@Inject&lt
 
 &lt;p&gt;Here is a little diagram of how &lt;strong&gt;Module&lt;/strong&gt; is being used by Dagger 2:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/images/dagger_2_diagram_2.png&#34; alt=&#34;Dagger 2 diagram 2&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../images/dagger_2_diagram_2.png&#34; alt=&#34;Dagger 2 diagram 2&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;new-preferenceslogger&#34;&gt;New &lt;code&gt;PreferencesLogger&lt;/code&gt;&lt;/h2&gt;
 

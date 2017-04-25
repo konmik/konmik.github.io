@@ -7,9 +7,9 @@
 <meta name="author" content="">
 <meta name="generator" content="Hugo 0.17" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
-<link rel="alternate" href="/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
 <title>Managing state reactive way - Konstantin Mikheev&#39;s programming blog</title>
 </head>
 <body>
@@ -17,6 +17,9 @@
 <header>
   <div class="container clearfix">
     <a class="path" href="http://konmik.com">[Konstantin Mikheev&#39;s programming blog]</a>
+    <a class="path" style="float: right" href="http://konmik.com/index.xml">[RSS]</a>
+    <a class="path" style="float: right" href="https://twitter.com/sirstripy">[Twitter]</a>
+    <a class="path" style="float: right" href="https://github.com/konmik">[GitHub]</a>
 
     <div class="right">
       
@@ -41,9 +44,9 @@
     <span class="key">tags:</span>
     <span class="val">
 
-        <a href="tags/java">Java</a>
+        <a href="http://konmik.com/tags/java">Java</a>
 
-        <a href="tags/android">Android</a>
+        <a href="http://konmik.com/tags/android">Android</a>
 
     </span>
 
@@ -88,7 +91,7 @@ it may change user&rsquo;s age and so on.</p>
 <p>You didn&rsquo;t want all of that while composing &ldquo;Hello, %username%&rdquo; string isn&rsquo;t it?
 Especially if you was doing it while filling the profile view and you got an update
 callback while processing a previous callback?
-All these events happening concurrently can give gray heir to anyone!</p>
+All these events, especially while happening concurrently, can give grey heir to anyone!</p>
 
 <p>OOP model does not have any answers to all these issues.
 Programmer is expected to write callback spaghetti, <code>synchronized</code> blocks, constantly
@@ -198,6 +201,12 @@ there are just no places where unpredictable things can happen.
 Your jugging ball does not suddenly turn into a rat or a bird,
 it does not try to bite you or to fly away.</p>
 
+<h4 id="single-source-of-truth">Single source of truth</h4>
+
+<p>The idea of having a single source of truth fits nicely into this approach.
+You have some state and when it changes you get notified. Nice!
+And it is better to have the truth immutable, just to avoid having some grey hairs.</p>
+
 <h2 id="adding-some-rocket-science">Adding some rocket science</h2>
 
 <p>The article says &ldquo;reactive&rdquo;, was it just do draw attention to some weird stuff
@@ -262,7 +271,7 @@ we must be very precise and should always get the updated list of items in the r
             <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">updateView</span><span class="o">);</span>
     <span class="o">}</span>
 
-    <span class="c1">// Call it from any thread, all the multithreading</span>
+    <span class="c1">// Call it from ANY thread, all the multithreading</span>
     <span class="c1">// will be handled by RxState.</span>
     <span class="kt">void</span> <span class="nf">onPagingUp</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newItems</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">state</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">old</span> <span class="o">-&gt;</span> <span class="o">{</span>
@@ -288,11 +297,47 @@ your own utility functions like <code>List concat(List, List)</code> or use a fu
 library with all the primitive functions and immutable collections included:
 <a href="https://github.com/konmik/solid">Solid</a>.</p>
 
+<h2 id="it-looks-familiar">It looks familiar!</h2>
+
+<p>There are currently two approaches I know about that provide similar functionality:</p>
+
+<ul>
+<li>You can go with plain RxJava and use <code>BehaviorSubject</code>.</li>
+<li>Or you can use Jake Wharton&rsquo;s
+<a href="https://github.com/JakeWharton/RxRelay">RxRelay</a>
+library to make it a little bit easier.</li>
+</ul>
+
+<p>A) Both approaches do not give any guarantees about making emissions on one scheduler.
+They will simply emit values on one of threads where they received one
+of values instead of emitting all of them where you need it.
+Welcome to writing <code>subscribeOn(mainThread())</code> and spaghetti of
+operators to connect other operators together.</p>
+
+<p>B) There is also no guarantee that emitted values will be sequential relatively to each other.</p>
+
+<p>Say, you want to change values like this:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">int</span> <span class="n">currentValue</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+<span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">currentValue</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+</code></pre></div>
+
+<p>In a concurrent environment something can change subject value between <code>getValue()</code> and <code>onNext()</code> calls
+and the classical race condition will happen - you will get repeating numbers sometimes.
+So you need to write poor man&rsquo;s <code>synchronized</code> blocks to prevent this
+or you can also limit yourself to one thread and write <code>subscribeOn(mainThread())</code>
+everywhere &ldquo;just to be sure&rdquo;.</p>
+
+<p>Not the best solutions in my opinion.
+I just want to write: <code>state.apply(it -&gt; it + 1)</code>
+and stop constantly thinking about all the multithreading issues.</p>
+
 <h2 id="implementation">Implementation</h2>
 
 <p>Here is some implementation reasoning:</p>
 
 <ul>
+<li>We&rsquo;re making modification sequence strict by
+taking the old state to produce the new one</li>
 <li>We do state modification in a lock to prevent multiple modifications
 of state happening concurrently</li>
 <li>Each new state is being put into a queue</li>
@@ -300,90 +345,11 @@ of state happening concurrently</li>
 this is the only way we can guarantee their sequence</li>
 </ul>
 
-<p>I&rsquo;m not sure yet if I need to release it as a library.
-For now you can just copy/paste the code (see below).</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RxState</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+<p>Here is the implementation for RxJava 1:
+<a href="https://github.com/konmik/rxstate/tree/master/rxstate1/src/main/java/util/rx">RxState</a>.</p>
 
-    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Subject</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">subject</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SerializedSubject</span><span class="o">&lt;&gt;(</span><span class="n">BehaviorSubject</span><span class="o">.</span><span class="na">create</span><span class="o">());</span>
-    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ConcurrentLinkedQueue</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">queue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentLinkedQueue</span><span class="o">&lt;&gt;();</span>
-
-    <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">T</span> <span class="n">value</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kd">volatile</span> <span class="kt">boolean</span> <span class="n">emitting</span><span class="o">;</span>
-
-    <span class="cm">/**</span>
-<span class="cm">     * While sequential emission of items is guaranteed,</span>
-<span class="cm">     * race conditions can happen outside RxState if provided scheduler</span>
-<span class="cm">     * is not single threaded.</span>
-<span class="cm">     */</span>
-    <span class="kd">public</span> <span class="nf">RxState</span><span class="o">(</span><span class="n">T</span> <span class="n">initialValue</span><span class="o">,</span> <span class="n">Scheduler</span> <span class="n">scheduler</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">initialValue</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">scheduler</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">initialValue</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="cm">/**</span>
-<span class="cm">     * Sequential values on the given scheduler.</span>
-<span class="cm">     */</span>
-    <span class="kd">public</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">values</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">subject</span><span class="o">;</span>
-    <span class="o">}</span>
-
-    <span class="cm">/**</span>
-<span class="cm">     * Apply a state `modification` function in a lock.</span>
-<span class="cm">     */</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Func1</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">func</span><span class="o">)</span> <span class="o">{</span>
-
-        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
-            <span class="n">queue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
-        <span class="o">}</span>
-
-        <span class="n">Scheduler</span><span class="o">.</span><span class="na">Worker</span> <span class="n">worker</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="na">createWorker</span><span class="o">();</span>
-        <span class="n">worker</span><span class="o">.</span><span class="na">schedule</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
-            <span class="n">emitLoop</span><span class="o">();</span>
-            <span class="n">worker</span><span class="o">.</span><span class="na">unsubscribe</span><span class="o">();</span>
-        <span class="o">});</span>
-    <span class="o">}</span>
-
-    <span class="cm">/**</span>
-<span class="cm">     * Current value. Only access it if you&#39;re not afraid of concurrency issues.</span>
-<span class="cm">     */</span>
-    <span class="kd">public</span> <span class="n">T</span> <span class="nf">value</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
-    <span class="o">}</span>
-
-    <span class="cm">/**</span>
-<span class="cm">     * This quick check can be useful in tests.</span>
-<span class="cm">     */</span>
-    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmitting</span><span class="o">()</span> <span class="o">{</span>
-        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="n">emitting</span> <span class="o">||</span> <span class="o">!</span><span class="n">queue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">();</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-
-    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">emitLoop</span><span class="o">()</span> <span class="o">{</span>
-        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">emitting</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">return</span><span class="o">;</span>
-            <span class="o">}</span>
-            <span class="n">emitting</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-        <span class="o">}</span>
-
-        <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">T</span> <span class="n">next</span><span class="o">;</span>
-            <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">if</span> <span class="o">(</span><span class="n">queue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-                    <span class="n">emitting</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-                    <span class="k">return</span><span class="o">;</span>
-                <span class="o">}</span>
-                <span class="n">next</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
-            <span class="o">}</span>
-            <span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">next</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
+<p>Here is the implementation for RxJava 2:
+<a href="https://github.com/konmik/rxstate/tree/master/rxstate2/src/main/java/util/rx2">RxState</a>.</p>
   </section>
 </article>
 

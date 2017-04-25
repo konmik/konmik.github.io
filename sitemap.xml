@@ -2,37 +2,47 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>/</loc>
+    <loc>http://konmik.com/</loc>
+    <lastmod>2017-04-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/post/is_programming_actually_math/</loc>
+    <lastmod>2017-04-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/post/when_to_not_use_rxjava/</loc>
+    <lastmod>2017-01-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/post/managing_state_reactive_way/</loc>
     <lastmod>2016-12-25T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/managing_state_reactive_way/</loc>
-    <lastmod>2016-12-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/why_lambdas_matter_even_on_android/</loc>
+    <loc>http://konmik.com/post/why_lambdas_matter_even_on_android/</loc>
     <lastmod>2016-01-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/rxjava_magic_finally_goes_away/</loc>
+    <loc>http://konmik.com/post/rxjava_magic_finally_goes_away/</loc>
     <lastmod>2015-12-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/how_to_have_100_percent_code_coverage/</loc>
+    <loc>http://konmik.com/post/how_to_have_100_percent_code_coverage/</loc>
     <lastmod>2015-09-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/introduction_to_model_view_presenter_on_android/</loc>
+    <loc>http://konmik.com/post/introduction_to_model_view_presenter_on_android/</loc>
     <lastmod>2015-03-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/snorkeling_with_dagger_2/</loc>
+    <loc>http://konmik.com/post/snorkeling_with_dagger_2/</loc>
     <lastmod>2015-02-01T00:00:00+00:00</lastmod>
   </url>
   
