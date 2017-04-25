@@ -4,6 +4,13 @@ date = "2017-04-24"
 tags = ["Programming in general"]
 +++
 
+At first I was annoyed. I was angry sometimes.
+Once I found an article which conforms with my ideas on the subject, and got a little calmed.
+Now, few years later, I can finally write this down.
+The main difference between programming and math is...
+
+<!--more-->
+
 ## The grand intro
 
 People who say that programming is math are either do not get what
