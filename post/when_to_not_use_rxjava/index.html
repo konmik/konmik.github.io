@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+<meta name="generator" content="Hugo 0.17" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
+<title>When to NOT use RxJava - Konstantin Mikheev&#39;s programming blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://konmik.com">[Konstantin Mikheev&#39;s programming blog]</a>
+    <a class="path" style="float: right" href="http://konmik.com/index.xml">[RSS]</a>
+    <a class="path" style="float: right" href="https://twitter.com/sirstripy">[Twitter]</a>
+    <a class="path" style="float: right" href="https://github.com/konmik">[GitHub]</a>
+
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2017-01-10">January 10, 2017</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="http://konmik.com/tags/java">Java</a>
+
+        <a href="http://konmik.com/tags/android">Android</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">When to NOT use RxJava</h1>
+  <section class="body" itemprop="articleBody">
+    <p>RxJava is very powerful.
+It solves a great amount of tasks easily.
+But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.
+Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.</p>
+
+<p></p>
+
+<h2 id="basic-example">Basic example</h2>
+
+<p>Let&rsquo;s take a very simple and obvious example of a wrong RxJava
+usage and go into theoretical details later.</p>
+
+<p>It is often can be found that people inspired with RxJava
+start turning everything into a stream.
+We even got a new mantra - &ldquo;Everything is a stream&rdquo;.</p>
+
+<p>Say, you need to implement <code>int max(int, int)</code> function (let&rsquo;s pretend it does not exist yet).
+What will you think if you will discover an implementation like this
+that was proudly created for you by a newbie who can&rsquo;t wait to apply the new magical hammer?</p>
+
+<h4 id="figure-a">Figure A.</h4>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">max</span><span class="o">(</span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">zip</span><span class="o">(</span><span class="n">left</span><span class="o">,</span> <span class="n">right</span><span class="o">,</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="o">?</span> <span class="n">b</span> <span class="o">:</span> <span class="n">a</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>Interesting, yeah?</p>
+
+<blockquote>
+<p>&ldquo;When you have a hammer everything looks like a nail.&rdquo;</p>
+</blockquote>
+
+<p>A sane developer will probably say &ldquo;WFT??!&rdquo; and implement something
+less shiny and inspiring but more practical:</p>
+
+<h4 id="figure-b">Figure B.</h4>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">int</span> <span class="nf">max</span><span class="o">(</span><span class="kt">int</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="o">?</span> <span class="n">b</span> <span class="o">:</span> <span class="n">a</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>There is even an option to refactor the old code like this:</p>
+
+<h4 id="figure-c">Figure C.</h4>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">max</span><span class="o">(</span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">zip</span><span class="o">(</span><span class="n">left</span><span class="o">,</span> <span class="n">right</span><span class="o">,</span> <span class="n">MyMath</span><span class="o">::</span><span class="n">max</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>But in practice such a weird <code>max</code> implementation is just a consequence of other
+weird functions that for some reason will look better if <code>max</code> works with observables.</p>
+
+<p>This example can be easily scaled into any
+size &ndash; people turn into stream <em>everything</em> literally.</p>
+
+<p>You can easily discover code like this:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">id</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>In a large codebase it happens all the time.</p>
+
+<p>Or you can find a 20-line function of operators
+that is doing the job that can easily be done without RxJava
+with the same amount of code!
+Try debugging a flow of events while the person who wrote it
+did not even think about events.</p>
+
+<p>I&rsquo;m not telling that mantras do not work.
+I hope that at this point it is pretty obvious by itself. ;)</p>
+
+<h2 id="so-what-is-exactly-wrong-here">So what is exactly wrong here?</h2>
+
+<p>The entire rant is about simplicity.</p>
+
+<p><strong>Figure B.</strong> says:
+&ldquo;take two ints and return one of them that is bigger&rdquo;</p>
+
+<p><strong>Figure A.</strong> says:
+&ldquo;Take two streams of integers, they will emit values once in a while, and there
+will probably be not equal amount of values in these streams, and these streams
+will probably will never emit any values, but just take these two streams
+and create another one that will wait unless both streams will emit at least one value,
+and return a value every time this happens, and the value should be
+the maximum of these two values, but if one of streams will return less values then
+you should wait unless it will emit something and you should buffer
+items of another stream while you&rsquo;re waiting.
+Keep in mind that I
+can subscribe any number of times and you need to create the new sequence every time.
+There is also a possibility to unsubscribe at any moment, so you will also need
+to unsubscribe from these two streams.
+Both streams can emit new values on different threads
+so you will need to emit the next value on the thread of the latest emission.
+Propagate all exceptions and stop stream once it happens.
+Stop returned stream if one of incoming streams stops.&rdquo;</p>
+
+<p>The enthusiastic developer will probably say:
+&ldquo;But we will never have such conditions!
+Both streams will always have exact amount of values,
+and I&rsquo;m not going to use multithreading here,
+and&hellip; and&hellip;&rdquo;</p>
+
+<p>C&rsquo;mon, tell this to your mother.</p>
+
+<p>Bugs happen all the time and one day one of these observables
+will NOT return any value and your app will just hang.
+And it will happen with 10% of all of your users.
+And you will not even get a stacktrace because nothing crashes.
+Or you will get a stacktrace, but it will not change anything,
+because RxJava stacktraces are something special.</p>
+
+<h2 id="do-not">DO NOT</h2>
+
+<h4 id="the-absence-of-events">The absence of events</h4>
+
+<p><strong>Do not</strong> use RxJava if there is no &ldquo;event&rdquo;. Just don&rsquo;t.
+If something does not say: &ldquo;this will happen at some point in time&rdquo;,
+do not create observables.</p>
+
+<p>RxJava is not a <em>data processing</em> library.
+It is an <em>event processing</em> library.</p>
+
+<p>Events are more complex than data
+because in addition to data events have <em>time</em> or <em>order of execution</em>.</p>
+
+<p>If you need to process a list of items, do not turn it into an observable.</p>
+
+<p>In addition to the complexity that will increase
+for the person who will try to understand
+the code there are additional downsides.
+Have you seen RxJava source code?
+It contains quite complex logic, so it is hard to debug.
+It also consumes additional resources to make multithreading safe.</p>
+
+<p>If you want to use functional programming while you do not have Java 8 streams,
+just take a third-party library or write a couple of utility functions.
+Your code will be much simpler and there will be less possibilities for bugs.</p>
+
+<h4 id="same-life-duration">Same life duration</h4>
+
+<p>Say, you have <code>Screen</code> and <code>Button</code> objects.
+Both operate on one thread, both have the same life duration.</p>
+
+<p>There are two general ways to pass events between them in OOP.
+You can either set a callback or pass one object into another&rsquo;s
+constructor arguments.</p>
+
+<p>Passing an object into constructor is usually simpler because
+this way you&rsquo;re strictly saying that the passed object&rsquo;s life duration
+is at least as long as the object&rsquo;s that is being created.</p>
+
+<pre><code>class Screen {
+    
+    Button logoutButton;
+    
+    Screen(Button logoutButton) {
+        this.logoutButton = logoutButton;    
+    }
+    
+    onProfileReceived(Profile profile) {
+        logoutButton.setVisibility(profile.isLoggedIn ? VISIBLE : GONE);
+    }
+}
+</code></pre>
+
+<p>A callback without the possibility to uninstall it
+is another technique that can be used if you need to
+propagate events into another direction.</p>
+
+<pre><code>class Screen {
+
+    Screen(Button logoutButton) {
+        logoutButton.setCallback(() -&gt; doLogout());    
+    }
+
+    doLogout() {
+        network.logout();
+        profile.update();
+    }
+}
+</code></pre>
+
+<p>However, if <code>Button</code> already exposes an observable for click notifications,
+it is OK to use it as it will not require any
+additional lines of code to implement.</p>
+
+<pre><code>logoutButton.clicks()
+    .subscribe(() -&gt; doLogout());
+</code></pre>
+
+<h4 id="reactive-spaghetti">Reactive spaghetti</h4>
+
+<p>Don&rsquo;t do like this (simplified example):</p>
+
+<pre><code>.switchMap(it -&gt; serverApi.login(name, password)
+    .switchMap(loginResult -&gt; serverApi.requestChatToken(loginResult.loginToken)
+        .switchMap(chatToken -&gt; serverApi.doOtherThingsAfter(chatToken))))
+</code></pre>
+
+<p>Do like this:</p>
+
+<pre><code>LoginResult loginResult = serverApi.login(name, password);
+String chatToken = serverApi.requestChatToken(loginResult.loginToken);
+return serverApi.doOtherThingsAfter(chatToken);
+</code></pre>
+
+<p>Why the second way is better?
+Because we&rsquo;re not trading ONE event into FOUR.
+When we&rsquo;re developing software we want to simplify things, not to complicate them.
+Events are more complex than linear code execution.</p>
+
+<p>It is easier to modify linear code as well.
+Imagine you decided to wrap <code>login</code> and <code>requestChatToken</code> into <code>synchronized</code> block
+to stop some other network interaction in-between.
+It is trivial to do when you have linear code
+but it is crazy hard to do when every your network call can be triggered by something
+you can&rsquo;t control.</p>
+
+<p>Write spaghetti only when there are no other ways.</p>
+
+<h4 id="returning-lambdas-implementing-functional-interfaces-by-objects">Returning lambdas, implementing functional interfaces by objects</h4>
+
+<p>If you&rsquo;re doing something the title says,
+there is a very high chance that there are simpler ways
+implementing the required functionality.</p>
+
+<p>We <em>can</em> replace <em>all</em> methods in OOP using RxJava.
+It is doable but it complicates understanding.</p>
+
+<p>Java is not a functional language &ndash; it is an OOP language
+with some functional capabilities.
+Java functional capabilities are verbose,
+they are also prone to accidentally making bugs.</p>
+
+<p>Clean and understandable code design matters.</p>
+
+<h2 id="do">DO</h2>
+
+<p>If it seems to you at this point that using RxJava is an entirely bad idea,
+there <em>are</em> very good use cases where RxJava really shines.</p>
+
+<h4 id="multithreading">Multithreading</h4>
+
+<p>Not much libraries compare to RxJava when it comes
+to dealing with multithreading code.
+Having a simple way to schedule function calls on different threads
+is priceless.</p>
+
+<h4 id="subscriptions">Subscriptions</h4>
+
+<p>When your objects have different life duration, having
+a simple way to manage their communication is very important.</p>
+
+<p>Forget about writing callback interfaces, lists of subscribers,
+event dispatching loops, and so on.</p>
+
+<h2 id="good-practices">Good practices</h2>
+
+<h4 id="side-effects">Side effects</h4>
+
+<p><em>Side effect</em> &ndash; is when function modifies variables outside of its scope
+or makes I/O. Side effects should normally be executed in a specific order,
+for example <code>print</code> that prints information to console creates a side-effect
+and if you will call several <code>print</code> in wrong order you will get wrong output.
+If you modify variables in wrong order you will also likely have bugs.</p>
+
+<p>RxJava has very clear semantic for using it with functions which
+create side-effects. This is useful when you&rsquo;re trying to
+understand someone&rsquo;s code, and it can also save you from having
+more bugs.</p>
+
+<p>Use <code>subscribe</code> function callbacks &ndash; they are intentionally designed for doing this.
+You can also use <code>do*</code> operators (<code>doOnNext</code>, <code>doOnError</code>, etc) in case you
+need to create a side-effect during chain execution.</p>
+
+<p>The default way to go is you need to pass data INTO the chain from a side:
+<code>flatMap</code>, <code>switchMap</code>, <code>concatMap</code>.
+There are more functions which fit this purpose,
+look at <code>Observable</code> definition.</p>
+
+<p>It is wrong to use other functions (<code>Observable.map</code> for example)
+for creating side-effects
+because it assumes that you&rsquo;re just transforming one value into another.
+A developer who will try to modify your code
+will think that it is OK to place this transformation into
+a different place, put it into another thread
+or even completely remove it while refactoring.
+If your <code>map</code> was saving the values into a database
+or was showing them on the screen
+then the refactoring will cause bugs.</p>
+
+<h4 id="simple-first">Simple first</h4>
+
+<p>Once you need to execute some action in background, it is
+better to implement it as a simple function first,
+and only then wrap it into an observable in case you need it.</p>
+
+<p>In some cases you will discover that composition of
+non-rx code is <em>easier</em> than having an observable that
+does hell knows what else.</p>
+
+<p>Simple code can be turned into complex very easy.
+It is hard to do the opposite.</p>
+
+<h4 id="single-thread-first">Single thread first</h4>
+
+<p>This is a sub-rule for &ldquo;Simple first&rdquo;.</p>
+
+<p>Once your function returns an observable,
+it is better to not schedule the returned observable
+on a specific scheduler inside the function.</p>
+
+<p>Unpredictable things can happen if the caller does not expect
+to get multithreading from the returned observable.</p>
+
+<p>Excessive jumps from one thread to another can also
+be slower than you can afford.</p>
+
+<p>Let the caller decide where it wants to schedule actions.</p>
+
+<h2 id="have-safe-rx-ing">Have safe rx-ing! :)</h2>
+  </section>
+</article>
+
+</main>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2017  Konstantin Mikheev&#39;s programming blog</span>
+  </div>
+</footer>
+
+</body>
+</html>
+
