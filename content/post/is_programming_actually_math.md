@@ -5,7 +5,7 @@ tags = ["Programming in general"]
 +++
 
 At first I was annoyed. I was angry sometimes.
-Once I found an article which conforms with my ideas on the subject, and got a little calmed.
+Once I found an article which conforms to my ideas on the subject, and got a little more calm.
 Now, few years later, I can finally write this down.
 The main difference between programming and math is...
 
@@ -17,6 +17,8 @@ People who say that programming is math are either do not get what
 programming is, or studied math too much.
 
 Just think: our reasons *why* we write software mathematicians call "side effects".
+Is your app showing something on the screen?
+It is just a side effect of some calculation.
 
 Nice, yeah?
 
