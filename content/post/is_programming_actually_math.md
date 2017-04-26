@@ -5,7 +5,7 @@ tags = ["Programming in general"]
 +++
 
 At first I was annoyed. I was angry sometimes.
-Once I found an article which conforms to my ideas on the subject, and got a little more calm.
+Once I found an article which conforms to my ideas on the subject, and got a little bit more calm.
 Now, few years later, I can finally write this down.
 The main difference between programming and math is...
 
