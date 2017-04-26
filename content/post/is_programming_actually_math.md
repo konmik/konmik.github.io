@@ -45,11 +45,11 @@ Mainly because of historical reasons.
 First computers were created to calculate different stuff. 
 They were even called "computers".
 
-But modern computer aren't actually computers, they do much more.
+But modern computers aren't actually computers, they do much more.
 When was the last time you actually calculated something on your computer?
 Oh, some of you can't even probably remember.
 I will remind you.
-Your salary, two months ago.
+Your money, two months ago.
 What were you doing with your so called "computers" since then?
 Not calculations, obviously.
 Some YouTube, some Facebook, maybe you was reading some articles,
