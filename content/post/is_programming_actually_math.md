@@ -134,7 +134,7 @@ If you're a mathematician, nobody will be against if you will create a new high-
 cryptography algorithm out of your findings.
 Or a nice sound encoding library.
 Or a crazy artificial intelligence algorithm that you will sell to Google for a lot of bucks.
-"Data science" is a also great field where math is vital.
+"Data science" is also a great field where math is vital.
 
 Math has very wide areas of application in computer programming.
 But it is just not the only thing anymore. 
