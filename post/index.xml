@@ -15,9 +15,9 @@
       <pubDate>Mon, 24 Apr 2017 00:00:00 +0000</pubDate>
       
       <guid>http://konmik.com/post/is_programming_actually_math/</guid>
-      <description>&lt;p&gt;At first I was annoyed. I was angry sometimes.
-Once I found an article which conforms to my ideas on the subject, and got a little bit more calm.
-Now, few years later, I can finally write this down.
+      <description>&lt;p&gt;At first I was annoyed by the subject. I was even angry sometimes.
+But once I found an article which conforms to my ideas on it and got a little bit more calm.
+Now, a few years later, I finally decided to write my own ideas down.
 The main difference between programming and math is&amp;hellip;&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;
@@ -33,16 +33,16 @@ It is just a side effect of some calculation.&lt;/p&gt;
 
 &lt;p&gt;Nice, yeah?&lt;/p&gt;
 
-&lt;p&gt;They say that &amp;ldquo;function&amp;rdquo; is a synonym for computation
-(there is even a more crazy definition of math function, but it is out of subject of this article).&lt;/p&gt;
+&lt;p&gt;They say that &amp;ldquo;function&amp;rdquo; is a synonym for &amp;ldquo;computation&amp;rdquo;
+(there is also a crazy definition of math function, but it is out of subject of this article).&lt;/p&gt;
 
 &lt;p&gt;We say that &amp;ldquo;function&amp;rdquo; is a series of steps to do.&lt;/p&gt;
 
 &lt;p&gt;Maybe we&amp;rsquo;re just mistaking?
-Let&amp;rsquo;s check a dictionary.
+Let&amp;rsquo;s check in a dictionary.
 In Latin, &amp;ldquo;function&amp;rdquo; means &amp;ldquo;execution&amp;rdquo;.
-In a usual life we&amp;rsquo;re saying that some device is &amp;ldquo;functioning&amp;rdquo; to describe that it is &amp;ldquo;working&amp;rdquo;.
-So we&amp;rsquo;re not mistaking, we&amp;rsquo;re just using the same word with different meaning.
+In usual life we say that a device is &amp;ldquo;functioning&amp;rdquo; to describe that it is &amp;ldquo;working&amp;rdquo;.
+So we&amp;rsquo;re not mistaking - we&amp;rsquo;re just using the same word with a different meaning.
 And the difference is crucial.&lt;/p&gt;
 
 &lt;p&gt;I&amp;rsquo;m not telling that mathematicians are bad guys, of course no!
@@ -61,9 +61,9 @@ When was the last time you actually calculated something on your computer?
 Oh, some of you can&amp;rsquo;t even probably remember.
 I will remind you.
 Your money, two months ago.
-What were you doing with your so called &amp;ldquo;computers&amp;rdquo; since then?
+What have you been doing with your so called &amp;ldquo;computers&amp;rdquo; since then?
 Not calculations, obviously.
-Some YouTube, some Facebook, maybe you was reading some articles,
+Some YouTube, some Facebook, maybe you were reading some articles,
 writing and receiving e-mails.&lt;/p&gt;
 
 &lt;p&gt;The second reason is a little bit more ridiculous.
@@ -72,30 +72,31 @@ I highly appreciate this attempt, despite the results we get sometimes.
 So, they didn&amp;rsquo;t have enough skilled programmers to teach programmers,
 because programmers are always at high demand as we all know.
 So they said mathematicians to give some training to students.
-In fact, not much universities actually realized the difference,
+In fact, not many universities actually realized the difference,
 they are still thinking that programming is a subdivision of math.&lt;/p&gt;
 
-&lt;h2 id=&#34;so-why-it-isn-t-a-subdivision-of-math-anymore&#34;&gt;So why it isn&amp;rsquo;t a subdivision of math anymore?&lt;/h2&gt;
+&lt;h2 id=&#34;so-why-isn-t-it-a-subdivision-of-math-anymore&#34;&gt;So why isn&amp;rsquo;t it a subdivision of math anymore?&lt;/h2&gt;
 
 &lt;p&gt;Programming is a science of handling data.
 Programs receive data, transform data and provide data.
-And they are doing a lots of this simultaneously.&lt;/p&gt;
+And they do lots of these simultaneously.&lt;/p&gt;
 
-&lt;p&gt;I worked as a professional computer programmer for 20 years,
-and I didn&amp;rsquo;t calculate a single integral.
-I mostly used 2nd grade math - multiplication and division,
-that&amp;rsquo;s what we&amp;rsquo;re using in our daily life,
-and we don&amp;rsquo;t need to be mathematicians to do it, right?&lt;/p&gt;
+&lt;p&gt;I have been working as a professional computer programmer for 20 years,
+and I haven&amp;rsquo;t calculated a single integral.
+I used mostly 2nd grade math - multiplication and division,
+that&amp;rsquo;s what we use in our daily life,
+and we don&amp;rsquo;t need to be mathematicians to do this, right?&lt;/p&gt;
 
-&lt;p&gt;Some languages used to build most popular accounting software can not even calculate square root.
+&lt;p&gt;Some programming languages that were used to build the most popular
+accounting software can not even calculate a square root.
 Add, Multiply and Subtract!
 Division can sometimes be used, but beware of the scary consequences!
 You can lose a cent because of rounding, so use it wisely.&lt;/p&gt;
 
 &lt;p&gt;You may say: &amp;ldquo;Hey, but computer processors are very complex,
-they&amp;rsquo;re probably using a lots of math internally, you need to know it!&amp;rdquo;
+they probably use lots of math internally, you need to know it!&amp;rdquo;
 No, they don&amp;rsquo;t.
-They&amp;rsquo;re using ridiculously small amount of math.
+They use ridiculously small amount of math.
 The same 2nd grade math.
 Except they don&amp;rsquo;t even use division.&lt;/p&gt;
 
@@ -106,8 +107,7 @@ Except they don&amp;rsquo;t even use division.&lt;/p&gt;
 &amp;ndash; Somebody from the Internets&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;For modern computer programming math has exactly the same
-relation to programming as chemistry.&lt;/p&gt;
+&lt;p&gt;Math has exactly the same relation to programming as chemistry.&lt;/p&gt;
 
 &lt;p&gt;You can write a program for a chemist without knowing chemistry at all,
 you just ask the chemist to provide you with formulas and you&amp;rsquo;re done.
@@ -115,9 +115,9 @@ You don&amp;rsquo;t actually need to study chemistry, you know?&lt;/p&gt;
 
 &lt;p&gt;When I was 18 I got my first serious job, and my first task was to create a database
 for chemical calculations with the possibility to print results.
-I had &amp;ldquo;below average&amp;rdquo; in my school&amp;rsquo;s chemistry class, so it was a very educative experience for me.
-I didn&amp;rsquo;t have &lt;em&gt;any&lt;/em&gt; idea on what I&amp;rsquo;m actually calculating.
-I tried to find something common with my school book and failed.
+I had &amp;ldquo;below average&amp;rdquo; at my school chemistry class, so it was a very educative experience for me.
+I didn&amp;rsquo;t have &lt;em&gt;any&lt;/em&gt; idea on what I was actually calculating.
+I tried to find something similar in my school book and failed.
 There were some crazy coefficients with 6 digits after the decimal points,
 and data with mystical names: K1, C23 and such.
 So I just entered the formulas into the programming language and got my money.&lt;/p&gt;
@@ -146,24 +146,25 @@ straight line between two very different disciplines, we do not have such lines 
 If you&amp;rsquo;re a mathematician, nobody will be against if you will create a new high-performance
 cryptography algorithm out of your findings.
 Or a nice sound encoding library.
-Or a crazy artificial intelligence algorithm that you will sell to Google for a lots of bucks.&lt;/p&gt;
+Or a crazy artificial intelligence algorithm that you will sell to Google for a lot of bucks.
+&amp;ldquo;Data science&amp;rdquo; is a also great field where math is vital.&lt;/p&gt;
 
 &lt;p&gt;Math has very wide areas of application in computer programming.
-It is just not the only thing anymore.&lt;/p&gt;
+But it is just not the only thing anymore.&lt;/p&gt;
 
 &lt;h2 id=&#34;the-final-note&#34;&gt;The final note&lt;/h2&gt;
 
 &lt;p&gt;When I finally showed my &amp;ldquo;chemical&amp;rdquo; app to a group of chemists, everyone got very excited about it.
 So they started testing it and &amp;ldquo;found a bug&amp;rdquo;: after applying a very long formula,
-the final result was twice as bigger than what they got from their calculator.
-They said they should never have such result otherwise we&amp;rsquo;re all
+the final result was twice as bigger than they got from their calculator.
+They said they should have never had such result otherwise we were all
 doomed and the gas factory we were working at
-should explode because of this.&lt;/p&gt;
+would explode because of this.&lt;/p&gt;
 
 &lt;p&gt;I was trying to find the bug for a few days.
-After I finally gave up, I decided to ask a chemist to make all the calculations manually
-to verify my app&amp;rsquo;s calculation step by step.
-She was throwing away some very small numbers after the decimal point, that&amp;rsquo;s why
+After I gave up, I decided to ask a chemist to make all the calculations manually
+to verify my app&amp;rsquo;s calculations step by step.
+And I found out that she was throwing away some very small numbers after the decimal point, that&amp;rsquo;s why
 we had different results!!!&lt;/p&gt;
 
 &lt;p&gt;After some discussions we decided to lower the app&amp;rsquo;s accuracy.
