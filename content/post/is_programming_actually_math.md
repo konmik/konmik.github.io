@@ -4,9 +4,6 @@ date = "2017-04-24"
 tags = ["Programming in general"]
 +++
 
-At first I was annoyed by the subject. I was even angry sometimes.
-But once I found an article which conforms to my ideas on it and got a little bit more calm.
-Now, a few years later, I finally decided to write my own ideas down.
 The main difference between programming and math is...
 
 <!--more-->
