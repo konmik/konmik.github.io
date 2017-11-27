@@ -6,3 +6,5 @@ PygmentsCodeFences = true
 theme = "hugo-base16-theme"
 canonifyURLs = true
 relativeURLs = true
+[taxonomies]
+  category = ""
