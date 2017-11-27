@@ -5,12 +5,21 @@
 <meta name="description" content="">
 <meta name="keywords" content="">
 <meta name="author" content="">
-<meta name="generator" content="Hugo 0.17" />
+<meta name="generator" content="Hugo 0.31" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
 <link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
 <title>Why lambdas matter (even on Android) - Konstantin Mikheev&#39;s programming blog</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110255812-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-110255812-1');
+</script>
+
 </head>
 <body>
 
@@ -129,23 +138,17 @@ Sure, it is not a good idea to blindly rethrow <em>all</em> exceptions, but if
 you want your app to crash (fail-fast strategy), why bother?</p>
 
 <p>Was:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="k">try</span> <span class="o">{</span>
-    <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">100</span><span class="o">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="k">try</span> <span class="o">{</span>
+    <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">100</span><span class="o">);</span>
 <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Became:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">rethrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">100</span><span class="o">));</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">rethrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">100</span><span class="o">));</span></code></pre></div>
 <p>And even:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">int</span> <span class="kt">byte</span> <span class="o">=</span> <span class="n">rethrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">inputStream</span><span class="o">.</span><span class="na">read</span><span class="o">());</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="kt">byte</span> <span class="o">=</span> <span class="n">rethrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">inputStream</span><span class="o">.</span><span class="na">read</span><span class="o">());</span></code></pre></div>
 <p>Implementation:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">RunnableThrows</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">RunnableThrows</span> <span class="o">{</span>
     <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span><span class="o">;</span>
 <span class="o">}</span>
 
@@ -165,20 +168,18 @@ you want your app to crash (fail-fast strategy), why bother?</p>
     <span class="o">}</span>
 <span class="o">}</span>
 
-<span class="cm">/**</span>
-<span class="cm"> * http://www.mail-archive.com/javaposse@googlegroups.com/msg05984.html</span>
-<span class="cm"> */</span>
+<span class="cm">/**
+</span><span class="cm"> * http://www.mail-archive.com/javaposse@googlegroups.com/msg05984.html
+</span><span class="cm"> */</span>
 <span class="kd">public</span> <span class="kd">static</span> <span class="n">RuntimeException</span> <span class="nf">rethrow</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">sneakyThrow0</span><span class="o">(</span><span class="n">throwable</span><span class="o">);</span>
     <span class="k">throw</span> <span class="kc">null</span><span class="o">;</span>
 <span class="o">}</span>
 
-<span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&quot;unchecked&quot;</span><span class="o">)</span>
+<span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
 <span class="kd">private</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="nf">sneakyThrow0</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">T</span> <span class="o">{</span>
     <span class="k">throw</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span> <span class="n">throwable</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>This <code>sneakyThrow0</code> just rethrows a checked exception without wrapping it into
 <code>RuntimeException</code>, so the exception&rsquo;s stacktrace becomes shorter.</p>
 
@@ -187,29 +188,23 @@ you want your app to crash (fail-fast strategy), why bother?</p>
 <p><code>suppress</code> is a brother of <code>rethrow</code>. It suppresses a thrown exception.</p>
 
 <p>Instead of:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">BigDecimal</span> <span class="n">number</span> <span class="o">=</span> <span class="kc">null</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">BigDecimal</span> <span class="n">number</span> <span class="o">=</span> <span class="kc">null</span>
 <span class="k">try</span> <span class="o">{</span>
     <span class="n">number</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="n">string</span><span class="o">);</span>
 <span class="o">}</span>
 <span class="k">catch</span> <span class="o">(</span><span class="n">NumberFormatException</span> <span class="n">ignored</span><span class="o">)</span> <span class="o">{</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Write:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">BugDecimal</span> <span class="n">number</span> <span class="o">=</span> <span class="n">suppress</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="n">string</span><span class="o">));</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">BugDecimal</span> <span class="n">number</span> <span class="o">=</span> <span class="n">suppress</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="n">string</span><span class="o">));</span></code></pre></div>
 <p>You can also be specific:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">BugDecimal</span> <span class="n">number</span> <span class="o">=</span> <span class="n">suppress</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="n">string</span><span class="o">),</span> <span class="n">NumberFormatException</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">BugDecimal</span> <span class="n">number</span> <span class="o">=</span> <span class="n">suppress</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="n">string</span><span class="o">),</span> <span class="n">NumberFormatException</span><span class="o">.</span><span class="na">class</span><span class="o">);</span></code></pre></div>
 <p>Implementation:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="nd">@Nullable</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="nd">@Nullable</span>
 <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">suppress</span><span class="o">(</span><span class="n">Callable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callable</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">&gt;...</span> <span class="n">throwables</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">try</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">();</span>
     <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">thrown</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">throwables</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">throwables</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span>
             <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
 
         <span class="k">for</span> <span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">throwable</span> <span class="o">:</span> <span class="n">throwables</span><span class="o">)</span> <span class="o">{</span>
@@ -219,9 +214,7 @@ you want your app to crash (fail-fast strategy), why bother?</p>
         <span class="o">}</span>
         <span class="k">throw</span> <span class="n">rethrow</span><span class="o">(</span><span class="n">thrown</span><span class="o">);</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>You can modify <code>suppress</code> to return boolean, <code>Optional</code> or to have any other tricky behavior.</p>
 
 <h5 id="delayed">Delayed</h5>
@@ -230,7 +223,7 @@ you want your app to crash (fail-fast strategy), why bother?</p>
 and cached for later usage.</p>
 
 <p>Was:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">private</span> <span class="kt">int</span> <span class="n">value</span><span class="o">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kt">int</span> <span class="n">value</span><span class="o">;</span>
 <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">isValueInitialized</span><span class="o">;</span>
 
 <span class="kd">private</span> <span class="kt">int</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
@@ -239,20 +232,14 @@ and cached for later usage.</p>
         <span class="n">isValueInitialized</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Became:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">private</span> <span class="n">Delayed</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">value</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Delayed</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">calculateValue</span><span class="o">());</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">Delayed</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">value</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Delayed</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">calculateValue</span><span class="o">());</span></code></pre></div>
 <p>This kind of variables are quite helpful when it comes to declaring data that does not exist at the moment
 of the class instantiation. On Android we can refer to Activity&rsquo;s extras like this:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">private</span> <span class="n">Delayed</span><span class="o">&lt;</span><span class="n">Record</span><span class="o">&gt;</span> <span class="n">record</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Delayed</span><span class="o">&lt;&gt;(()</span> <span class="o">-&gt;</span> <span class="n">getIntent</span><span class="o">().</span><span class="na">getParcelableExtra</span><span class="o">(</span><span class="s">&quot;record&quot;</span><span class="o">));</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">Delayed</span><span class="o">&lt;</span><span class="n">Record</span><span class="o">&gt;</span> <span class="n">record</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Delayed</span><span class="o">&lt;&gt;(()</span> <span class="o">-&gt;</span> <span class="n">getIntent</span><span class="o">().</span><span class="na">getParcelableExtra</span><span class="o">(</span><span class="s">&#34;record&#34;</span><span class="o">));</span></code></pre></div>
 <p>Implementation:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Delayed</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Delayed</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Factory</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
         <span class="n">T</span> <span class="nf">create</span><span class="o">();</span>
@@ -273,9 +260,7 @@ of the class instantiation. On Android we can refer to Activity&rsquo;s extras l
         <span class="o">}</span>
         <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>This pattern allows to solve one of fundamental problems: we don&rsquo;t want to calculate a value
 twice but we don&rsquo;t want to manually control the variable initialization/usage order.</p>
 
@@ -292,15 +277,13 @@ function. Instead of implementing your own class which has <code>Comparator</cod
 you can just pass a lambda into the <code>sort</code> function.</p>
 
 <p>Here is another example. How many times did you write something like this?</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">copy</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">in</span><span class="o">,</span> <span class="n">OutputStream</span> <span class="n">out</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4096</span><span class="o">];</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">copy</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">in</span><span class="o">,</span> <span class="n">OutputStream</span> <span class="n">out</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">4096</span><span class="o">];</span>
     <span class="kt">int</span> <span class="n">read</span><span class="o">;</span>
-    <span class="k">while</span> <span class="o">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">in</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">read</span><span class="o">);</span>
+    <span class="k">while</span> <span class="o">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">in</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">read</span><span class="o">);</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>But what if you want to copy not from <code>InputStream</code> into <code>OutputStream</code> but from any other
 pool of data into another pool?
 OOP way is to implement <code>InputStream</code> and <code>OutputStream</code>
@@ -308,7 +291,7 @@ every time you need a buffered copying. This is very hard so nobody actually do 
 tons of buffered copying functions everywhere.</p>
 
 <p>Here is an algorithm that does not depend upon a specific class.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Action1Throws</span><span class="o">&lt;</span><span class="n">T1</span><span class="o">,</span> <span class="n">E</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Action1Throws</span><span class="o">&lt;</span><span class="n">T1</span><span class="o">,</span> <span class="n">E</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">&gt;</span> <span class="o">{</span>
     <span class="kt">void</span> <span class="nf">call</span><span class="o">(</span><span class="n">T1</span> <span class="n">t</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">E</span><span class="o">;</span>
 <span class="o">}</span>
 
@@ -318,25 +301,21 @@ tons of buffered copying functions everywhere.</p>
 
 <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">E1</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">,</span> <span class="n">E2</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">&gt;</span>
 <span class="kt">void</span> <span class="nf">bufferedCopy</span><span class="o">(</span><span class="n">Func1Throws</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[],</span> <span class="n">Integer</span><span class="o">,</span> <span class="n">E1</span><span class="o">&gt;</span> <span class="n">reader</span><span class="o">,</span> <span class="n">Action1Throws</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[],</span> <span class="n">E2</span><span class="o">&gt;</span> <span class="n">consumer</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">E1</span><span class="o">,</span> <span class="n">E2</span> <span class="o">{</span>
-    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4096</span><span class="o">];</span>
+    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">4096</span><span class="o">];</span>
     <span class="kt">int</span> <span class="n">read</span><span class="o">;</span>
-    <span class="k">while</span> <span class="o">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">consumer</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">read</span> <span class="o">==</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span> <span class="o">?</span> <span class="n">buffer</span> <span class="o">:</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">read</span><span class="o">));</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Yep, the function declaration looks terrible. :D This is Java, a quite verbose beast.</p>
 
 <p>But now we can reuse the code!</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">md5</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">in</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">MessageDigest</span> <span class="n">digest</span> <span class="o">=</span> <span class="n">rethrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">MessageDigest</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;MD5&quot;</span><span class="o">));</span>
-    <span class="n">bufferedCopy</span><span class="o">(</span><span class="n">in</span><span class="o">::</span><span class="n">read</span><span class="o">,</span> <span class="n">buffer</span> <span class="o">-&gt;</span> <span class="n">digest</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span><span class="o">));</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">BigInteger</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">digest</span><span class="o">.</span><span class="na">digest</span><span class="o">())</span>
-        <span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">16</span><span class="o">).</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">32</span><span class="o">).</span><span class="na">replace</span><span class="o">(</span><span class="sc">&#39; &#39;</span><span class="o">,</span> <span class="sc">&#39;0&#39;</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">md5</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">in</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">MessageDigest</span> <span class="n">digest</span> <span class="o">=</span> <span class="n">rethrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">MessageDigest</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&#34;MD5&#34;</span><span class="o">));</span>
+    <span class="n">bufferedCopy</span><span class="o">(</span><span class="nl">in:</span><span class="o">:</span><span class="n">read</span><span class="o">,</span> <span class="n">buffer</span> <span class="o">-&gt;</span> <span class="n">digest</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span><span class="o">));</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">BigInteger</span><span class="o">(</span><span class="n">1</span><span class="o">,</span> <span class="n">digest</span><span class="o">.</span><span class="na">digest</span><span class="o">())</span>
+        <span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">16</span><span class="o">).</span><span class="na">substring</span><span class="o">(</span><span class="n">0</span><span class="o">,</span> <span class="n">32</span><span class="o">).</span><span class="na">replace</span><span class="o">(</span><span class="sc">&#39; &#39;</span><span class="o">,</span> <span class="sc">&#39;0&#39;</span><span class="o">);</span>
+<span class="o">}</span></code></pre></div>
 <p>The OOP version of Algorithm pattern was very poor. Now we can <em>really</em> reuse our algorithms.</p>
 
 <p>Consequences of this pattern replacement are fundamental.
@@ -386,7 +365,7 @@ there is a couple of alternatives:
 <p>How streams look like? (Solid)</p>
 
 <p>Was:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;</span> <span class="nf">tree</span><span class="o">(</span><span class="n">File</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;</span> <span class="nf">tree</span><span class="o">(</span><span class="n">File</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">List</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
     <span class="n">result</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">path</span><span class="o">);</span>
 
@@ -399,17 +378,13 @@ there is a couple of alternatives:
         <span class="n">files</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">tree</span><span class="o">(</span><span class="n">file</span><span class="o">));</span>
     <span class="o">}</span>
     <span class="k">return</span> <span class="n">files</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Became:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">Stream</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;</span> <span class="nf">tree</span><span class="o">(</span><span class="n">File</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">Stream</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;</span> <span class="nf">tree</span><span class="o">(</span><span class="n">File</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">File</span><span class="o">[]</span> <span class="n">files</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="na">listFiles</span><span class="o">();</span>
     <span class="k">return</span> <span class="n">files</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">of</span><span class="o">(</span><span class="n">path</span><span class="o">)</span> <span class="o">:</span>
         <span class="n">of</span><span class="o">(</span><span class="n">path</span><span class="o">).</span><span class="na">merge</span><span class="o">(</span><span class="n">stream</span><span class="o">(</span><span class="n">files</span><span class="o">).</span><span class="na">flatMap</span><span class="o">(</span><span class="n">it</span> <span class="o">-&gt;</span> <span class="n">tree</span><span class="o">(</span><span class="n">it</span><span class="o">)));</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>The syntax can look weird and you need to study several new methods,
 but it is just a matter of habit. It took just one month for me
 to completely switch my way of thinking about data.</p>
@@ -430,7 +405,7 @@ where all events are processed with RxJava instead of usual OOP method calls.</p
 with several methods, such interfaces can not be substituted by lambdas.</p>
 
 <p>Was:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">animator</span><span class="o">.</span><span class="na">addListener</span><span class="o">(</span><span class="k">new</span> <span class="n">Animator</span><span class="o">.</span><span class="na">AnimatorListener</span><span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">animator</span><span class="o">.</span><span class="na">addListener</span><span class="o">(</span><span class="k">new</span> <span class="n">Animator</span><span class="o">.</span><span class="na">AnimatorListener</span><span class="o">()</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAnimationStart</span><span class="o">(</span><span class="n">Animator</span> <span class="n">animation</span><span class="o">)</span> <span class="o">{</span>
 
@@ -440,15 +415,11 @@ with several methods, such interfaces can not be substituted by lambdas.</p>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAnimationEnd</span><span class="o">(</span><span class="n">Animator</span> <span class="n">animation</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">view</span><span class="o">.</span><span class="na">setVisibility</span><span class="o">(</span><span class="n">GONE</span><span class="o">)</span>
     <span class="o">}</span>
-<span class="o">});</span>
-</code></pre></div>
-
+<span class="o">});</span></code></pre></div>
 <p>Became:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">animator</span><span class="o">.</span><span class="na">addListener</span><span class="o">(</span><span class="k">new</span> <span class="n">AnimatorEndListener</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">view</span><span class="o">.</span><span class="na">setVisibility</span><span class="o">(</span><span class="n">GONE</span><span class="o">));</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">animator</span><span class="o">.</span><span class="na">addListener</span><span class="o">(</span><span class="k">new</span> <span class="n">AnimatorEndListener</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">view</span><span class="o">.</span><span class="na">setVisibility</span><span class="o">(</span><span class="n">GONE</span><span class="o">));</span></code></pre></div>
 <p>With:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnimatorEndListener</span> <span class="kd">implements</span> <span class="n">Animator</span><span class="o">.</span><span class="na">AnimatorListener</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnimatorEndListener</span> <span class="kd">implements</span> <span class="n">Animator</span><span class="o">.</span><span class="na">AnimatorListener</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="kd">final</span> <span class="n">Runnable</span> <span class="n">onEnd</span><span class="o">;</span>
 
@@ -465,9 +436,7 @@ with several methods, such interfaces can not be substituted by lambdas.</p>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAnimationEnd</span><span class="o">(</span><span class="n">Animator</span> <span class="n">animation</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">onEnd</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <h3 id="the-future-of-programming-languages">The future of programming languages</h3>
 
 <p>In the introduction I wrote about power of languages. The idea is not new. Any programmer who
@@ -517,6 +486,13 @@ I hope that we will get Clojure sooner or later.</p>
 
 <p><a href="https://github.com/konmik/solid">Solid</a></p>
   </section>
+  <br/>
+  <div class="meta">
+    <span class="key">To improve my English grammar:</span>
+    <span class="val">just <a href="https://github.com/konmik/konmik.github.io/tree/source/content/post">open the .md file</a> and press "Edit" button<br/></span>
+    <span class="key">Have more ideas?</span>
+    <span class="val"><a href="https://github.com/konmik/konmik.github.io/issues">Create an issue</a></span>
+  </div>
 </article>
 
 </main>

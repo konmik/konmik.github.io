@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://konmik.com/</loc>
-    <lastmod>2017-04-24T00:00:00+00:00</lastmod>
+    <loc>http://konmik.com/post/code_simplicity_01/</loc>
+    <lastmod>2017-11-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -44,6 +45,23 @@
   <url>
     <loc>http://konmik.com/post/snorkeling_with_dagger_2/</loc>
     <lastmod>2015-02-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/</loc>
+    <lastmod>2017-11-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/post/</loc>
+    <lastmod>2017-11-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>

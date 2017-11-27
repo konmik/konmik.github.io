@@ -5,12 +5,21 @@
 <meta name="description" content="">
 <meta name="keywords" content="">
 <meta name="author" content="">
-<meta name="generator" content="Hugo 0.17" />
+<meta name="generator" content="Hugo 0.31" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
 <link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
 <title>Managing state reactive way - Konstantin Mikheev&#39;s programming blog</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110255812-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-110255812-1');
+</script>
+
 </head>
 <body>
 
@@ -144,7 +153,7 @@ So we only need to allocate the difference between the old and the new graphs.</
 
 <p>Let&rsquo;s take an example.
 Here is the representation of state in a currency selection dialog:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">class</span> <span class="nc">CurrencySelectionState</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nc">CurrencySelectionState</span> <span class="o">{</span>
 
     <span class="kd">public</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">currencies</span><span class="o">;</span>
     <span class="kd">public</span> <span class="kd">final</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">selected</span><span class="o">;</span>
@@ -168,9 +177,7 @@ Here is the representation of state in a currency selection dialog:</p>
     <span class="n">CurrencySelectionState</span> <span class="nf">withSelected</span><span class="o">(</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">CurrencyInfo</span><span class="o">&gt;</span> <span class="n">selected</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="k">new</span> <span class="n">CurrencySelectionState</span><span class="o">(</span><span class="n">currencies</span><span class="o">,</span> <span class="n">selected</span><span class="o">,</span> <span class="n">networkError</span><span class="o">);</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>When user selects another currency, we only create a new instance
 of <code>CurrencySelectionState</code> with the old list and new <code>selected</code> field.
 We don&rsquo;t need to copy the currency list itself because it was not changed.
@@ -182,11 +189,9 @@ project, you can try automatic code generators for such purposes, for example
 <a href="https://github.com/gabrielittner/auto-value-with">AutoValue: With Extension</a>.</p>
 
 <p>We can also stack such &ldquo;modifications&rdquo; by calling them in a chain:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">CurrencySelectionState</span> <span class="n">newViewState</span> <span class="o">=</span> <span class="n">oldViewState</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">CurrencySelectionState</span> <span class="n">newViewState</span> <span class="o">=</span> <span class="n">oldViewState</span>
     <span class="o">.</span><span class="na">withCurrencies</span><span class="o">(</span><span class="n">newList</span><span class="o">)</span>
-    <span class="o">.</span><span class="na">withSelected</span><span class="o">(</span><span class="n">selectedItem</span><span class="o">);</span>
-</code></pre></div>
-
+    <span class="o">.</span><span class="na">withSelected</span><span class="o">(</span><span class="n">selectedItem</span><span class="o">);</span></code></pre></div>
 <p>After getting a new <code>CurrencySelectionState</code> instance,
 all we need is to call our <code>currencySelectionDialog.update(newViewState)</code>
 to refresh view and the job is done.</p>
@@ -257,13 +262,13 @@ we must be very precise and should always get the updated list of items in the r
 <h2 id="usage-example">Usage example</h2>
 
 <p>Here is how we&rsquo;re going to use it:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">class</span> <span class="nc">CurrencySelection</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nc">CurrencySelection</span> <span class="o">{</span>
 
-    <span class="c1">// The state itself.</span>
-    <span class="c1">// We&#39;re providing the initial value for it.</span>
-    <span class="c1">// We also need to specify a scheduler where we want to observe</span>
-    <span class="c1">// emitted values.</span>
-    <span class="n">RxState</span><span class="o">&lt;</span><span class="n">CurrencySelectionState</span><span class="o">&gt;</span> <span class="n">state</span> <span class="o">=</span>
+    <span class="c1">// The state itself.
+</span><span class="c1"></span>    <span class="c1">// We&#39;re providing the initial value for it.
+</span><span class="c1"></span>    <span class="c1">// We also need to specify a scheduler where we want to observe
+</span><span class="c1"></span>    <span class="c1">// emitted values.
+</span><span class="c1"></span>    <span class="n">RxState</span><span class="o">&lt;</span><span class="n">CurrencySelectionState</span><span class="o">&gt;</span> <span class="n">state</span> <span class="o">=</span>
          <span class="k">new</span> <span class="n">RxState</span><span class="o">&lt;&gt;(</span><span class="k">new</span> <span class="n">CurrencySelectionState</span><span class="o">(),</span> <span class="n">mainThread</span><span class="o">());</span>
 
     <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
@@ -271,20 +276,18 @@ we must be very precise and should always get the updated list of items in the r
             <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">updateView</span><span class="o">);</span>
     <span class="o">}</span>
 
-    <span class="c1">// Call it from ANY thread, all the multithreading</span>
-    <span class="c1">// will be handled by RxState.</span>
-    <span class="kt">void</span> <span class="nf">onPagingUp</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newItems</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Call it from ANY thread, all the multithreading
+</span><span class="c1"></span>    <span class="c1">// will be handled by RxState.
+</span><span class="c1"></span>    <span class="kt">void</span> <span class="nf">onPagingUp</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newItems</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">state</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">old</span> <span class="o">-&gt;</span> <span class="o">{</span>
-            <span class="c1">// Do not modify the old state, create a new one!</span>
-            <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+            <span class="c1">// Do not modify the old state, create a new one!
+</span><span class="c1"></span>            <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Currency</span><span class="o">&gt;</span> <span class="n">newList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
             <span class="n">newList</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">newItems</span><span class="o">);</span>
             <span class="n">newList</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">old</span><span class="o">.</span><span class="na">currencies</span><span class="o">);</span>
             <span class="k">return</span> <span class="n">old</span><span class="o">.</span><span class="na">withCurrencies</span><span class="o">(</span><span class="n">unmodifiableList</span><span class="o">(</span><span class="n">newList</span><span class="o">));</span>
         <span class="o">});</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>This pattern perfectly fits into any architecture.
 You can keep <code>RxState</code> in a view if you&rsquo;re adhering to &ldquo;I don&rsquo;t care&rdquo; architecture,
 you can put it into a presenter when doing MVP,
@@ -317,10 +320,8 @@ operators to connect other operators together.</p>
 <p>B) There is also no guarantee that emitted values will be sequential relatively to each other.</p>
 
 <p>Say, you want to change values like this:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">int</span> <span class="n">currentValue</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
-<span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">currentValue</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="n">currentValue</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+<span class="n">subject</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">currentValue</span> <span class="o">+</span> <span class="n">1</span><span class="o">);</span></code></pre></div>
 <p>In a concurrent environment something can change subject value between <code>getValue()</code> and <code>onNext()</code> calls
 and the classical race condition will happen - you will get repeating numbers sometimes.
 So you need to write poor man&rsquo;s <code>synchronized</code> blocks to prevent this
@@ -351,6 +352,13 @@ this is the only way we can guarantee their sequence</li>
 <p>Here is the implementation for RxJava 2:
 <a href="https://github.com/konmik/rxstate/tree/master/rxstate2/src/main/java/util/rx2">RxState</a>.</p>
   </section>
+  <br/>
+  <div class="meta">
+    <span class="key">To improve my English grammar:</span>
+    <span class="val">just <a href="https://github.com/konmik/konmik.github.io/tree/source/content/post">open the .md file</a> and press "Edit" button<br/></span>
+    <span class="key">Have more ideas?</span>
+    <span class="val"><a href="https://github.com/konmik/konmik.github.io/issues">Create an issue</a></span>
+  </div>
 </article>
 
 </main>

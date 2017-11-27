@@ -5,12 +5,21 @@
 <meta name="description" content="">
 <meta name="keywords" content="">
 <meta name="author" content="">
-<meta name="generator" content="Hugo 0.17" />
+<meta name="generator" content="Hugo 0.31" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
 <link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
 <title>When to NOT use RxJava - Konstantin Mikheev&#39;s programming blog</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110255812-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-110255812-1');
+</script>
+
 </head>
 <body>
 
@@ -74,11 +83,9 @@ What will you think if you will discover an implementation like this
 that was proudly created for you by a newbie who can&rsquo;t wait to apply the new magical hammer?</p>
 
 <h4 id="figure-a">Figure A.</h4>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">max</span><span class="o">(</span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">max</span><span class="o">(</span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">zip</span><span class="o">(</span><span class="n">left</span><span class="o">,</span> <span class="n">right</span><span class="o">,</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="o">?</span> <span class="n">b</span> <span class="o">:</span> <span class="n">a</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Interesting, yeah?</p>
 
 <blockquote>
@@ -89,19 +96,15 @@ that was proudly created for you by a newbie who can&rsquo;t wait to apply the n
 less shiny and inspiring but more practical:</p>
 
 <h4 id="figure-b">Figure B.</h4>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kt">int</span> <span class="nf">max</span><span class="o">(</span><span class="kt">int</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="nf">max</span><span class="o">(</span><span class="kt">int</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="o">?</span> <span class="n">b</span> <span class="o">:</span> <span class="n">a</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>There is even an option to refactor the old code like this:</p>
 
 <h4 id="figure-c">Figure C.</h4>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">max</span><span class="o">(</span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">zip</span><span class="o">(</span><span class="n">left</span><span class="o">,</span> <span class="n">right</span><span class="o">,</span> <span class="n">MyMath</span><span class="o">::</span><span class="n">max</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">max</span><span class="o">(</span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">zip</span><span class="o">(</span><span class="n">left</span><span class="o">,</span> <span class="n">right</span><span class="o">,</span> <span class="nl">MyMath:</span><span class="o">:</span><span class="n">max</span><span class="o">);</span>
+<span class="o">}</span></code></pre></div>
 <p>But in practice such a weird <code>max</code> implementation is just a consequence of other
 weird functions that for some reason will look better if <code>max</code> works with observables.</p>
 
@@ -109,11 +112,9 @@ weird functions that for some reason will look better if <code>max</code> works 
 size &ndash; people turn into stream <em>everything</em> literally.</p>
 
 <p>You can easily discover code like this:</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">Observable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">id</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>In a large codebase it happens all the time.</p>
 
 <p>Or you can find a 20-line function of operators
@@ -376,6 +377,13 @@ be slower than you can afford.</p>
 
 <h2 id="have-safe-rx-ing">Have safe rx-ing! :)</h2>
   </section>
+  <br/>
+  <div class="meta">
+    <span class="key">To improve my English grammar:</span>
+    <span class="val">just <a href="https://github.com/konmik/konmik.github.io/tree/source/content/post">open the .md file</a> and press "Edit" button<br/></span>
+    <span class="key">Have more ideas?</span>
+    <span class="val"><a href="https://github.com/konmik/konmik.github.io/issues">Create an issue</a></span>
+  </div>
 </article>
 
 </main>

@@ -5,12 +5,21 @@
 <meta name="description" content="">
 <meta name="keywords" content="">
 <meta name="author" content="">
-<meta name="generator" content="Hugo 0.17" />
+<meta name="generator" content="Hugo 0.31" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://konmik.com/css/style.css" type="text/css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
 <link rel="alternate" href="http://konmik.com/index.xml" type="application/rss+xml" title="Konstantin Mikheev&#39;s programming blog">
 <title>Introduction to Model View Presenter on Android - Konstantin Mikheev&#39;s programming blog</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110255812-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-110255812-1');
+</script>
+
 </head>
 <body>
 
@@ -188,8 +197,8 @@ allows to control data flows easily.</p>
 <p>I would like to thank the guy who created a simple api that I use for my examples: <a href="http://www.icndb.com/">The Internet Chuck Norris Database</a></p>
 
 <h2 id="without-mvp-example-00-https-github-com-konmik-mvpexamples-tree-master-example00">Without MVP <a href="https://github.com/konmik/MVPExamples/tree/master/example00">example 00</a>:</h2>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;Chuck Norris&quot;</span><span class="o">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&#34;Chuck Norris&#34;</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">&gt;</span> <span class="n">adapter</span><span class="o">;</span>
     <span class="kd">private</span> <span class="n">Subscription</span> <span class="n">subscription</span><span class="o">;</span>
@@ -212,8 +221,8 @@ allows to control data flows easily.</p>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestItems</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">unsubscribe</span><span class="o">();</span>
         <span class="n">subscription</span> <span class="o">=</span> <span class="n">App</span><span class="o">.</span><span class="na">getServerAPI</span><span class="o">()</span>
-            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">name</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">],</span> <span class="n">name</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">])</span>
-            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">name</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;\\s+&#34;</span><span class="o">)[</span><span class="n">0</span><span class="o">],</span> <span class="n">name</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;\\s+&#34;</span><span class="o">)[</span><span class="n">1</span><span class="o">])</span>
+            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="n">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
             <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">AndroidSchedulers</span><span class="o">.</span><span class="na">mainThread</span><span class="o">())</span>
             <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;()</span> <span class="o">{</span>
                 <span class="nd">@Override</span>
@@ -243,9 +252,7 @@ allows to control data flows easily.</p>
             <span class="n">subscription</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>An experienced developer will notice that this simple example has some
 critical defects in it:</p>
 
@@ -263,9 +270,9 @@ a significant application slowdown.</p></li>
 
 <p>Please, do not try this at home! :) This example is for demonstration purposes only.
 In the real life you&rsquo;re not going to use a static variable to hold your presenter.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;Chuck Norris&quot;</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&#34;Chuck Norris&#34;</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">[]</span> <span class="n">items</span><span class="o">;</span>
     <span class="kd">private</span> <span class="n">Throwable</span> <span class="n">error</span><span class="o">;</span>
@@ -274,8 +281,8 @@ In the real life you&rsquo;re not going to use a static variable to hold your pr
 
     <span class="kd">public</span> <span class="nf">MainPresenter</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">App</span><span class="o">.</span><span class="na">getServerAPI</span><span class="o">()</span>
-            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">],</span> <span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">])</span>
-            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;\\s+&#34;</span><span class="o">)[</span><span class="n">0</span><span class="o">],</span> <span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;\\s+&#34;</span><span class="o">)[</span><span class="n">1</span><span class="o">])</span>
+            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="n">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
             <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">AndroidSchedulers</span><span class="o">.</span><span class="na">mainThread</span><span class="o">())</span>
             <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;()</span> <span class="o">{</span>
                 <span class="nd">@Override</span>
@@ -305,13 +312,11 @@ In the real life you&rsquo;re not going to use a static variable to hold your pr
                 <span class="n">view</span><span class="o">.</span><span class="na">onItemsError</span><span class="o">(</span><span class="n">error</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>Technically speaking, MainPresenter has three &ldquo;streams&rdquo; of events: <em>onNext</em>, <em>onError</em>, <em>onTakeView</em>.
 They join in <code>publish()</code> method and <em>onNext</em> or <em>onError</em> values become published to a MainActivity instance
 that has been supplied with <em>onTakeView</em>.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Item</span><span class="o">&gt;</span> <span class="n">adapter</span><span class="o">;</span>
 
@@ -346,9 +351,7 @@ that has been supplied with <em>onTakeView</em>.</p>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">throwable</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_LONG</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>MainActivity creates MainPresenter and keeps it outside of reach of onCreate/onDestroy cycle. MainActivity uses
 a static variable to reference MainPresenter, so every time a process restarts due to out-of-memory event,
 MainActivity should check if the presenter is still here and create it if needed.</p>
@@ -398,17 +401,17 @@ There are just about 180 lines of code to drive Presenter and 230 lines of code 
 <h2 id="example-with-nucleus-https-github-com-konmik-nucleus-example-02-https-github-com-konmik-mvpexamples-tree-master-example02">Example with <a href="https://github.com/konmik/nucleus">Nucleus</a> <a href="https://github.com/konmik/MVPExamples/tree/master/example02">example 02</a></h2>
 
 <p>Note: since the moment of writing this article, a new version of Nucleus was released. You can find updated examples in the <a href="https://github.com/konmik/nucleus">Nucleus project repository</a>.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;Chuck Norris&quot;</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&#34;Chuck Norris&#34;</span><span class="o">;</span>
 
     <span class="nd">@Override</span>
     <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedState</span><span class="o">)</span> <span class="o">{</span>
         <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedState</span><span class="o">);</span>
 
         <span class="n">App</span><span class="o">.</span><span class="na">getServerAPI</span><span class="o">()</span>
-            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">],</span> <span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;\\s+&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">])</span>
-            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getItems</span><span class="o">(</span><span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;\\s+&#34;</span><span class="o">)[</span><span class="n">0</span><span class="o">],</span> <span class="n">DEFAULT_NAME</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;\\s+&#34;</span><span class="o">)[</span><span class="n">1</span><span class="o">])</span>
+            <span class="o">.</span><span class="na">delay</span><span class="o">(</span><span class="n">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
             <span class="o">.</span><span class="na">observeOn</span><span class="o">(</span><span class="n">AndroidSchedulers</span><span class="o">.</span><span class="na">mainThread</span><span class="o">())</span>
             <span class="o">.</span><span class="na">compose</span><span class="o">(</span><span class="k">this</span><span class="o">.&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;</span><span class="n">deliverLatestCache</span><span class="o">())</span>
             <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">Action1</span><span class="o">&lt;</span><span class="n">ServerAPI</span><span class="o">.</span><span class="na">Response</span><span class="o">&gt;()</span> <span class="o">{</span>
@@ -447,9 +450,7 @@ There are just about 180 lines of code to drive Presenter and 230 lines of code 
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemsError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">throwable</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_LONG</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 <p>As you can see, this example is significantly shorter and cleaner than the previous one. Nucleus creates/destroys/saves presenter,
 attaches/detaches a View to it and sends request results right into an attached view automatically.</p>
 
@@ -516,7 +517,7 @@ views any time and presenters will outlive all this actions, continuing backgrou
 <p>The rule is simple: the presenter&rsquo;s main purpose is to manage requests. So View should not handle or restart requests itself.
 From a View&rsquo;s perspective, background tasks are something that never disappear and will always return a result or an error <em>without
 any callbacks</em>.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">DEFAULT_NAME</span><span class="o">;</span>
 
@@ -531,13 +532,11 @@ any callbacks</em>.</p>
     <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onSave</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="n">Bundle</span> <span class="n">state</span><span class="o">)</span> <span class="o">{</span>
         <span class="kd">super</span><span class="o">.</span><span class="na">onSave</span><span class="o">(</span><span class="n">state</span><span class="o">);</span>
         <span class="n">state</span><span class="o">.</span><span class="na">putString</span><span class="o">(</span><span class="n">NAME_KEY</span><span class="o">,</span> <span class="n">name</span><span class="o">);</span>
-    <span class="o">}</span>
-</code></pre></div>
-
+    <span class="o">}</span></code></pre></div>
 <p>I recommend using awesome <a href="https://github.com/frankiesardo/icepick">Icepick</a> library. It reduces code size and simplifies
 application logic without using runtime annotations - everything happens during compilation. This library is
 a good partner for <a href="http://jakewharton.github.io/butterknife">ButterKnife</a>.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainPresenter</span> <span class="kd">extends</span> <span class="n">RxPresenter</span><span class="o">&lt;</span><span class="n">MainActivity</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="nd">@State</span> <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">DEFAULT_NAME</span><span class="o">;</span>
 
@@ -551,9 +550,7 @@ a good partner for <a href="http://jakewharton.github.io/butterknife">ButterKnif
     <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onSave</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="n">Bundle</span> <span class="n">state</span><span class="o">)</span> <span class="o">{</span>
         <span class="kd">super</span><span class="o">.</span><span class="na">onSave</span><span class="o">(</span><span class="n">state</span><span class="o">);</span>
         <span class="n">Icepick</span><span class="o">.</span><span class="na">saveInstanceState</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">state</span><span class="o">);</span>
-    <span class="o">}</span>
-</code></pre></div>
-
+    <span class="o">}</span></code></pre></div>
 <p>If you have more than a couple of request arguments this library naturally saves life. You can create <code>BasePresenter</code> and put <em>Icepick</em>
 into that class once and all subclasses will automatically get the ability to save their fields that are annotated
 with <code>@State</code> and you will never need to implement <code>onSave</code> again. This also works for saving Activity&rsquo;s, Fragment&rsquo;s or View&rsquo;s state.</p>
@@ -582,6 +579,13 @@ just violates KISS principle. Don&rsquo;t play ping-pong between your view and p
 
 <p>Give MVP a try, tell a friend. :)</p>
   </section>
+  <br/>
+  <div class="meta">
+    <span class="key">To improve my English grammar:</span>
+    <span class="val">just <a href="https://github.com/konmik/konmik.github.io/tree/source/content/post">open the .md file</a> and press "Edit" button<br/></span>
+    <span class="key">Have more ideas?</span>
+    <span class="val"><a href="https://github.com/konmik/konmik.github.io/issues">Create an issue</a></span>
+  </div>
 </article>
 
 </main>
