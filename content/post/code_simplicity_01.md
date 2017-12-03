@@ -186,7 +186,7 @@ But now we have a more general I/O function and this function
 must also be called in a specific order.
 
 We may say that when joining two I/O function calls we
-reduce these function complexity 2 to 1 but it is still not 0.
+reduce these function complexity from 2 to 1 but it is still not 0.
 It can become even worse when we have parallel code execution
 in the program and the I/O function can covertly affect the execution
 of other functions sharing the same resource.
