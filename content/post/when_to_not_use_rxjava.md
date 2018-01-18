@@ -17,12 +17,12 @@ Here I will try to explain where RxJava can help and in which cases it is better
 Let's take a very simple and obvious example of a wrong RxJava
 usage and go into theoretical details later.
 
-It is often can be found that people inspired with RxJava
+Often, people inspired with RxJava
 start turning everything into a stream.
 We even got a new mantra - "Everything is a stream".
 
 Say, you need to implement `int max(int, int)` function (let's pretend it does not exist yet).
-What will you think if you will discover an implementation like this
+What will you think if you discover an implementation like this
 that was proudly created for you by a newbie who can't wait to apply the new magical hammer?
 
 #### Figure A.
@@ -37,8 +37,8 @@ Interesting, yeah?
 
 > "When you have a hammer everything looks like a nail."
 
-A sane developer will probably say "WFT??!" and implement something
-less shiny and inspiring but more practical:
+A sane developer will probably say "WTF??!" and implement something
+less shiny and inspiring, but more practical:
 
 #### Figure B.
 
@@ -75,17 +75,17 @@ Observable<Integer> getId() {
 In a large codebase it happens all the time.
 
 Or you can find a 20-line function of operators
-that is doing the job that can easily be done without RxJava
+that is doing a job that can easily be done without RxJava -
 with the same amount of code!
-Try debugging a flow of events while the person who wrote it
+Try debugging a flow of events when the person who wrote it
 did not even think about events.
 
-I'm not telling that mantras do not work.
-I hope that at this point it is pretty obvious by itself. ;)
+I'm not saying that mantras do not work.
+I hope that at this point that's pretty obvious. ;)
 
-## So what is exactly wrong here?
+## So what exactly is wrong here?
 
-The entire rant is about simplicity.
+This entire rant is about simplicity.
 
 **Figure B.** says:
 "take two ints and return one of them that is bigger" 
@@ -135,13 +135,13 @@ RxJava is not a *data processing* library.
 It is an *event processing* library.
 
 Events are more complex than data
-because in addition to data events have *time* or *order of execution*.
+because, in addition to data, events have *time* or *order of execution*.
 
 If you need to process a list of items, do not turn it into an observable.
 
-In addition to the complexity that will increase
-for the person who will try to understand
-the code there are additional downsides.
+Besides the complexity that will increase
+for a person trying to understand
+the code, there are other downsides.
 Have you seen RxJava source code?
 It contains quite complex logic, so it is hard to debug.
 It also consumes additional resources to make multithreading safe.
