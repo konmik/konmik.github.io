@@ -6,10 +6,21 @@
     <description>Recent content on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Nov 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 06 Feb 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://konmik.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Immutable data is the main key to simple code</title>
+      <link>http://konmik.com/post/code_simplicity_02/</link>
+      <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/post/code_simplicity_02/</guid>
+      <description>&lt;p&gt;Use immutable data like a pro.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>The Code Simplicity Chart (c)</title>
