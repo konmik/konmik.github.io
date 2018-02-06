@@ -75,12 +75,12 @@ Here I will try to explain where RxJava can help and in which cases it is better
 <p>Let&rsquo;s take a very simple and obvious example of a wrong RxJava
 usage and go into theoretical details later.</p>
 
-<p>It is often can be found that people inspired with RxJava
+<p>Often, people inspired with RxJava
 start turning everything into a stream.
 We even got a new mantra - &ldquo;Everything is a stream&rdquo;.</p>
 
 <p>Say, you need to implement <code>int max(int, int)</code> function (let&rsquo;s pretend it does not exist yet).
-What will you think if you will discover an implementation like this
+What will you think if you discover an implementation like this
 that was proudly created for you by a newbie who can&rsquo;t wait to apply the new magical hammer?</p>
 
 <h4 id="figure-a">Figure A.</h4>
@@ -93,8 +93,8 @@ that was proudly created for you by a newbie who can&rsquo;t wait to apply the n
 <p>&ldquo;When you have a hammer everything looks like a nail.&rdquo;</p>
 </blockquote>
 
-<p>A sane developer will probably say &ldquo;WFT??!&rdquo; and implement something
-less shiny and inspiring but more practical:</p>
+<p>A sane developer will probably say &ldquo;WTF??!&rdquo; and implement something
+less shiny and inspiring, but more practical:</p>
 
 <h4 id="figure-b">Figure B.</h4>
 <div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="nf">max</span><span class="o">(</span><span class="kt">int</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
@@ -119,17 +119,17 @@ size &ndash; people turn into stream <em>everything</em> literally.</p>
 <p>In a large codebase it happens all the time.</p>
 
 <p>Or you can find a 20-line function of operators
-that is doing the job that can easily be done without RxJava
+that is doing a job that can easily be done without RxJava -
 with the same amount of code!
-Try debugging a flow of events while the person who wrote it
+Try debugging a flow of events when the person who wrote it
 did not even think about events.</p>
 
-<p>I&rsquo;m not telling that mantras do not work.
-I hope that at this point it is pretty obvious by itself. ;)</p>
+<p>I&rsquo;m not saying that mantras do not work.
+I hope that at this point that&rsquo;s pretty obvious. ;)</p>
 
-<h2 id="so-what-is-exactly-wrong-here">So what is exactly wrong here?</h2>
+<h2 id="so-what-exactly-is-wrong-here">So what exactly is wrong here?</h2>
 
-<p>The entire rant is about simplicity.</p>
+<p>This entire rant is about simplicity.</p>
 
 <p><strong>Figure B.</strong> says:
 &ldquo;take two ints and return one of them that is bigger&rdquo;</p>
@@ -179,13 +179,13 @@ do not create observables.</p>
 It is an <em>event processing</em> library.</p>
 
 <p>Events are more complex than data
-because in addition to data events have <em>time</em> or <em>order of execution</em>.</p>
+because, in addition to data, events have <em>time</em> or <em>order of execution</em>.</p>
 
 <p>If you need to process a list of items, do not turn it into an observable.</p>
 
-<p>In addition to the complexity that will increase
-for the person who will try to understand
-the code there are additional downsides.
+<p>Besides the complexity that will increase
+for a person trying to understand
+the code, there are other downsides.
 Have you seen RxJava source code?
 It contains quite complex logic, so it is hard to debug.
 It also consumes additional resources to make multithreading safe.</p>
