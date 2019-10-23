@@ -47,7 +47,9 @@ div.clearfix {
     width: 100%;
   }
 }
-
+a:hover {
+  background-color: yellow;
+}
 article.single section,
 .article-list article {
   background-color: #f2f0ec;
