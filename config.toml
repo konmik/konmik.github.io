@@ -14,3 +14,21 @@ copyright = "(c) Konstantin Mikheev 2020"
   # oneHeadingSize = false
   [site]
       copyright = "Copyright"
+
+[menu]
+  [[menu.main]]
+    identifier = "rss"
+    name = "[RSS]"
+    url = "http://konmik.com/index.xml"
+    weight = 1
+  [[menu.main]]
+    identifier = "twitter"
+    name = "[Twitter]"
+    url = "https://twitter.com/sirstripy"
+    weight = 2
+  [[menu.main]]
+    identifier = "github"
+    name = "[GitHub]"
+    url = "https://github.com/konmik"
+    weight = 3
+    
