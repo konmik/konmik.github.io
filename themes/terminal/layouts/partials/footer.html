@@ -1,0 +1,12 @@
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="copyright copyright--user">
+      <span>{{ $.Site.Copyright | safeHTML }}</span>
+    </div>
+</footer>
+
+<script src="{{ "assets/main.js" | absURL }}"></script>
+<script src="{{ "assets/prism.js" | absURL }}"></script>
+
+<!-- Extended footer section-->
+{{ partial "extended_footer.html" . }}

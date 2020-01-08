@@ -1,10 +1,16 @@
 title = "Konstantin Mikheev's programming blog"
 baseURL = "http://konmik.com/"
 languageCode = "en-us"
-pygmentsuseclasses = true
-PygmentsCodeFences = true
-theme = "hugo-base16-theme"
-canonifyURLs = true
-relativeURLs = true
-[taxonomies]
-  category = ""
+theme = "terminal"
+paginate = 5
+copyright = "(c) Konstantin Mikheev 2020"
+
+[params]
+  readMore = "Read"
+  # ["orange", "blue", "red", "green", "pink"]
+  themeColor = "green"
+  fullWidthTheme = false
+  centerTheme = true
+  # oneHeadingSize = false
+  [site]
+      copyright = "Copyright"
