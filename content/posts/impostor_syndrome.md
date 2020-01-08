@@ -130,30 +130,6 @@ critical thinking and self-criticism (never unlearns), he will very
 likely become *slower* than he/she was 3 years ago, while being sure
 in his/her superiority.
 
-##### Drop rotten stuff ASAP
-
-Getting rid of rotten stuff requires almost the
-same amount of effort as adding and using it.
-
-Maintaining rotten stuff can also be much more expensive than
-replacing it or rewriting it from scratch.
-
-I had a case when updating a badly written library took 1 month,
-but the library could be reimplemented in 3 days without having any issues
-(I did it just to prove my point).
-Imagine people working on this library's maintenance - they waste
-time every month, for several years!
-They could easily rewrite it and save my and their time.
-
-People often argue that rewriting gives no result.
-Of course, it gives no result if it is done by the same
-person while he/she didn't learn anything and used his old mindset!
-It is the old mindset that caused problems to appear in the first place.
-
-Repeating the same action without unlearning is absolutely pointless.
-Make sure to tell *exactly* why rewriting the code will solve the problem
-and why the existing approach was not efficient.
-
 ##### Hype cycle
 
 You can often hear about [Hype cycle](https://en.wikipedia.org/wiki/Hype_cycle)
@@ -222,12 +198,12 @@ find a PC and learn how it is composed.
 > "Premature optimization is the root of all evil" -- Donald Knuth
 
 Write and run benchmarks. Many of them.
-Do it to prove that optimization is needed.
+Do it to prove that an optimization is needed.
 Or the opposite - that is it not needed.
 
 We always hear that "we're doing it this way because it is faster this way".
-If they cannot tell how many nanoseconds it actually saves, they are just lying.
-They do this because they cannot unlearn.
+If they cannot tell how many nanoseconds it saves, they are just lying.
+They do it because they cannot unlearn.
 
 It is common knowledge that premature optimization does not worth additional effort,
 nevertheless we see many developers write many-many lines of code to increase their code performance
