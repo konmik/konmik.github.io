@@ -1,7 +1,7 @@
 +++
 title = "Impostor Syndrome for Software Developers"
 draft = false
-date = "2020-01-01"
+date = "2020-01-08"
 tags = ["Programming Culture"]
 truncated = true
 +++
