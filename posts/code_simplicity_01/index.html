@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>The Code Simplicity Chart (c) :: Konstantin Mikheev&#39;s programming blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="description"
+  content="How to understand if your code is simple or complex.
+" />
+<meta name="keywords"
+  content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="http://konmik.com/posts/code_simplicity_01/" />
+
+
+<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+
+<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144"
+  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+
+<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title"
+  content="The Code Simplicity Chart (c) :: Konstantin Mikheev&#39;s programming blog — " />
+<meta name="twitter:description"
+  content="How to understand if your code is simple or complex.
+" />
+<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image" content="">
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title"
+  content="The Code Simplicity Chart (c) :: Konstantin Mikheev&#39;s programming blog — ">
+<meta property="og:description"
+  content="How to understand if your code is simple or complex.
+" />
+<meta property="og:url" content="http://konmik.com/posts/code_simplicity_01/" />
+<meta property="og:site_name" content="The Code Simplicity Chart (c)" />
+<meta property="og:image" content="">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+<meta property="article:published_time" content="2017-11-21 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="http://konmik.com/">
+  <div class="logo">
+    Konstantin Mikheev&#39;s programming blog
+  </div>
+</a>
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+</header>
+
+
+  <div class="content">
+    
+<div class="post">
+  <h1 class="post-title">
+    <a href="http://konmik.com/posts/code_simplicity_01/">The Code Simplicity Chart (c)</a></h1>
+  <div class="post-meta">
+    
+    <span class="post-date">
+      2017-11-21
+    </span>
+    
+    
+  </div>
+
+  
+  <span class="post-tags">
+    
+    #<a href="http://konmik.com/tags/programming-theory/">Programming theory</a>&nbsp;
+    
+  </span>
+  
+
+  
+
+  <div class="post-content">
+    <p>How to understand if your code is simple or complex.</p>
+<h3 id="preface">Preface</h3>
+<p>This is probably the most confusing and the most important topic
+of computer programming at the same time.
+There are thousands of articles telling about the importance of
+writing simple code, and how it is important for debugging,
+adding new features quickly, for easier refactoring
+and for catching up by newcomers.
+Hundreds of widespread phrases were told by famous computer programmers
+telling how good it is to write simple code.</p>
+<p>But there is absolutely zero articles telling what simple code actually is.</p>
+<p>This and the following articles are targeting these topics - what simple
+code is, how to distinguish it from complicated code and how to replace
+some patterns we use in our daily work with simpler patterns.</p>
+<h1 id="what-simple-means-here">What &ldquo;simple&rdquo; means here?</h1>
+<blockquote>
+<p>Simple:<!-- raw HTML omitted -->
+&ldquo;Easily understood or done; presenting no difficulty.&ldquo;<!-- raw HTML omitted -->
+&ldquo;Plain, basic, or uncomplicated in form, nature or design;
+without much decoration or ornamentation.&ldquo;<!-- raw HTML omitted -->
+&ndash; Oxford Dictionary</p>
+</blockquote>
+<p>Simplicity is subjective, as it comes from our ability to
+understand - our ability to recognize abstractions,
+subdivide them into smaller parts and to find connections between them.
+Luckily, the code we write is measurable so we can, to some extent,
+measure the amount of hoops our brains have to jump through to understand how the
+program works.</p>
+<p>&ldquo;What does this program do?&rdquo; is the main question.
+If it is easy and obvious to answer by reading the code -
+the code is considered to be simple.</p>
+<h1 id="simple-does-not-mean-familiar">&ldquo;Simple&rdquo; does not mean &ldquo;familiar&rdquo;</h1>
+<p>While it is easier to write code using familiar
+methods, it is just a matter of habit.
+We learn new things to change our habits.
+There can be habits which allow to produce less complicated code.
+If we will learn them, they will be as familiar to us as our current methods
+but the code we’re creating will be much simpler from the point of view
+of the more educated persons we will become.</p>
+<p>In these articles on simplicity I'm not going to feed you
+with patterns which can change with
+new programming languages or which can
+even become anti-patterns with time.</p>
+<p>Let's go.</p>
+<h1 id="quantity-matters">Quantity matters</h1>
+<p>This is the most important part and all other ideas on simplicity
+grow from this fact. Quantity matters. Be it the number of Lines of Code (LoC),
+the number of <code>if</code> conditions, the number of variables - it all matters.</p>
+<p>It is a widespread fact that people can keep in mind a limited amount of variables.
+I disagree.
+Given enough time we can literally place the entire program into our mind
+and play with it as we want to.
+However, while working with real-life tasks we always have
+limited amount of time and limited amount of code to read.
+In addition, our code is constantly evolving, invalidating
+the pieces of code we know.
+We switch between tasks, our attention switches,
+and now we need to re-read the code to catch things up.</p>
+<p>I sometimes meet people who say: &ldquo;I like to be verbose&rdquo;.
+And sometimes I am not lucky enough so I have to read their code
+and this is <strong>hard</strong>.
+Instead of using if/else they're creating a class hierarchy.
+Instead of creating a reusable function they're copy-pasting 90% of their code
+into several places.</p>
+<p>There is a common practice to be more verbose to explain an algorithm
+with longer variable names or by splitting long expressions into
+several small statements.
+There are also exceptional cases when the algorithm is very compressed,
+and replacing it with a longer version increases readability.
+But given the same readability, the shorter version is almost always simpler.</p>
+<p>The obvious thing is that understanding a part of a program (the smaller amount of code)
+is easier than understanding the entire program (the bigger amount of code).</p>
+<p>So, this is the first &ldquo;axiom&rdquo; here: quantity matters.</p>
+<blockquote>
+<p>Axiom - &ldquo;a rule or principle that most people believe to be true&quot;<!-- raw HTML omitted -->
+&ndash; Oxford Dictionary</p>
+</blockquote>
+<h1 id="the-code-simplicity-chart-c">The Code Simplicity Chart (c)</h1>
+<p>I never saw it written anywhere, but it literally flies in the air.
+If you know several programming languages implementing different paradigms,
+this thing becomes pretty obvious.
+However, nobody wrote it.
+So I've added this (c) to mark the authorship and to draw your
+attention to the fact that this thing is actually <em>NEW</em>.</p>
+<p>Here it is, from simple to complex:</p>
+<ul>
+<li>Immutable data</li>
+<li>Pure function</li>
+<li>I/O function</li>
+<li>Shared mutable data</li>
+<li>Event function</li>
+</ul>
+<p>Let's consider each of the items here.</p>
+<h3 id="immutable-data">Immutable data</h3>
+<p><strong>Immutable data</strong> is the simplest possible thing our programs consist of.
+Be it a constant or some data structure passed into a function as a parameter -
+if it is immutable then it is simple.</p>
+<p>It is simple because it does not change over time.
+It contains no actions or logic.</p>
+<p>It also does not matter with which other functions it is shared with,
+the data can be considered without thinking about the other application parts,
+allowing us to write totally isolated pieces of program.
+It will just never break and we can always rely on it.</p>
+<p>In programming languages without support of immutable data
+a simple agreement to not modify the data structure can do the trick.</p>
+<h3 id="pure-function">Pure function</h3>
+<p><strong>Pure function</strong> is a function that does only one thing - it transforms data.</p>
+<p>Pure function is more complex than immutable data because to write
+a function we need to know the data structure it works on.
+Complexity just adds, it is not different.
+Pure functions are also simple and rock solid because they
+never break anything outside of them and they always produce the same
+result given the same arguments.</p>
+<p>So, here they are - two building blocks that can be used to
+write code that is actually scalable.</p>
+<p>Only <em>zero</em> scales infinitely.</p>
+<p>Zero mutation data and zero side-effecting functions.
+They can be composed and used without limitations or the fear that something will break.
+We can grow a program to whatever size we want without being afraid that
+the amount of bugs will start growing exponentially.</p>
+<p>When speaking about pure function simplicity, we just mean that
+even if it is complex, its complexity does not affect other parts of
+the program.</p>
+<h3 id="io-function">I/O function</h3>
+<p><strong>I/O function</strong> transforms data but it also should
+take place at a certain moment in time.</p>
+<p>We can call pure functions in any order and any number of times -
+the result will always be the same.
+I/O functions do not have such luxury: if we change the order of I/O function
+calls we will get &ldquo;Joe!Hello, &quot; instead of &ldquo;Hello, Joe!&quot;.</p>
+<p>This complexity does not scale well.
+Once, we have a couple of functions that should be called
+in a certain order, we have to architect the whole of our
+program in a way that these functions will never
+be called in wrong order, otherwise bugs will happen.</p>
+<p>Imagine calling <code>closeFile</code> function before calling <code>read</code>.
+To prevent this, we wrap such functions into one function which
+does these calls in the right order.
+We also should not forget to call <code>closeFile</code>.
+But now we have a more general I/O function and this function
+must also be called in a specific order.</p>
+<p>We may say that when joining two I/O function calls we
+reduce these function complexity 2 to 1 but it is still not 0.
+It can become even worse when we have parallel code execution
+in the program and the I/O function can covertly affect the execution
+of other functions sharing the same resource.</p>
+<h3 id="shared-mutable-data">Shared mutable data</h3>
+<p><strong>Shared mutable data</strong> goes next.
+It is important that it must be modified in a certain order,
+and in addition it affects, covertly, execution of other functions.</p>
+<p>Shared mutable data is one of the main reasons behind bugs.
+It is hard to trace all the ways the data can be
+modified and so it makes program harder to understand.
+In large programs, mutable data can be shared quite intricately.</p>
+<p>For example, we have a list of goods in memory cache and we want to share it
+across different application screens to avoid looking up database too often.
+Suddenly, one of the screens decides to apply a filter to the list and removes
+some goods that it does not need to show.
+Nice!
+The next time another screen will want to take the list of goods,
+it will only get a part of the list while expecting to get all of them.
+This is a real bug I fixed once.
+It could never had happened if the list was immutable.
+And who knows how many similar bugs exist being unnoticed
+by testers and annoying users with misbehavior or even crashes.</p>
+<p>The problem of mutable shared data makes it
+almost impossible to write reliable multi-threading code.
+The complexity of the order of data mutation in multi-threading
+environment becomes unbearable <em>very</em> quickly, so refactoring
+code to make use of immutable data is the most reasonable thing we can usually do
+to eliminate race conditions.
+It usually leads to code that is easier to understand as well,
+because immutable data encourages writing pure functions
+that are very easy to understand.</p>
+<p>Shared mutable data can sometimes be considered as a couple of
+I/O functions - one reads and another writes, while the
+data can be considered as external to our program.
+This approach even works in some programming languages,
+but it just adds another layer of complexity
+on top of shared mutable data.</p>
+<h3 id="event-function">Event function</h3>
+<p><strong>Event function</strong> has the highest complexity because it
+can perform several I/O calls, mutate shared data,
+and the worst - it can also call other event functions.</p>
+<p>For the sake of simplicity, I'm joining under this category
+all the multi-purpose functions which do hell knows what.
+&ldquo;Here be dragons&rdquo;.</p>
+<h1 id="the-chart-is-not-complete">The chart is not complete</h1>
+<p>There are items in-between.
+We can consider, for example, local function mutable variables
+or some fancy ways to work with shared mutable data.
+The chart shows the main milestones.
+The rest lies somewhere in-between.</p>
+<p>There can also be obvious cases when by having one shared mutable
+variable we can avoid writing one hundred lines of
+pure functions, but such cases are extremely rare.
+Quantity matters and if it allows to write less code,
+then that is cool, but we should also consider how much other code
+the reader will have to dig through to understand all the possible
+interactions with the variable, be they direct or mediated, and how
+often he or she will have to re-read the code
+if something will be changed.</p>
+<h1 id="whats-next">What's next?</h1>
+<p>The application of this chart is a skill that every computer programmer
+should develop to consider (him|her)self a professional.
+It boosts productivity and application reliability to the highest levels.
+Maintenance costs also go down significantly as we have to spend less time
+on debugging and reading old code.</p>
+<p>These principles already took the web development experience by storm,
+raising the latest wave of popular frameworks.</p>
+<p>The story just starts here - we can use these principles
+for writing most of our software, getting all the benefits
+of having simpler code, but this time the approach on simplicity
+is not just based on someone's opinion - it is logically
+justified and can be actually measured.</p>
+<h1 id="todo">TODO</h1>
+<ul>
+<li>Some magnificent ways to apply The Code Simplicity Chart</li>
+<li>How code simplicity principles evolve the way we do IT</li>
+<li>Simplicity in programming language design</li>
+<li>Reducing complexity in fine details</li>
+<li>Architecture and code simplicity</li>
+</ul>
+<p>I'm planning to release one article per couple of weeks,
+but life is an unpredictable thing.</p>
+<p>Ping me on Twitter if you have to wait too
+much for the next article in the series,
+this can actually motivate me to write more. :)</p>
+<p>Sharing the article also helps! ;)</p>
+<h1 id="-">-</h1>
+<p>Thanks to <a href="https://github.com/upasana-me">Upasana Shukla</a>
+for proofreading this article.</p>
+  </div>
+
+
+  <h3>Did you like it? Share!</h3>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a1c5667151c1f30"></script>
+  <div class="addthis_inline_share_toolbox"></div>
+
+
+  
+  <div class="pagination">
+    <div class="pagination__title">
+      <span class="pagination__title-h"></span>
+      <hr />
+    </div>
+    <div class="pagination__buttons">
+      
+      <span class="button previous">
+        <a href="http://konmik.com/posts/code_simplicity_02/">
+          <span class="button__icon">←</span>
+          <span class="button__text">Immutable data is the main key to simple code</span>
+        </a>
+      </span>
+      
+      
+      <span class="button next">
+        <a href="http://konmik.com/posts/is_programming_actually_math/">
+          <span class="button__text">Is programming actually math?</span>
+          <span class="button__icon">→</span>
+        </a>
+      </span>
+      
+    </div>
+  </div>
+  
+
+
+  
+
+</div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    <div class="copyright copyright--user">
+      <span>(c) Konstantin Mikheev 2020</span>
+    </div>
+</footer>
+
+<script src="http://konmik.com/assets/main.js"></script>
+<script src="http://konmik.com/assets/prism.js"></script>
+
+
+
+
+  
+</div>
+
+</body>
+</html>

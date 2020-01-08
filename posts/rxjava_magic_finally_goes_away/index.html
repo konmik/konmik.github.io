@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>RxJava magic (finally) goes away :: Konstantin Mikheev&#39;s programming blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="description"
+  content="There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.
+Docs and tutorials are either too shallow or too complicated.
+Here is the middle ground that is essential to know before playing with RxJava.
+In these tests we will take each RxJava part&amp;hellip; apart and explore how exactly it works.
+" />
+<meta name="keywords"
+  content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="http://konmik.com/posts/rxjava_magic_finally_goes_away/" />
+
+
+<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+
+<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144"
+  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+
+<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title"
+  content="RxJava magic (finally) goes away :: Konstantin Mikheev&#39;s programming blog — " />
+<meta name="twitter:description"
+  content="There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.
+Docs and tutorials are either too shallow or too complicated.
+Here is the middle ground that is essential to know before playing with RxJava.
+In these tests we will take each RxJava part&amp;hellip; apart and explore how exactly it works.
+" />
+<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image" content="">
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title"
+  content="RxJava magic (finally) goes away :: Konstantin Mikheev&#39;s programming blog — ">
+<meta property="og:description"
+  content="There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.
+Docs and tutorials are either too shallow or too complicated.
+Here is the middle ground that is essential to know before playing with RxJava.
+In these tests we will take each RxJava part&amp;hellip; apart and explore how exactly it works.
+" />
+<meta property="og:url" content="http://konmik.com/posts/rxjava_magic_finally_goes_away/" />
+<meta property="og:site_name" content="RxJava magic (finally) goes away" />
+<meta property="og:image" content="">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+<meta property="article:published_time" content="2015-12-08 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="http://konmik.com/">
+  <div class="logo">
+    Konstantin Mikheev&#39;s programming blog
+  </div>
+</a>
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+</header>
+
+
+  <div class="content">
+    
+<div class="post">
+  <h1 class="post-title">
+    <a href="http://konmik.com/posts/rxjava_magic_finally_goes_away/">RxJava magic (finally) goes away</a></h1>
+  <div class="post-meta">
+    
+    <span class="post-date">
+      2015-12-08
+    </span>
+    
+    
+  </div>
+
+  
+  <span class="post-tags">
+    
+    #<a href="http://konmik.com/tags/java/">Java</a>&nbsp;
+    
+    #<a href="http://konmik.com/tags/android/">Android</a>&nbsp;
+    
+  </span>
+  
+
+  
+
+  <div class="post-content">
+    <p>There is too much &ldquo;magic&rdquo; inside of RxJava.</p>
+<p>Docs and tutorials are either too shallow or too complicated.</p>
+<p>Here is the middle ground that is <em>essential</em> to know before playing with RxJava.</p>
+<p>In these tests we will take each RxJava part&hellip; apart and explore how exactly it works.</p>
+<p>Inspired by:</p>
+<ul>
+<li><a href="https://blog.8thlight.com/uncle-bob/2015/08/06/let-the-magic-die.html">Make the Magic go away.</a></li>
+<li><a href="https://www.youtube.com/watch?v=3bAQXTVsEiQ">Reactive Programming</a></li>
+</ul>
+<h3 id="basic-usage-pattern">Basic usage pattern</h3>
+<p>Let's start from a familiar example. We will take it apart later.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">just</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Action1<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertEquals<span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+</code></pre></div><h3 id="implementing-own-observable-and-subscriber">Implementing own <code>Observable</code> and <code>Subscriber</code></h3>
+<p>We will now implement our own <code>just(1)</code> <code>Observable</code> and take a brief look at <code>Observable.subscribe</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">AtomicBoolean emitted <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicBoolean<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// Creating Observable the usual way:
+</span><span style="color:#75715e"></span>Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> observable <span style="color:#f92672">=</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> subscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        emitted<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertFalse<span style="color:#f92672">(</span>emitted<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// Nothing happens at this point! Observable does not emit values by itself,
+</span><span style="color:#75715e"></span><span style="color:#75715e">// we need to subscribe first.
+</span><span style="color:#75715e"></span>
+AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// First, Observable.unsafeSubscribe is a simplified version of Observable.subscribe,
+</span><span style="color:#75715e"></span><span style="color:#75715e">// so we will use it instead.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// Second, Observable.subscribe(Action1) is just a shortcut for
+</span><span style="color:#75715e"></span><span style="color:#75715e">// Observable.subscribe(Subscriber), here we will use Subscriber directly.
+</span><span style="color:#75715e"></span>
+observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">unsafeSubscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// We will rethrow the exception to not ignore asserts.
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer it<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>it<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertTrue<span style="color:#f92672">(</span>emitted<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+assertEquals<span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// The value has been emitted and received after the subscription.
+</span></code></pre></div><h3 id="observablecreate-and-observableunsafesubscribe"><code>Observable.create</code> and <code>Observable.unsafeSubscribe</code></h3>
+<p>We will now take apart <code>Observable.create</code> and <code>Observable.unsafeSubscribe</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> onSubscribe <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> subscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// This is how Observable.create(OnSubscribe&lt;T&gt; f) looks like (simplified),
+</span><span style="color:#75715e"></span><span style="color:#75715e">// so we don&#39;t need to &#34;implement&#34; it:
+</span><span style="color:#75715e"></span><span style="color:#75715e">//  protected Observable(OnSubscribe &lt; T &gt; f) {
+</span><span style="color:#75715e"></span><span style="color:#75715e">//      this.onSubscribe = f;
+</span><span style="color:#75715e"></span><span style="color:#75715e">//  }
+</span><span style="color:#75715e"></span>
+AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> subscriber <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer it<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>it<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// This is how Observable.unsafeSubscribe looks like (simplified):
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+    onSubscribe<span style="color:#f92672">.</span><span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+assertEquals<span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// onNext still works!
+</span></code></pre></div><p>A little resume: <code>OnSubscribe</code> function sends data directly to a given <code>Subscriber</code> by
+calling it's methods.</p>
+<p>Note: <code>Observable</code> was not used in this test at all.</p>
+<h3 id="what-subscription-is">What <code>Subscription</code> is</h3>
+<p><code>Subscription</code> is a simple interface with just two methods:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">unsubscribe</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> subscriber <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> observable <span style="color:#f92672">=</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> targetSubscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        assertEquals<span style="color:#f92672">(</span>subscriber<span style="color:#f92672">,</span> targetSubscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span> 
+        <span style="color:#75715e">// subscriber and targetSubscriber are the same object.
+</span><span style="color:#75715e"></span>
+        assertFalse<span style="color:#f92672">(</span>subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#75715e">// subscriber is subscribed, this is OK.
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// All subscriptions are created in the subscribed state.
+</span><span style="color:#75715e"></span>
+        targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscription subscription <span style="color:#f92672">=</span> observable<span style="color:#f92672">.</span><span style="color:#a6e22e">unsafeSubscribe</span><span style="color:#f92672">(</span>subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertEquals<span style="color:#f92672">(</span>subscription<span style="color:#f92672">,</span> subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// Surprise! Subscription and Subscriber are the same object.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// Subscriber implements Subscription interface.
+</span><span style="color:#75715e"></span>
+assertFalse<span style="color:#f92672">(</span>subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// ...and it is still subscribed even after the onCompleted() call... wait, WHY???
+</span><span style="color:#75715e"></span>
+assertEquals<span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// onNext still works!
+</span></code></pre></div><h3 id="regular-observablesubscribe-and-safesubscriber">Regular <code>Observable.subscribe</code> and <code>SafeSubscriber</code></h3>
+<p>The regular version of <code>Observable.subscribe(...)</code> wraps <code>Subscriber</code>
+into <code>SafeSubscriber</code> and automatically enforces the lifecycle event order.</p>
+<p>For example, <code>SafeSubscriber</code> automatically calls <code>unsubscribe()</code> after <code>onComplete()</code> has been received.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> subscriber <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> observable <span style="color:#f92672">=</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> targetSubscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        assertTrue<span style="color:#f92672">(</span>targetSubscriber <span style="color:#66d9ef">instanceof</span> SafeSubscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#75715e">// The regular subscribe() gave us a SafeSubscriber instance.
+</span><span style="color:#75715e"></span>
+        targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// This time we will use the regular subscribe():
+</span><span style="color:#75715e"></span>Subscription subscription <span style="color:#f92672">=</span> observable<span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span>subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertNotEquals<span style="color:#f92672">(</span>subscription<span style="color:#f92672">,</span> subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// Subscription and Subscriber are NOT the same object now.
+</span><span style="color:#75715e"></span>
+assertTrue<span style="color:#f92672">(</span>subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// ...SafeSubscriber in action.
+</span><span style="color:#75715e"></span>
+assertEquals<span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// onNext still works! :)
+</span></code></pre></div><h3 id="chaining-operators">Chaining operators</h3>
+<p>This is a simple exploration of chaining operators.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> observable <span style="color:#f92672">=</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> subscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        <span style="color:#75715e">// the received subscriber is some internal class inside of OperatorTake.
+</span><span style="color:#75715e"></span>        assertTrue<span style="color:#f92672">(</span>subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">contains</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;OperatorTake&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>2<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>3<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> received <span style="color:#f92672">=</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">synchronizedList</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> subscriber <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer it<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        received<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>it<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+Subscription subscription <span style="color:#f92672">=</span> observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">take</span><span style="color:#f92672">(</span>2<span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">skip</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">mergeWith</span><span style="color:#f92672">(</span>Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">just</span><span style="color:#f92672">(</span>3<span style="color:#f92672">,</span> 4<span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">unsafeSubscribe</span><span style="color:#f92672">(</span>subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertEquals<span style="color:#f92672">(</span>subscription<span style="color:#f92672">,</span> subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// subscription is still subscriber - it is just returned by unsafeSubscriber as-is!
+</span><span style="color:#75715e"></span>
+assertArrayEquals<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">[</span><span style="color:#f92672">]</span><span style="color:#f92672">{</span>2<span style="color:#f92672">,</span> 3<span style="color:#f92672">,</span> 4<span style="color:#f92672">}</span><span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">toArray</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// It works, surprisingly!
+</span></code></pre></div><h3 id="but-how-does-operator-chaining-work">But&hellip; <em>how</em> does operator chaining work?</h3>
+<p>We will now look inside <code>take()</code> function and see how one observable gets transformed into another after applying the operator.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> observable <span style="color:#f92672">=</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">just</span><span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> 2<span style="color:#f92672">,</span> 3<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+OperatorTake<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> operatorTake <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> OperatorTake<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span>2<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> received1 <span style="color:#f92672">=</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">synchronizedList</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// Operator is a function that takes one subscriber and returns another:
+</span><span style="color:#75715e"></span><span style="color:#75715e">// public interface Operator&lt;R, T&gt; extends Func1&lt;Subscriber&lt;R&gt;, Subscriber&lt;T&gt;&gt; {
+</span><span style="color:#75715e"></span>observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">lift</span><span style="color:#f92672">(</span>operatorTake<span style="color:#f92672">)</span> <span style="color:#75715e">// this is what happens inside of .take(2)
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Action1<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            received1<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertArrayEquals<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">[</span><span style="color:#f92672">]</span><span style="color:#f92672">{</span>1<span style="color:#f92672">,</span> 2<span style="color:#f92672">}</span><span style="color:#f92672">,</span> received1<span style="color:#f92672">.</span><span style="color:#a6e22e">toArray</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// Works as expected.
+</span><span style="color:#75715e"></span>
+List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> received2 <span style="color:#f92672">=</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">synchronizedList</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// We will now decompose the lift(Operator) function.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// It just returns a new Observable like this:
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> childSubscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// This is where operator is called to create a new subscriber.
+</span><span style="color:#75715e"></span>            Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> operatorSubscriber <span style="color:#f92672">=</span>
+                operatorTake<span style="color:#f92672">.</span><span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>childSubscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                operatorSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onStart</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+                observable<span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span>operatorSubscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+            <span style="color:#f92672">}</span>
+            <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                operatorSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            childSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span> <span style="color:#75715e">// Observable`s constructor is protected, so we call
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">// it here by creating an anonymous class
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Action1<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            received2<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// The chain of observables is constructed first.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// When subscribe() is called, a chain of subscribers gets created from operators.
+</span><span style="color:#75715e"></span>
+assertArrayEquals<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">[</span><span style="color:#f92672">]</span><span style="color:#f92672">{</span>1<span style="color:#f92672">,</span> 2<span style="color:#f92672">}</span><span style="color:#f92672">,</span> received2<span style="color:#f92672">.</span><span style="color:#a6e22e">toArray</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// Works!
+</span></code></pre></div><h3 id="asynchronous-subscription">Asynchronous subscription</h3>
+<p>Here we will see how <code>Observable.subscribeOn</code> works.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">AtomicReference<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> onSubscribeThreadName <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicReference<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> observable <span style="color:#f92672">=</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> subscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        onSubscribeThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        subscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+AtomicReference<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> subscriberThreadName <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicReference<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscription subscription <span style="color:#f92672">=</span> observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribeOn</span><span style="color:#f92672">(</span>Schedulers<span style="color:#f92672">.</span><span style="color:#a6e22e">io</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Action1<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            subscriberThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+            received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#f92672">!</span>subscription<span style="color:#f92672">.</span><span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+assertTrue<span style="color:#f92672">(</span>onSubscribeThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">contains</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;RxCachedThreadScheduler&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// OnSubscribe is called on some internal Rx thread, as expected.
+</span><span style="color:#75715e"></span>
+assertEquals<span style="color:#f92672">(</span>onSubscribeThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">,</span> subscriberThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// But values has been received on the same thread where subscription happened!
+</span><span style="color:#75715e"></span><span style="color:#75715e">// This is because we control only subscription with subscribeOn.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// If we want to receive values on a specific thread we need to use observeOn.
+</span><span style="color:#75715e"></span>
+assertEquals<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;main&#34;</span><span style="color:#f92672">,</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// We&#39;re still safe here.
+</span></code></pre></div><h3 id="observing-values-on-a-custom-thread">Observing values on a custom thread</h3>
+<p>This time we will use <code>Observable.observerOn</code> operator to receive values on a given thread.
+We will also create our own simple <code>Scheduler</code> to understand how it works line.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">AtomicReference<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> onSubscribeThreadName <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicReference<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+AtomicInteger received <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+AtomicReference<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> subscriberThreadName <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicReference<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// We will add scheduled actions from the background thread here
+</span><span style="color:#75715e"></span><span style="color:#75715e">// and run them on the current thread.
+</span><span style="color:#75715e"></span>CopyOnWriteArrayList<span style="color:#f92672">&lt;</span>Runnable<span style="color:#f92672">&gt;</span> commandQueue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> CopyOnWriteArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscription subscription <span style="color:#f92672">=</span> Observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">just</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">doOnSubscribe</span><span style="color:#f92672">(</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span> onSubscribeThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribeOn</span><span style="color:#f92672">(</span>Schedulers<span style="color:#f92672">.</span><span style="color:#a6e22e">io</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">observeOn</span><span style="color:#f92672">(</span>Schedulers<span style="color:#f92672">.</span><span style="color:#a6e22e">from</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Executor<span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">// Schedulers.from just wraps Executor.
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span><span style="color:#f92672">(</span>Runnable command<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            commandQueue<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>command<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Action1<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            subscriberThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+            received<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#f92672">!</span>subscription<span style="color:#f92672">.</span><span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">|</span><span style="color:#f92672">|</span> commandQueue<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>commandQueue<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        commandQueue<span style="color:#f92672">.</span><span style="color:#a6e22e">remove</span><span style="color:#f92672">(</span>0<span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">run</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+    Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+assertTrue<span style="color:#f92672">(</span>onSubscribeThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">contains</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;RxCachedThreadScheduler&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// OnSubscribe is still called on the given io() thread.
+</span><span style="color:#75715e"></span>
+assertEquals<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;main&#34;</span><span style="color:#f92672">,</span> subscriberThreadName<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// But we observe values on the given observeOn thread (which is &#34;main&#34;).
+</span></code></pre></div><h3 id="backpressure">Backpressure</h3>
+<p>Backpressure is the ability of <code>Observable</code> to <em>not</em> emit more values than it is requested by <code>Subscriber</code>.</p>
+<p>Let's see how it works.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> received <span style="color:#f92672">=</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">synchronizedList</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> subscriber <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">// #1
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onStart</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">onStart</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#75715e">// Start from requesting one value.
+</span><span style="color:#75715e"></span>        request<span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span> 
+
+        <span style="color:#75715e">// request() is Subscriber&#39;s method that just calls Producer`s request().
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// (more about Producer a few lines below)
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        received<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>integer <span style="color:#f92672">&lt;</span> 5<span style="color:#f92672">)</span> <span style="color:#75715e">// We want to get only 5 items.
+</span><span style="color:#75715e"></span>            request<span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span> <span style="color:#75715e">// #3
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+Observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> targetSubscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+            AtomicInteger lastSent <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+            targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">setProducer</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Producer<span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#a6e22e">@Override</span>
+                <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">request</span><span style="color:#f92672">(</span><span style="color:#66d9ef">long</span> n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>lastSent<span style="color:#f92672">.</span><span style="color:#a6e22e">incrementAndGet</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span> <span style="color:#75715e">// #2
+</span><span style="color:#75715e"></span>                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">unsafeSubscribe</span><span style="color:#f92672">(</span>subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+assertArrayEquals<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">[</span><span style="color:#f92672">]</span><span style="color:#f92672">{</span>1<span style="color:#f92672">,</span> 2<span style="color:#f92672">,</span> 3<span style="color:#f92672">,</span> 4<span style="color:#f92672">,</span> 5<span style="color:#f92672">}</span><span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">toArray</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+</code></pre></div><p>A careful reader could notice that <code>Subscriber</code> and <code>OnSubscribe</code> are calling each other recursively.
+What will happen if we will change <code>(integer &lt; 5)</code> to <code>(integer &lt; 3000)</code>?</p>
+<p>A-ha!</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>In the real life we're not going to use backpressure in a single thread chain, so don't be scared by this exception.</p>
+<h3 id="asynchronous-backpressure">Asynchronous backpressure</h3>
+<p>Sending requests and values, back and forth, through different threads. Amazing!</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> received <span style="color:#f92672">=</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">synchronizedList</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> subscriber <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Subscriber<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onStart</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">onStart</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        request<span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCompleted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onError</span><span style="color:#f92672">(</span>Throwable e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span>e<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>Integer integer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        received<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>integer<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+        <span style="color:#75715e">// We can use large backpressure numbers now because
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// each scheduled action&#39;s stack starts from the scheduler&#39;s thread root.
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>integer <span style="color:#f92672">&lt;</span> 5000<span style="color:#f92672">)</span>
+            request<span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">else</span>
+            unsubscribe<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span> <span style="color:#75715e">// We need to unsubscribe to exit background thread loop later.
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span><span style="color:#f92672">;</span>
+
+Subscription subscription <span style="color:#f92672">=</span> Observable
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">OnSubscribe</span><span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#a6e22e">@Override</span>
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">call</span><span style="color:#f92672">(</span>Subscriber<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Integer<span style="color:#f92672">&gt;</span> targetSubscriber<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+            AtomicInteger lastSent <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+            targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">setProducer</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Producer<span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#a6e22e">@Override</span>
+                <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">request</span><span style="color:#f92672">(</span><span style="color:#66d9ef">long</span> n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    targetSubscriber<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>lastSent<span style="color:#f92672">.</span><span style="color:#a6e22e">incrementAndGet</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">observeOn</span><span style="color:#f92672">(</span>Schedulers<span style="color:#f92672">.</span><span style="color:#a6e22e">io</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+    <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span>subscriber<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#f92672">!</span>subscription<span style="color:#f92672">.</span><span style="color:#a6e22e">isUnsubscribed</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+assertEquals<span style="color:#f92672">(</span>5000<span style="color:#f92672">,</span> received<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#75715e">// We can now receive any amount of requested items.
+</span></code></pre></div>
+  </div>
+
+
+  <h3>Did you like it? Share!</h3>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a1c5667151c1f30"></script>
+  <div class="addthis_inline_share_toolbox"></div>
+
+
+  
+  <div class="pagination">
+    <div class="pagination__title">
+      <span class="pagination__title-h"></span>
+      <hr />
+    </div>
+    <div class="pagination__buttons">
+      
+      <span class="button previous">
+        <a href="http://konmik.com/posts/why_lambdas_matter_even_on_android/">
+          <span class="button__icon">←</span>
+          <span class="button__text">Why lambdas matter (even on Android)</span>
+        </a>
+      </span>
+      
+      
+      <span class="button next">
+        <a href="http://konmik.com/posts/how_to_have_100_percent_code_coverage/">
+          <span class="button__text">How to have 100% code coverage with tests and be sane</span>
+          <span class="button__icon">→</span>
+        </a>
+      </span>
+      
+    </div>
+  </div>
+  
+
+
+  
+
+</div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    <div class="copyright copyright--user">
+      <span>(c) Konstantin Mikheev 2020</span>
+    </div>
+</footer>
+
+<script src="http://konmik.com/assets/main.js"></script>
+<script src="http://konmik.com/assets/prism.js"></script>
+
+
+
+
+  
+</div>
+
+</body>
+</html>

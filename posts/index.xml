@@ -1,16 +1,54 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Java on Konstantin Mikheev&#39;s programming blog</title>
-    <link>http://konmik.com/tags/java/</link>
-    <description>Recent content in Java on Konstantin Mikheev&#39;s programming blog</description>
+    <title>Posts on Konstantin Mikheev&#39;s programming blog</title>
+    <link>http://konmik.com/posts/</link>
+    <description>Recent content in Posts on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
-    <lastBuildDate>Tue, 10 Jan 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 08 Jan 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://konmik.com/tags/java/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://konmik.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Impostor Syndrome for Software Developers</title>
+      <link>http://konmik.com/posts/impostor_syndrome/</link>
+      <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/impostor_syndrome/</guid>
+      <description>&lt;p&gt;I often see recommendations on twitter about how to deal with impostor syndrome.
+It is almost always something like &amp;ldquo;just convince yourself that you&#39;re not an impostor&amp;rdquo;.
+It is hard to do if you have a conscience.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Immutable data is the main key to simple code</title>
+      <link>http://konmik.com/posts/code_simplicity_02/</link>
+      <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/code_simplicity_02/</guid>
+      <description>&lt;p&gt;Use immutable data like a pro.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>The Code Simplicity Chart (c)</title>
+      <link>http://konmik.com/posts/code_simplicity_01/</link>
+      <pubDate>Tue, 21 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/code_simplicity_01/</guid>
+      <description>&lt;p&gt;How to understand if your code is simple or complex.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Is programming actually math?</title>
+      <link>http://konmik.com/posts/is_programming_actually_math/</link>
+      <pubDate>Mon, 24 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/is_programming_actually_math/</guid>
+      <description>&lt;p&gt;The main difference between programming and math is&amp;hellip;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>When to NOT use RxJava</title>
@@ -70,6 +108,17 @@ that appear even when we&#39;re using such advanced technology as RxJava.&lt;/p&
 show a quick and elegant solution to unit tests complexity,
 benefits of having 100% code coverage with tests
 and how achieve it easily.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Introduction to Model View Presenter on Android</title>
+      <link>http://konmik.com/posts/introduction_to_model_view_presenter_on_android/</link>
+      <pubDate>Mon, 23 Mar 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/introduction_to_model_view_presenter_on_android/</guid>
+      <description>&lt;p&gt;This article is a step-by-step introduction to MVP on Android, from a simplest possible
+example to best practices. The article also introduces a new library
+that makes MVP on Android extremely simple.&lt;/p&gt;</description>
     </item>
     
     <item>
