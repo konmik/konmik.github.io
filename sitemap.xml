@@ -3,7 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://konmik.com/tags/android/</loc>
+    <lastmod>2020-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/posts/how_to_live_better_without_di/</loc>
+    <lastmod>2020-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://konmik.com/posts/impostor_syndrome/</loc>
+    <lastmod>2020-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://konmik.com/tags/java/</loc>
     <lastmod>2020-01-08T00:00:00+00:00</lastmod>
   </url>
   
@@ -50,16 +65,6 @@
   <url>
     <loc>http://konmik.com/tags/programming-in-general/</loc>
     <lastmod>2017-04-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://konmik.com/tags/android/</loc>
-    <lastmod>2017-01-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://konmik.com/tags/java/</loc>
-    <lastmod>2017-01-10T00:00:00+00:00</lastmod>
   </url>
   
   <url>

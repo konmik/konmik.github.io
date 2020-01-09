@@ -13,12 +13,27 @@
     
     
     <item>
+      <title>How to live better without Dependency Injection</title>
+      <link>http://konmik.com/posts/how_to_live_better_without_di/</link>
+      <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/how_to_live_better_without_di/</guid>
+      <description>&lt;p&gt;&lt;em&gt;(I&#39;ve just learned Dagger, what is wrong?
+Imagine my anxiety now, I am NOT happy seeing an article with this title!
+I hope that the author does not have any idea!)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Five years have passed since my first &lt;a href=&#34;http://konmik.com/posts/snorkeling_with_dagger_2/&#34;&gt;Dagger 2 article&lt;/a&gt;.
+It is time to write the last one.
+We do not need Dagger anymore.
+In fact, we didn&#39;t even need it in the first place.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Impostor Syndrome for Software Developers</title>
       <link>http://konmik.com/posts/impostor_syndrome/</link>
       <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>http://konmik.com/posts/impostor_syndrome/</guid>
-      <description>&lt;p&gt;I often see recommendations on twitter about how to deal with impostor syndrome.
+      <description>&lt;p&gt;I often see recommendations on Twitter about how to deal with impostor syndrome.
 It is almost always something like &amp;ldquo;just convince yourself that you&#39;re not an impostor&amp;rdquo;.
 It is hard to do if you have a conscience.&lt;/p&gt;</description>
     </item>

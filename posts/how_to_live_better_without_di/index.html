@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>How to live better without Dependency Injection :: Konstantin Mikheev&#39;s programming blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="description"
+  content="(I&#39;ve just learned Dagger, what is wrong? Imagine my anxiety now, I am NOT happy seeing an article with this title! I hope that the author does not have any idea!)
+Five years have passed since my first Dagger 2 article. It is time to write the last one. We do not need Dagger anymore. In fact, we didn&#39;t even need it in the first place.
+" />
+<meta name="keywords"
+  content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="http://konmik.com/posts/how_to_live_better_without_di/" />
+
+
+<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+
+<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144"
+  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+
+<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title"
+  content="How to live better without Dependency Injection :: Konstantin Mikheev&#39;s programming blog — " />
+<meta name="twitter:description"
+  content="(I&#39;ve just learned Dagger, what is wrong? Imagine my anxiety now, I am NOT happy seeing an article with this title! I hope that the author does not have any idea!)
+Five years have passed since my first Dagger 2 article. It is time to write the last one. We do not need Dagger anymore. In fact, we didn&#39;t even need it in the first place.
+" />
+<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image" content="">
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title"
+  content="How to live better without Dependency Injection :: Konstantin Mikheev&#39;s programming blog — ">
+<meta property="og:description"
+  content="(I&#39;ve just learned Dagger, what is wrong? Imagine my anxiety now, I am NOT happy seeing an article with this title! I hope that the author does not have any idea!)
+Five years have passed since my first Dagger 2 article. It is time to write the last one. We do not need Dagger anymore. In fact, we didn&#39;t even need it in the first place.
+" />
+<meta property="og:url" content="http://konmik.com/posts/how_to_live_better_without_di/" />
+<meta property="og:site_name" content="How to live better without Dependency Injection" />
+<meta property="og:image" content="">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+<meta property="article:published_time" content="2020-01-08 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="http://konmik.com/">
+  <div class="logo">
+    Konstantin Mikheev&#39;s programming blog
+  </div>
+</a>
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+    <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+        
+      
+        
+          <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+        
+      
+        
+          <li><a href="https://github.com/konmik">[GitHub]</a></li>
+        
+      
+    
+
+    
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+      
+    
+      
+        <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+      
+    
+      
+        <li><a href="https://github.com/konmik">[GitHub]</a></li>
+      
+    
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<div class="post">
+  <h1 class="post-title">
+    <a href="http://konmik.com/posts/how_to_live_better_without_di/">How to live better without Dependency Injection</a></h1>
+  <div class="post-meta">
+    
+    <span class="post-date">
+      2020-01-08
+    </span>
+    
+    
+  </div>
+
+  
+  <span class="post-tags">
+    
+    #<a href="http://konmik.com/tags/java/">Java</a>&nbsp;
+    
+    #<a href="http://konmik.com/tags/android/">Android</a>&nbsp;
+    
+  </span>
+  
+
+  
+
+  <div class="post-content">
+    <p><em>(I've just learned Dagger, what is wrong?
+Imagine my anxiety now, I am NOT happy seeing an article with this title!
+I hope that the author does not have any idea!)</em></p>
+<p>Five years have passed since my first <a href="http://konmik.com/posts/snorkeling_with_dagger_2/">Dagger 2 article</a>.
+It is time to write the last one.
+We do not need Dagger anymore.
+In fact, we didn't even need it in the first place.</p>
+<h3 id="what-is-wrong">What is wrong</h3>
+<p>Dagger allows us to solve many issues that we have with OOP code.
+It helps with testing,
+makes code declarative,
+makes it easy to use some best programming practices,
+verifies the dependency graph at compile-time,
+and allows us to look down on the developers who are not able to understand it.</p>
+<p>But it comes with serious costs.</p>
+<p>First, <strong>Dagger is a code generator</strong>.</p>
+<p>It increases build time and, like any other code generator, it causes build configuration issues.
+Some developers have to clean their projects before building even though they have changed just one line.
+Incremental compilation breaks often.
+I heard of a project where Dagger takes 50% of the build time.
+Maybe it is OK for some, but I waste more than 10 hours monthly waiting
+for my builds, adding another 10 hours would not help.</p>
+<p>Second, <strong>Dagger is complex to setup</strong>.</p>
+<p>Build configs, configuration classes, configuration interfaces,
+annotations, scopes, modules, components, whatever.
+This is ridiculously complex for a developer who just wants to get a dependency.
+If we want to use Dagger for tests it comes with an even bigger tax.</p>
+<p>Third, and the most important, <strong>It locks the codebase to OOP paradigm</strong>.</p>
+<p>With the rise of functional programming, passing dependencies using contructors becomes harder.
+There are simply no constructors! There are even no mutable fields to inject into!</p>
+<p>When instead of creating an OOP hierarchy there is a possibility to solve a problem in one function
+call with a lambda, convincing yourself in Dagger benefits becomes harder and harder.</p>
+<h3 id="are-there-alternatives">Are there alternatives?</h3>
+<p>I am not telling anyone to go and buy something like <a href="https://insert-koin.io/">Koin</a>.
+If we could be satisfied with a dependency injection framework that has so little
+features I would recommend keeping all of the dependencies
+inside of <code>Map&lt;Class, Lazy&gt;</code>, one for each scope.
+At least that would have the benefit of being
+<a href="http://people.apache.org/~fhanik/kiss.html">Stupid Simple</a>.
+(Looking at Koin source code&hellip; hey, they are actually using maps&hellip;)</p>
+<p>I am telling that we do not need dependency injection at all!</p>
+<p>What are the problems we want to deal with using DI?</p>
+<ul>
+<li><strong>modularization</strong> - We want to put our code into different modules and have them linked after the app starts.</li>
+<li><strong>testing</strong> - We want to supply mocks and test objects instead of dependencies.</li>
+<li><strong>boilerplate</strong> - We want to get rid of the pain of passing dependencies everywhere manually.</li>
+</ul>
+<p>So if we find a way to get rid of these problems while adding fewer problems than Dagger adds, we win!
+Can we have a solution that would deal with these issues for us?</p>
+<h3 id="hold-my-beer-examples-are-in-kotlin-because-2020">Hold my beer (examples are in Kotlin, because 2020)</h3>
+<p>Let's start with a simple example.
+The code will look terrible at the beginning but it will become better at the end.</p>
+<p>We're going to travel into the functional world. That's why we will start by injecting <em>functions</em>.</p>
+<p><strong>Module A</strong>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">lateinit</span> <span style="color:#66d9ef">var</span> output: (Any) -&gt; Unit
+
+<span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">outMax</span>(a: Int, b: Int) {
+    output(max(a, b))
+}
+</code></pre></div><p><strong>Module Main</strong> (depends on <strong>Module A</strong>):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+    output = <span style="color:#f92672">::</span>print
+
+    outMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>)
+    outMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>)
+}
+</code></pre></div><p>Output:</p>
+<pre><code>42
+</code></pre><p>Modularization problem has been solved!</p>
+<p><em>wat<br>
+That was too fast.<br>
+What is happening here?</em></p>
+<p>Please, pay some attention - I am explaining the magic.</p>
+<p>In <strong>Module A</strong> we're defining <code>outMax</code> that will output (print to standard output) the max of two numbers.</p>
+<p>It depends on <code>print</code> function, but instead of calling <code>print</code> directly (assume it exists only in <strong>Module Main</strong>),
+we're using variable <code>output</code> that will hold a reference to <code>print</code> function.</p>
+<p>When <code>main</code> function starts the first thing it does is initializes <code>output</code> with
+the real function implementation (we're using standard Kotlin <code>print</code>).
+Then it is OK to call <code>outMax</code>.</p>
+<p>If we try calling <code>outMax</code> without initializing <code>output</code> first
+there will be <code>UninitializedPropertyAccessException</code> thrown,
+it will signify that our dependencies are broken
+(like we forgot to call Dagger's <code>inject</code> and get <code>NullPointerException</code>).</p>
+<p>Literally, we've just replaced a class hierarchy (as we usually do with Dagger)
+with a function reference.</p>
+<p>Zero annotations so far, let's move further.</p>
+<h3 id="hold-my-beer-2---testing">Hold my beer 2 - testing</h3>
+<p><strong>Module A</strong> test</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ModuleAKtTest</span> {
+    @Test
+    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">printMaxPrints</span>() {
+        <span style="color:#66d9ef">var</span> printed: Any? = <span style="color:#66d9ef">null</span>
+        output = { printed = it }
+        outMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">42</span>)
+        assertEquals(<span style="color:#ae81ff">42</span>, printed)
+    }
+}
+</code></pre></div><p>Output:</p>
+<pre><code>BUILD SUCCESSFUL in 0s
+</code></pre><p>This was a little joke about gradle.</p>
+<p>I will just type here the string that I see in my IDE because configuring gradle test output is too hard.</p>
+<pre><code>Tests passed: 1 of 1 test - 14ms
+</code></pre><p><em>Wait a moment!<br>
+Are my eyes lying to me?<br>
+It took more lines to write the stupid joke than injecting a test <code>output</code>?<br>
+How is it even possible?<br>
+Where is the test Dagger module definition?<br>
+Where is a Dagger component?<br>
+Why did it take just 14 ms?<br>
+WHO STOLE MY ANNOTATIONS? :-/</em></p>
+<p>I will say more: in a real test we will be using Mockito, so we will not even need <code>var printed: Any? = null</code> line.
+One dependency injection = one line of code.
+And if we keep our code clean and tidy this rule will work in ALL tests.</p>
+<p>This is it!
+This is the power of KISS!</p>
+<h3 id="solving-the-boilerplate-issue">Solving the boilerplate issue</h3>
+<p>Solved!</p>
+<p>Right, there is no boilerplate code to deal with.</p>
+<p>Feeling a bit upset? Or happy? In a doubt? The example code sucks a bit?</p>
+<h3 id="making-it-ready-for-production">Making it ready for production</h3>
+<p>Anyone can come and redefine <code>output</code> at runtime.
+Let's add some protection to prevent inexperienced developers from breaking it.
+A single variable has no logic, so it cannot control its assignment.</p>
+<p>The obvious design is to create an intermediate object that has <code>fun inject()</code> function
+that will check if it is the right time to have an injection.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Late</span>&lt;T : Any&gt; <span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">constructor</span>() {
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">var</span> value: T? = <span style="color:#66d9ef">null</span>
+
+    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">get</span>(): T =
+        value <span style="color:#f92672">?:</span> <span style="color:#66d9ef">throw</span> UninitializedPropertyAccessException()
+
+    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">inject</span>(it: T?) {
+        <span style="color:#66d9ef">if</span> (locked) <span style="color:#66d9ef">throw</span> IllegalStateException(<span style="color:#e6db74">&#34;Already injected&#34;</span>)
+        value = it
+    }
+}
+
+<span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">late</span>(): Late&lt;T&gt; =
+    Late()
+
+<span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">lockLateInjections</span>() {
+    locked = <span style="color:#66d9ef">true</span>
+}
+
+<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">var</span> locked = <span style="color:#66d9ef">false</span>
+</code></pre></div><p>In <strong>Module A</strong>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">val</span> out = late&lt;(Any) -&gt; Unit&gt;()
+
+<span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">printMax</span>(a: Int, b: Int) {
+    <span style="color:#66d9ef">out</span>.<span style="color:#66d9ef">get</span>().invoke(max(a, b))
+}
+</code></pre></div><p>In <strong>Module Main</strong>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#66d9ef">out</span>.inject(<span style="color:#f92672">::</span>print)
+    lockInjections()
+
+    printMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>)
+    printMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>)
+}
+</code></pre></div><p>If somebody will try to inject a new <code>out</code> function after <code>lockInjections()</code> he or she will get <code>IllegalStateException</code>.
+If somebody will try to call <code>out.get()</code> before it was injected <code>UninitializedPropertyAccessException</code> will be thrown.</p>
+<p>All checks are in place!</p>
+<p><em>Is it a good design to crash the app in case if a developer makes a mistake?</em></p>
+<p>Java does it all the time, just check standard library.
+Having an exception <em>in case of a developer's mistake</em> is a good design.
+That's why they were created for.</p>
+<p>The only thing that left is the ugly call syntax <code>out.get().invoke(42)</code>, let's add some Kotlin sugar.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.getValue(thisRef: Any?, property: KProperty&lt;*&gt;): T =
+    <span style="color:#66d9ef">get</span>()
+
+<span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.setValue(thisRef: Any?, property: KProperty&lt;*&gt;, value: T?) =
+    inject(value)
+</code></pre></div><p>Now it can be used even nicer:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">var</span> out <span style="color:#66d9ef">by</span> late&lt;(Any) -&gt; Unit&gt;()
+<span style="color:#66d9ef">out</span> = <span style="color:#f92672">::</span>print
+<span style="color:#66d9ef">out</span>(<span style="color:#ae81ff">42</span>)
+</code></pre></div><p>Done!</p>
+<h1 id="pros-and-cons-of-late">Pros and cons of <code>Late</code></h1>
+<p>Pros:</p>
+<ul>
+<li>a dependency definition is one line of code</li>
+<li>a dependency injection is one line of code</li>
+<li>a test injection is one line of code</li>
+<li>no code generation is needed</li>
+<li>no OOP hierarchies are needed</li>
+<li>no frameworks are needed</li>
+<li>no libraries are needed</li>
+<li>Stupid Simple</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>no OOP-stile dependency management -
+we cannot have different instances of the same function injected into different places</li>
+<li>no compile-time checks of the dependency graph -
+a dependency can be not initialized at the right moment in time, causing <code>UninitializedPropertyAccessException</code></li>
+<li>no scopes -
+if we have a dependency that is limited to one screen the dependency will not be disposed when the screen closes</li>
+</ul>
+<h5 id="why-oop-style-dependency-management-is-not-that-important">Why OOP-style dependency management is not that important</h5>
+<p>OOP-style dependency management can only be needed when we're dealing with OOP code.</p>
+<p>If we're trying to implement our apps in a functional manner
+we inject functions, and they rarely have mutable variables inside.
+If they have no mutable variables inside it means that there is no
+point in having different instances of the same function in different places.</p>
+<p>When the amount of OOP code with mutable variables all
+over the application decreases we need less OOP-style dependencies
+so we need DI less and less (it can be replaced by manual parameter passing using constructors).</p>
+<p>There is another trick.
+Open your Dagger module, or where you define the dependencies in your DI framework.
+Look carefully.
+About 90% of the dependencies are singletons.
+Just make them injectable with <code>Late</code>!</p>
+<h5 id="why-compile-time-checks-of-the-dependency-graph-are-not-that-important">Why compile-time checks of the dependency graph are not that important</h5>
+<p>Not all DI frameworks have it.
+Most of the modern Kotlin DI frameworks do not even have an annotation processor!</p>
+<p>Practice shows that uninitialized dependencies are almost always getting caught during development time.
+I had it only once when dependency access was happening before it's initialization in production and Dagger
+could not help in that case too because it would not be initialized yet.</p>
+<p>To avoid having uninitialized dependencies I recommend writing a single function <code>injectAll()</code>
+and then add <code>injectToModuleA()</code>, <code>injectToModuleB()</code> and other injection functions,
+and call them during app startup in one place.
+After injection ends services and other application parts can be started.</p>
+<h5 id="why-scopes-are-not-that-important">Why scopes are not that important</h5>
+<p>Using this simple approach we can deal with about 90% of the dependencies without involving OOP and DI -
+they can be singletons or function references.</p>
+<p>The scope-specific OOP part can be &ldquo;injected&rdquo; manually by calling constructors with parameters as we did in pre-DI era.</p>
+<h1 id="other-info">Other info</h1>
+<p>I had the same approach used in a JavaScript pet project.
+JavaScript does not have <code>by</code> operator overloading, but I was able
+to make the injection code look nice by having <code>late()</code> function
+returning a function that has methods,
+so I could call <code>out.inject(x)</code> and then call <code>out()</code>.
+JavaScript may look a bit weird now, but think a bit - the same trick is possible in Kotlin! ;)</p>
+<h1 id="a-fitting-cite-that-contains-a-summary-of-this-article">A fitting cite that contains a summary of this article</h1>
+<blockquote>
+<p>&ldquo;All problems in computer science can be solved by another level of indirection&rdquo; &ndash; David Wheeler</p>
+</blockquote>
+<p>One of the main keys to the KISS principle is to use as little indirections as possible.
+Instead of having them all over constructors and DI frameworks it is enough to define them once.</p>
+<p>Have fun!</p>
+  </div>
+
+
+  <h3>Did you like it? Share!</h3>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a1c5667151c1f30"></script>
+  <div class="addthis_inline_share_toolbox"></div>
+
+
+  
+  <div class="pagination">
+    <div class="pagination__title">
+      <span class="pagination__title-h"></span>
+      <hr />
+    </div>
+    <div class="pagination__buttons">
+      
+      
+      <span class="button next">
+        <a href="http://konmik.com/posts/impostor_syndrome/">
+          <span class="button__text">Impostor Syndrome for Software Developers</span>
+          <span class="button__icon">→</span>
+        </a>
+      </span>
+      
+    </div>
+  </div>
+  
+
+
+  
+
+</div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    <div class="copyright copyright--user">
+      <span>(c) Konstantin Mikheev 2020</span>
+    </div>
+</footer>
+
+<script src="http://konmik.com/assets/main.js"></script>
+<script src="http://konmik.com/assets/prism.js"></script>
+
+
+
+
+  
+</div>
+
+</body>
+</html>
