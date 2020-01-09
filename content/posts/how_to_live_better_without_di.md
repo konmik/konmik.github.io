@@ -77,7 +77,7 @@ Can we have a solution that would deal with these issues for us?
 Let's start with a simple example.
 The code will look terrible at the beginning but it will become better at the end.
 
-We're going to travel into the functional world. That's why we will start by injecting *functions*.
+We're going to travel into the functional world. That's why we will start by injecting functions.
 
 **Module A**:
 
@@ -194,7 +194,7 @@ Anyone can come and redefine `output` at runtime.
 Let's add some protection to prevent inexperienced developers from breaking it.
 A single variable has no logic, so it cannot control its assignment.
 
-The obvious design is to create an intermediate object that has `fun inject()` function
+The obvious design is to create an intermediate object
 that will check if it is the right time to have an injection.
 
 ```Kotlin
@@ -205,8 +205,8 @@ class Late<T : Any> internal constructor() {
     fun get(): T =
         value ?: throw UninitializedPropertyAccessException()
 
-    fun inject(it: T?) {
-        if (locked) throw IllegalStateException("Already injected")
+    fun set(it: T) {
+        if (locked) throw IllegalStateException("Injection is not allowed")
         value = it
     }
 }
@@ -235,7 +235,7 @@ In **Module Main**:
 
 ```Kotlin
 fun main() {
-    output.inject(::print)
+    output.set(::print)
     lockInjections()
 
     printMax(2, 4)
@@ -260,8 +260,9 @@ The only thing that left is the ugly call syntax `output.get().invoke(42)`, let'
 operator fun <T : Any> Late<T>.getValue(thisRef: Any?, property: KProperty<*>): T =
     get()
 
-operator fun <T : Any> Late<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T?) =
-    inject(value)
+operator fun <T : Any> Late<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    set(value)
+}
 ```
 
 Now it can be used even nicer:
@@ -342,10 +343,10 @@ I had the same approach used in a JavaScript pet project.
 JavaScript does not have `by` operator overloading, but I was able
 to make the injection code look nice by having `late()` function
 returning a function that has methods,
-so I could call `output.inject(x)` and then call `output()`.
-JavaScript may look a bit weird now, but think a bit - the same trick is possible in Kotlin! ;)
+so I could call `output.set(x)` and then call `output(42)`.
+JavaScript may look a bit weird, but think a bit - the same trick is possible in Kotlin! ;)
 
-# A fitting cite that contains a summary of this article
+# A fitting cite that contains the summary of this article
 
 > "All problems in computer science can be solved by another level of indirection" -- David Wheeler
 
