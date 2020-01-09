@@ -223,10 +223,10 @@ private var locked = false
 In **Module A**:
 
 ```Kotlin
-val out = late<(Any) -> Unit>()
+val output = late<(Any) -> Unit>()
 
 fun printMax(a: Int, b: Int) {
-    out.get().invoke(max(a, b))
+    output.get().invoke(max(a, b))
 }
 ```
 
@@ -234,7 +234,7 @@ In **Module Main**:
 
 ```Kotlin
 fun main() {
-    out.inject(::print)
+    output.inject(::print)
     lockInjections()
 
     printMax(2, 4)
@@ -242,8 +242,8 @@ fun main() {
 }
 ```
 
-If somebody will try to inject a new `out` function after `lockInjections()` he or she will get `IllegalStateException`.
-If somebody will try to call `out.get()` before it was injected `UninitializedPropertyAccessException` will be thrown.
+If somebody will try to inject a new `output` function after `lockInjections()` he or she will get `IllegalStateException`.
+If somebody will try to call `output.get()` before it was injected `UninitializedPropertyAccessException` will be thrown.
 
 All checks are in place!
 
@@ -253,7 +253,7 @@ Java does it all the time, just check standard library.
 Having an exception *in case of a developer's mistake* is a good design.
 That's why they were created for.
 
-The only thing that left is the ugly call syntax `out.get().invoke(42)`, let's add some Kotlin sugar.
+The only thing that left is the ugly call syntax `output.get().invoke(42)`, let's add some Kotlin sugar.
 
 ```Kotlin
 operator fun <T : Any> Late<T>.getValue(thisRef: Any?, property: KProperty<*>): T =
@@ -266,9 +266,9 @@ operator fun <T : Any> Late<T>.setValue(thisRef: Any?, property: KProperty<*>, v
 Now it can be used even nicer:
 
 ```Kotlin
-var out by late<(Any) -> Unit>()
-out = ::print
-out(42)
+var output by late<(Any) -> Unit>()
+output = ::print
+output(42)
 ```
 
 Done!
@@ -341,7 +341,7 @@ I had the same approach used in a JavaScript pet project.
 JavaScript does not have `by` operator overloading, but I was able
 to make the injection code look nice by having `late()` function
 returning a function that has methods,
-so I could call `out.inject(x)` and then call `out()`.
+so I could call `output.inject(x)` and then call `output()`.
 JavaScript may look a bit weird now, but think a bit - the same trick is possible in Kotlin! ;)
 
 # A fitting cite that contains a summary of this article
