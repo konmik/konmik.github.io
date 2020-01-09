@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kotlin on Konstantin Mikheev&#39;s programming blog</title>
+    <link>http://konmik.com/tags/kotlin/</link>
+    <description>Recent content in Kotlin on Konstantin Mikheev&#39;s programming blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>(c) Konstantin Mikheev 2020</copyright>
+    <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://konmik.com/tags/kotlin/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How to live better without Dependency Injection</title>
+      <link>http://konmik.com/posts/how_to_live_better_without_di/</link>
+      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://konmik.com/posts/how_to_live_better_without_di/</guid>
+      <description>&lt;p&gt;&lt;em&gt;(I&#39;ve just learned Dagger, what is wrong?
+Imagine my anxiety now, I am NOT happy seeing an article with this title!
+I hope that the author does not have any idea!)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Five years have passed since my first &lt;a href=&#34;http://konmik.com/posts/snorkeling_with_dagger_2/&#34;&gt;Dagger 2 article&lt;/a&gt;.
+It is time to write the last one.
+We do not need Dagger anymore.
+In fact, we didn&#39;t even need it in the first place.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

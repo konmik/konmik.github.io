@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
-    <lastBuildDate>Wed, 08 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://konmik.com/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>How to live better without Dependency Injection</title>
       <link>http://konmik.com/posts/how_to_live_better_without_di/</link>
-      <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>http://konmik.com/posts/how_to_live_better_without_di/</guid>
       <description>&lt;p&gt;&lt;em&gt;(I&#39;ve just learned Dagger, what is wrong?

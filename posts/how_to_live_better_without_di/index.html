@@ -59,7 +59,7 @@ Five years have passed since my first Dagger 2 article. It is time to write the 
 <meta property="og:image:height" content="1024">
 
 
-<meta property="article:published_time" content="2020-01-08 00:00:00 &#43;0000 UTC" />
+<meta property="article:published_time" content="2020-01-09 00:00:00 &#43;0000 UTC" />
 
 
 
@@ -139,7 +139,7 @@ Five years have passed since my first Dagger 2 article. It is time to write the 
   <div class="post-meta">
     
     <span class="post-date">
-      2020-01-08
+      2020-01-09
     </span>
     
     
@@ -148,7 +148,7 @@ Five years have passed since my first Dagger 2 article. It is time to write the 
   
   <span class="post-tags">
     
-    #<a href="http://konmik.com/tags/java/">Java</a>&nbsp;
+    #<a href="http://konmik.com/tags/kotlin/">Kotlin</a>&nbsp;
     
     #<a href="http://konmik.com/tags/android/">Android</a>&nbsp;
     
@@ -256,7 +256,8 @@ with a function reference.</p>
     }
 }
 </code></pre></div><p>Output:</p>
-<pre><code>BUILD SUCCESSFUL in 0s
+<pre><code>konmik@m16 nodi % ./gradlew test
+BUILD SUCCESSFUL in 0s
 </code></pre><p>This was a little joke about gradle.</p>
 <p>I will just type here the string that I see in my IDE because configuring gradle test output is too hard.</p>
 <pre><code>Tests passed: 1 of 1 test - 14ms
@@ -305,36 +306,36 @@ that will check if it is the right time to have an injection.</p>
 
 <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">var</span> locked = <span style="color:#66d9ef">false</span>
 </code></pre></div><p>In <strong>Module A</strong>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">val</span> out = late&lt;(Any) -&gt; Unit&gt;()
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">val</span> output = late&lt;(Any) -&gt; Unit&gt;()
 
 <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">printMax</span>(a: Int, b: Int) {
-    <span style="color:#66d9ef">out</span>.<span style="color:#66d9ef">get</span>().invoke(max(a, b))
+    output.<span style="color:#66d9ef">get</span>().invoke(max(a, b))
 }
 </code></pre></div><p>In <strong>Module Main</strong>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
-    <span style="color:#66d9ef">out</span>.inject(<span style="color:#f92672">::</span>print)
+    output.inject(<span style="color:#f92672">::</span>print)
     lockInjections()
 
     printMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>)
     printMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>)
 }
-</code></pre></div><p>If somebody will try to inject a new <code>out</code> function after <code>lockInjections()</code> he or she will get <code>IllegalStateException</code>.
-If somebody will try to call <code>out.get()</code> before it was injected <code>UninitializedPropertyAccessException</code> will be thrown.</p>
+</code></pre></div><p>If somebody will try to inject a new <code>output</code> function after <code>lockInjections()</code> he or she will get <code>IllegalStateException</code>.
+If somebody will try to call <code>output.get()</code> before it was injected <code>UninitializedPropertyAccessException</code> will be thrown.</p>
 <p>All checks are in place!</p>
 <p><em>Is it a good design to crash the app in case if a developer makes a mistake?</em></p>
 <p>Java does it all the time, just check standard library.
 Having an exception <em>in case of a developer's mistake</em> is a good design.
 That's why they were created for.</p>
-<p>The only thing that left is the ugly call syntax <code>out.get().invoke(42)</code>, let's add some Kotlin sugar.</p>
+<p>The only thing that left is the ugly call syntax <code>output.get().invoke(42)</code>, let's add some Kotlin sugar.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.getValue(thisRef: Any?, property: KProperty&lt;*&gt;): T =
     <span style="color:#66d9ef">get</span>()
 
 <span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.setValue(thisRef: Any?, property: KProperty&lt;*&gt;, value: T?) =
     inject(value)
 </code></pre></div><p>Now it can be used even nicer:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">var</span> out <span style="color:#66d9ef">by</span> late&lt;(Any) -&gt; Unit&gt;()
-<span style="color:#66d9ef">out</span> = <span style="color:#f92672">::</span>print
-<span style="color:#66d9ef">out</span>(<span style="color:#ae81ff">42</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">var</span> output <span style="color:#66d9ef">by</span> late&lt;(Any) -&gt; Unit&gt;()
+output = <span style="color:#f92672">::</span>print
+output(<span style="color:#ae81ff">42</span>)
 </code></pre></div><p>Done!</p>
 <h1 id="pros-and-cons-of-late">Pros and cons of <code>Late</code></h1>
 <p>Pros:</p>
@@ -390,7 +391,7 @@ they can be singletons or function references.</p>
 JavaScript does not have <code>by</code> operator overloading, but I was able
 to make the injection code look nice by having <code>late()</code> function
 returning a function that has methods,
-so I could call <code>out.inject(x)</code> and then call <code>out()</code>.
+so I could call <code>output.inject(x)</code> and then call <code>output()</code>.
 JavaScript may look a bit weird now, but think a bit - the same trick is possible in Kotlin! ;)</p>
 <h1 id="a-fitting-cite-that-contains-a-summary-of-this-article">A fitting cite that contains a summary of this article</h1>
 <blockquote>
