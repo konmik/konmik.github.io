@@ -3,10 +3,9 @@ title = "Impostor Syndrome for Software Developers"
 draft = false
 date = "2020-01-08"
 tags = ["Programming Culture"]
-truncated = true
 +++
 
-I often see recommendations on twitter about how to deal with impostor syndrome.
+I often see recommendations on Twitter about how to deal with impostor syndrome.
 It is almost always something like "just convince yourself that you're not an impostor".
 It is hard to do if you have a conscience.
 
@@ -14,13 +13,15 @@ It is hard to do if you have a conscience.
 
 ## Introduction
 
-During my early career, I had a very hard case of being an impostor.
-I was hired when I was just 18 and I was given a salary that was higher than my father's salary.
+The first time I was hired when I was just 18 and I was given
+a salary that was higher than my father's salary.
 My knowledge of software development was close to zero.
 I wasn't a genius - I was just an average guy who managed to read a couple of books
 (we didn't even have Internet to learn so you can imagine).
 
-Many years later I managed to see how many working hours the software I created have saved.
+Did I have importor syndrome? Hell, yeah!
+
+Only many years later I managed to see how many working hours the software I created have saved.
 At the company I was working at, we managed to deal with the business having only 2 accountants
 while in the other division of the same company they had 6 for the same work.
 So my salary must be as of those 4 absent accountants, right?
@@ -59,7 +60,7 @@ I am afraid that I will be hated after having this article published.
 It is a very mentally hot topic.
 
 I will be very clear: I'm not trying to shame anyone, nor I am trying to make anyone guilty.
-After all, I was in the same place myself.
+After all, I was in the same position myself.
 
 The way out is HARD.
 
@@ -76,7 +77,8 @@ So you have to learn.
 
 Unfortunately, having an _education_ is not enough.
 If we had an education system that actually teaches that would be really nice.
-I would stop seeing "impostor syndrome" in my twitter and anxiety level amongst developers would drop.
+I would stop seeing "impostor syndrome" in my Twitter and
+anxiety level amongst developers would drop.
 Maybe we also could have better software.
 
 Don't worry - you don't have to learn the useless stuff you do not need.
@@ -199,7 +201,7 @@ find a PC and learn how it is composed.
 
 Write and run benchmarks. Many of them.
 Do it to prove that an optimization is needed.
-Or the opposite - that is it not needed.
+Or the opposite - that it is not needed.
 
 We always hear that "we're doing it this way because it is faster this way".
 If they cannot tell how many nanoseconds it saves, they are just lying.
@@ -311,3 +313,9 @@ Databases - what transaction is and how it works. What are the current types
 of databases (key-value storage, SQL, Object database, etc) and when to use them.
 
 And the most important of all the references: [The Kiss Principle](http://people.apache.org/~fhanik/kiss.html).
+
+### Never stop learning
+
+Add your own items to the list.
+
+Learning can be even more fun you decide what to learn yourself.
