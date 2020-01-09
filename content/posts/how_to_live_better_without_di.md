@@ -156,7 +156,7 @@ konmik@m16 nodi % ./gradlew test
 BUILD SUCCESSFUL in 0s
 ```
 
-This was just a little joke about gradle.
+This was a little joke about gradle.
 
 I will just type here the string that I see in my IDE because configuring gradle test output is too hard.
 
