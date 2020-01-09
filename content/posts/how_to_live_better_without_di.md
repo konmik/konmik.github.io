@@ -1,8 +1,8 @@
 +++
 title = "How to live better without Dependency Injection"
 draft = false
-date = "2020-01-08"
-tags = ["Java", "Android"]
+date = "2020-01-09"
+tags = ["Kotlin", "Android"]
 +++
 
 *(I've just learned Dagger, what is wrong?
