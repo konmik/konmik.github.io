@@ -210,7 +210,7 @@ Can we have a solution that would deal with these issues for us?</p>
 <h3 id="hold-my-beer-examples-are-in-kotlin-because-2020">Hold my beer (examples are in Kotlin, because 2020)</h3>
 <p>Let's start with a simple example.
 The code will look terrible at the beginning but it will become better at the end.</p>
-<p>We're going to travel into the functional world. That's why we will start by injecting <em>functions</em>.</p>
+<p>We're going to travel into the functional world. That's why we will start by injecting functions.</p>
 <p><strong>Module A</strong>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">lateinit</span> <span style="color:#66d9ef">var</span> output: (Any) -&gt; Unit
 
@@ -282,7 +282,7 @@ This is the power of KISS!</p>
 <p>Anyone can come and redefine <code>output</code> at runtime.
 Let's add some protection to prevent inexperienced developers from breaking it.
 A single variable has no logic, so it cannot control its assignment.</p>
-<p>The obvious design is to create an intermediate object that has <code>fun inject()</code> function
+<p>The obvious design is to create an intermediate object
 that will check if it is the right time to have an injection.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Late</span>&lt;T : Any&gt; <span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">constructor</span>() {
 
@@ -291,8 +291,8 @@ that will check if it is the right time to have an injection.</p>
     <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">get</span>(): T =
         value <span style="color:#f92672">?:</span> <span style="color:#66d9ef">throw</span> UninitializedPropertyAccessException()
 
-    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">inject</span>(it: T?) {
-        <span style="color:#66d9ef">if</span> (locked) <span style="color:#66d9ef">throw</span> IllegalStateException(<span style="color:#e6db74">&#34;Already injected&#34;</span>)
+    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">set</span>(it: T) {
+        <span style="color:#66d9ef">if</span> (locked) <span style="color:#66d9ef">throw</span> IllegalStateException(<span style="color:#e6db74">&#34;Injection is not allowed&#34;</span>)
         value = it
     }
 }
@@ -313,7 +313,7 @@ that will check if it is the right time to have an injection.</p>
 }
 </code></pre></div><p>In <strong>Module Main</strong>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
-    output.inject(<span style="color:#f92672">::</span>print)
+    output.<span style="color:#66d9ef">set</span>(<span style="color:#f92672">::</span>print)
     lockInjections()
 
     printMax(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>)
@@ -330,8 +330,9 @@ That's why they were created for.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.getValue(thisRef: Any?, property: KProperty&lt;*&gt;): T =
     <span style="color:#66d9ef">get</span>()
 
-<span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.setValue(thisRef: Any?, property: KProperty&lt;*&gt;, value: T?) =
-    inject(value)
+<span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">fun</span> &lt;T : Any&gt; <span style="color:#a6e22e">Late</span>&lt;T&gt;.setValue(thisRef: Any?, property: KProperty&lt;*&gt;, value: T) {
+    <span style="color:#66d9ef">set</span>(value)
+}
 </code></pre></div><p>Now it can be used even nicer:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Kotlin" data-lang="Kotlin"><span style="color:#66d9ef">var</span> output <span style="color:#66d9ef">by</span> late&lt;(Any) -&gt; Unit&gt;()
 output = <span style="color:#f92672">::</span>print
@@ -391,9 +392,9 @@ they can be singletons or function references.</p>
 JavaScript does not have <code>by</code> operator overloading, but I was able
 to make the injection code look nice by having <code>late()</code> function
 returning a function that has methods,
-so I could call <code>output.inject(x)</code> and then call <code>output()</code>.
-JavaScript may look a bit weird now, but think a bit - the same trick is possible in Kotlin! ;)</p>
-<h1 id="a-fitting-cite-that-contains-a-summary-of-this-article">A fitting cite that contains a summary of this article</h1>
+so I could call <code>output.set(x)</code> and then call <code>output(42)</code>.
+JavaScript may look a bit weird, but think a bit - the same trick is possible in Kotlin! ;)</p>
+<h1 id="a-fitting-cite-that-contains-the-summary-of-this-article">A fitting cite that contains the summary of this article</h1>
 <blockquote>
 <p>&ldquo;All problems in computer science can be solved by another level of indirection&rdquo; &ndash; David Wheeler</p>
 </blockquote>
