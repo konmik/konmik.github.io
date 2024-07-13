@@ -12,12 +12,12 @@
 <meta name="keywords"
   content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="http://konmik.com/posts/code_simplicity_02/" />
+<link rel="canonical" href="konmik.com/posts/code_simplicity_02/" />
 
 
-<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+<link rel="stylesheet" href="konmik.com/assets/style.css">
 
-<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+<link rel="stylesheet" href="konmik.com/assets/green.css">
 
 
 
@@ -25,9 +25,9 @@
 
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144"
-  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+  href="konmik.com/img/apple-touch-icon-144-precomposed.png">
 
-<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+<link rel="shortcut icon" href="konmik.com/img/favicon/green.png">
 
 
 
@@ -37,7 +37,7 @@
 <meta name="twitter:description"
   content="Use immutable data like a pro.
 " />
-<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:site" content="konmik.com/" />
 <meta name="twitter:creator" content="" />
 <meta name="twitter:image" content="">
 
@@ -49,7 +49,7 @@
 <meta property="og:description"
   content="Use immutable data like a pro.
 " />
-<meta property="og:url" content="http://konmik.com/posts/code_simplicity_02/" />
+<meta property="og:url" content="konmik.com/posts/code_simplicity_02/" />
 <meta property="og:site_name" content="Immutable data is the main key to simple code" />
 <meta property="og:image" content="">
 <meta property="og:image:width" content="2048">
@@ -76,7 +76,7 @@
   <header class="header">
   <div class="header__inner">
     <div class="header__logo">
-      <a href="http://konmik.com/">
+      <a href="konmik.com/">
   <div class="logo">
     Konstantin Mikheev&#39;s programming blog
   </div>
@@ -90,15 +90,15 @@
     
       
         
-          <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+          <li><a href="konmik.com/index.xml">[RSS]</a></li>
         
       
         
-          <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+          <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
         
       
         
-          <li><a href="https://github.com/konmik">[GitHub]</a></li>
+          <li><a href="github.com/konmik">[GitHub]</a></li>
         
       
     
@@ -109,15 +109,15 @@
   <ul class="menu__inner menu__inner--mobile">
     
       
-        <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+        <li><a href="konmik.com/index.xml">[RSS]</a></li>
       
     
       
-        <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+        <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
       
     
       
-        <li><a href="https://github.com/konmik">[GitHub]</a></li>
+        <li><a href="github.com/konmik">[GitHub]</a></li>
       
     
     
@@ -132,7 +132,7 @@
     
 <div class="post">
   <h1 class="post-title">
-    <a href="http://konmik.com/posts/code_simplicity_02/">Immutable data is the main key to simple code</a></h1>
+    <a href="konmik.com/posts/code_simplicity_02/">Immutable data is the main key to simple code</a></h1>
   <div class="post-meta">
     
     <span class="post-date">
@@ -145,7 +145,7 @@
   
   <span class="post-tags">
     
-    #<a href="http://konmik.com/tags/programming-theory/">Programming theory</a>&nbsp;
+    #<a href="konmik.com/tags/programming-theory/">Programming theory</a>&nbsp;
     
   </span>
   
@@ -158,11 +158,11 @@
 <p>I was often told that to understand how to work with immutable data
 I have to study a real functional language like Haskell,
 where mutable data does not exist at all.</p>
-<p>Luckily, you don't have to - I'm already typing this article, it should be enough.
-I'm not that kind of a snob to give someone hard to reach goals just to
+<p>Luckily, you don&rsquo;t have to - I&rsquo;m already typing this article, it should be enough.
+I&rsquo;m not that kind of a snob to give someone hard to reach goals just to
 make a secret, draw attention and to show how smart I am.
-I'm drawing your attention by <em>revealing</em> the secret. ;)</p>
-<p>If you haven't yet - I'm inviting you to read my first article on
+I&rsquo;m drawing your attention by <em>revealing</em> the secret. ;)</p>
+<p>If you haven&rsquo;t yet - I&rsquo;m inviting you to read my first article on
 the subject of code simplicity - <a href="/post/code_simplicity_01">The Code Simplicity Chart</a>.
 The current article is an in-depth look into the problem of code simplicity
 and it is based on the forementioned article completely.</p>
@@ -178,26 +178,26 @@ a self-controlling piece of program that reacts on events and initiates other ev
 in response.
 At the end our programs consist of thousands of interconnected pieces
 that send events to each other in a totally uncontrolled manner.</p>
-<p>By forcing our data to be immutable we're reducing the amount
+<p>By forcing our data to be immutable we&rsquo;re reducing the amount
 of events that are happening inside of our programs.
 How is this possible?</p>
 <h3 id="an-example">An example</h3>
 <p>Imagine we have a <code>Person</code> object that is being shown on the screen.
 Every time we mutate its fields we need to raise a corresponding event to update the
 corresponding text shown on the screen.
-We're changing the person name - we have to update the person's name on the screen.</p>
+We&rsquo;re changing the person name - we have to update the person&rsquo;s name on the screen.</p>
 <p>What if we want this data to be persisted as well?
 The person name has changed - how we need to save the new name to the database.
 What if <code>Person</code> has tens of fields?</p>
 <p>This strategy is complex.</p>
-<p>In reality we're trying to bundle several events like this into one - the person
-was changed, so we're serializing it into the database entirely to avoid writing
+<p>In reality we&rsquo;re trying to bundle several events like this into one - the person
+was changed, so we&rsquo;re serializing it into the database entirely to avoid writing
 a separate flow of events for each field.</p>
 <p>But what if we want to show a <em>list</em> of persons on the screen?</p>
-<p>That's where our event bundling strategy usually fails
+<p>That&rsquo;s where our event bundling strategy usually fails
 because this is so easy &ndash; to mutate a data field, keeping the
 rest of the list unchanged.
-We're installing a callback for each item in the list so when it changes -
+We&rsquo;re installing a callback for each item in the list so when it changes -
 it updates the corresponding text on the screen.
 Sounds easy?</p>
 <p>Not that easy because we can get a bunch of other problems:</p>
@@ -217,11 +217,11 @@ of complexities and, uh, bugs.</li>
 </ul>
 <p>But having immutable list of immutable persons solves all of these
 problems completely.
-Now, instead of having to track each person we're tracking
+Now, instead of having to track each person we&rsquo;re tracking
 the list of persons at once, the number of possible events gets reduced dramatically.</p>
 <p>Imagine now we have only <em>one</em> mutable variable, and the variable name is <code>items</code>.
 It contains an immutable list of persons.
-When we need to update the list on the screen we're
+When we need to update the list on the screen we&rsquo;re
 just raising <em>one</em> event that passes the immutable list
 to renderer that will show it to user.
 Do we need to show more persons?
@@ -244,7 +244,7 @@ This approach works amazingly.</p>
 <em>events</em> with <em>immutable data</em>.
 In terms of program complexity, it is like jumping from infinity to zero.
 I cannot even tell how awesome it is &ndash; instead of raising events
-they're creating immutable data structures like &ldquo;button X pressed&rdquo; and then calling
+they&rsquo;re creating immutable data structures like &ldquo;button X pressed&rdquo; and then calling
 a <em>pure</em> function that creates a new instance of the entire program
 which is also just an immutable data structure by itself!</p>
 <h3 id="immutable-data-is-not-a-new-idea">Immutable data is not a new idea</h3>
@@ -271,13 +271,13 @@ And one of the main ideas that appears here is that <strong>we are not hiding da
 So there is no point in protecting it from external access.</p>
 <p>Data is not an &ldquo;implementation detail&rdquo; anymore
 and our functions do not rely on internal data structure anyway.
-We're shifting our programming paradigm
+We&rsquo;re shifting our programming paradigm
 from manipulating on mutable fields into
 manipulating on large chunks of data.</p>
-<p>Instead of &ldquo;modify person's name and pass it through 10 functions to show it on the screen&rdquo;, we now have &ldquo;modify the person's name and pass the <em>person</em> through 10 functions to show it on the screen&rdquo;.
+<p>Instead of &ldquo;modify person&rsquo;s name and pass it through 10 functions to show it on the screen&rdquo;, we now have &ldquo;modify the person&rsquo;s name and pass the <em>person</em> through 10 functions to show it on the screen&rdquo;.
 You see?
 Now these 10 functions that are passing data are not passing name (implementation detail) anymore, so it does not matter if it hidden or not.
-In addition, if we will want to pass the person's <em>age</em> we will not even need to write yet another 10 passing functions.</p>
+In addition, if we will want to pass the person&rsquo;s <em>age</em> we will not even need to write yet another 10 passing functions.</p>
 <h1 id="immutability-and-oop">Immutability and OOP</h1>
 <p>Nowadays people who are still writing plain mutable OOP code are
 sometimes very suspicious about data classes.
@@ -286,7 +286,7 @@ But reality is that data classes are the best way so write simple code.</p>
 <p>Excessive data hiding in OOP leads to the fact that in OOP languages
 we have to pass data in very intricate ways.
 If we want to serialize <code>Person</code> into JSON
-we're passing some kind of abstraction like <code>Serializer</code>
+we&rsquo;re passing some kind of abstraction like <code>Serializer</code>
 and ask <code>Person</code> to serialize itself.
 Sounds easy, but this practice leads to having class hierarchies
 and gigantic classes with mostly copy-pasted code.
@@ -304,11 +304,11 @@ one of two evils - we either break data hiding rule and make our data vulnerable
 to external forces OR we use class hierarchies that are very verbose and
 hard to understand, compose and test.
 But now the problem is solved.</p>
-<p>Let's leave pure OOP to those who &ldquo;like to be verbose&rdquo; and go to the next stop.
+<p>Let&rsquo;s leave pure OOP to those who &ldquo;like to be verbose&rdquo; and go to the next stop.
 We already won lambdas that became acceptable in most languages
 despite OOP purist complaints, and there are very few steps to do left.
 The &ldquo;base programming language feature pack&rdquo; is getting closer.</p>
-<p>Definitely, when we're writing a library we should still limit amount
+<p>Definitely, when we&rsquo;re writing a library we should still limit amount
 of internal data and functions visibility - for the sake of simplicity of API
 and for the sake of the freedom to change the library internals.</p>
 <h1 id="immutability-at-smaller-scale">Immutability at smaller scale</h1>
@@ -316,34 +316,34 @@ and for the sake of the freedom to change the library internals.</p>
 functional approach more than OOP.
 Especially in order to work with lists.</p>
 <p>Imagine we need to remove all persons that are younger than 18 from our list
-we're showing on the screen.</p>
-<p>We can't just take the list and remove the items from it, remember: the list is immutable.
+we&rsquo;re showing on the screen.</p>
+<p>We can&rsquo;t just take the list and remove the items from it, remember: the list is immutable.
 We will need to make a copy of it with items removed.</p>
 <p>In Java with mutable data this code typically look like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> list<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">-</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>list<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">age</span> <span style="color:#f92672">&lt;</span> 18<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        list<span style="color:#f92672">.</span><span style="color:#a6e22e">remove</span><span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>        
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>How many times we're repeating this pattern over and over again?
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> list.<span style="color:#a6e22e">size</span>() <span style="color:#f92672">-</span> 1; i <span style="color:#f92672">&gt;=</span> 0; i<span style="color:#f92672">--</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (list.<span style="color:#a6e22e">get</span>(i).<span style="color:#a6e22e">age</span> <span style="color:#f92672">&lt;</span> 18) {
+</span></span><span style="display:flex;"><span>        list.<span style="color:#a6e22e">remove</span>(i);        
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>How many times we&rsquo;re repeating this pattern over and over again?
 Ubiquitous <code>for</code> loops are plaguing our codebases,
 violating the &ldquo;Do not Repeat Yourself&rdquo; rule.</p>
 <p>Just count the amount of times we can make a mistake filtering the mutable list.
 We could forget to type <code>-1</code> at the beginning. We could forget to put <code>&gt;=</code> sign instead of <code>&gt;</code>.
-The idea of reverse iteration is totally unobvious to newbies and they're constantly making
+The idea of reverse iteration is totally unobvious to newbies and they&rsquo;re constantly making
 these mistakes, hanging up for tens of minutes every time they need to remove items.</p>
 <p>But if we decided to go immutable we just cannot write such loops anymore.
 There are a few strategies for working with immutable lists,
 but all of them are very verbose.
 So instead of repeating ourselves we tend to write small
 reusable functions for working with immutable data.</p>
-<p>In addition, we don't want the temporary mutable data to leak
+<p>In addition, we don&rsquo;t want the temporary mutable data to leak
 and break our strategy, so the main policy about temporary mutable data - it
 should not leave the function it was created in.</p>
 <p>This is the typical code we can find in a codebase
 that is oriented on working with immutable data:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">newList <span style="color:#f92672">=</span> filter<span style="color:#f92672">(</span>list<span style="color:#f92672">,</span> person <span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span> person<span style="color:#f92672">.</span><span style="color:#a6e22e">age</span> <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> 18<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-</code></pre></div><p>How many times we can make a logical mistake filtering this list?
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>newList <span style="color:#f92672">=</span> filter(list, person <span style="color:#f92672">-&gt;</span> person.<span style="color:#a6e22e">age</span> <span style="color:#f92672">&gt;=</span> 18);
+</span></span></code></pre></div><p>How many times we can make a logical mistake filtering this list?
 No matter how hard I try, I cannot find more potential bugs
 than in the example with <code>for</code> loop.</p>
 <h1 id="performance-faq">Performance FAQ</h1>
@@ -373,7 +373,7 @@ of simpler code.</p>
 <p>The opposite is also possible - in the example
 above <code>filter</code> function can actually work faster because
 when deleting items from a mutable list with <code>for</code> loop <code>remove</code> function
-wastes time on copying items every time we're deleting an item.</p>
+wastes time on copying items every time we&rsquo;re deleting an item.</p>
 </li>
 <li>
 <p><strong>Sometimes</strong> program performance can even increase up to several times.
@@ -395,7 +395,7 @@ This is one of the main laws of universe.</p>
 <p>But when we consider ideas it sometimes works in
 opposite direction: when we remove complexity &ndash; other parts of the code
 also become simpler.
-The miracle, as I see it, is that we're reducing amount of events
+The miracle, as I see it, is that we&rsquo;re reducing amount of events
 by reducing amount of shared mutable data.
 Complexity does not appear somewhere in exchange &ndash; it just disappears.</p>
 <p>Use simple tools to solve simple problems &ndash; hard problems will not even appear.</p>
@@ -419,7 +419,7 @@ for proofreading this article.</p>
     <div class="pagination__buttons">
       
       <span class="button previous">
-        <a href="http://konmik.com/posts/impostor_syndrome/">
+        <a href="konmik.com/posts/impostor_syndrome/">
           <span class="button__icon">←</span>
           <span class="button__text">Impostor Syndrome for Software Developers</span>
         </a>
@@ -427,7 +427,7 @@ for proofreading this article.</p>
       
       
       <span class="button next">
-        <a href="http://konmik.com/posts/code_simplicity_01/">
+        <a href="konmik.com/posts/code_simplicity_01/">
           <span class="button__text">The Code Simplicity Chart (c)</span>
           <span class="button__icon">→</span>
         </a>
@@ -452,8 +452,8 @@ for proofreading this article.</p>
     </div>
 </footer>
 
-<script src="http://konmik.com/assets/main.js"></script>
-<script src="http://konmik.com/assets/prism.js"></script>
+<script src="konmik.com/assets/main.js"></script>
+<script src="konmik.com/assets/prism.js"></script>
 
 
 

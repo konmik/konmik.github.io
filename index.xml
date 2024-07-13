@@ -2,151 +2,96 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Konstantin Mikheev&#39;s programming blog</title>
-    <link>http://konmik.com/</link>
+    <link>konmik.com/</link>
     <description>Recent content on Konstantin Mikheev&#39;s programming blog</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
     <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="http://konmik.com/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <atom:link href="konmik.com/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How to live better without Dependency Injection</title>
-      <link>http://konmik.com/posts/how_to_live_better_without_di/</link>
+      <link>konmik.com/posts/how_to_live_better_without_di/</link>
       <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/how_to_live_better_without_di/</guid>
-      <description>&lt;p&gt;&lt;em&gt;(I&#39;ve just learned Dagger, what is wrong?
-Imagine my anxiety now, I am NOT happy seeing an article with this title!
-I hope that the author does not have any idea!)&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Five years have passed since my first &lt;a href=&#34;http://konmik.com/posts/snorkeling_with_dagger_2/&#34;&gt;Dagger 2 article&lt;/a&gt;.
-It is time to write the last one.
-We do not need Dagger anymore.
-In fact, we didn&#39;t even need it in the first place.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/how_to_live_better_without_di/</guid>
+      <description>&lt;p&gt;&lt;em&gt;(I&amp;rsquo;ve just learned Dagger, what is wrong?&#xA;Imagine my anxiety now, I am NOT happy seeing an article with this title!&#xA;I hope that the author does not have any idea!)&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;Five years have passed since my first &lt;a href=&#34;http://konmik.com/posts/snorkeling_with_dagger_2/&#34;&gt;Dagger 2 article&lt;/a&gt;.&#xA;It is time to write the last one.&#xA;We do not need Dagger anymore.&#xA;In fact, we didn&amp;rsquo;t even need it in the first place.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Impostor Syndrome for Software Developers</title>
-      <link>http://konmik.com/posts/impostor_syndrome/</link>
+      <link>konmik.com/posts/impostor_syndrome/</link>
       <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/impostor_syndrome/</guid>
-      <description>&lt;p&gt;I often see recommendations on Twitter about how to deal with impostor syndrome.
-It is almost always something like &amp;ldquo;just convince yourself that you&#39;re not an impostor&amp;rdquo;.
-It is hard to do if you have a conscience.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/impostor_syndrome/</guid>
+      <description>&lt;p&gt;I often see recommendations on Twitter about how to deal with impostor syndrome.&#xA;It is almost always something like &amp;ldquo;just convince yourself that you&amp;rsquo;re not an impostor&amp;rdquo;.&#xA;It is hard to do if you have a conscience.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Immutable data is the main key to simple code</title>
-      <link>http://konmik.com/posts/code_simplicity_02/</link>
+      <link>konmik.com/posts/code_simplicity_02/</link>
       <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/code_simplicity_02/</guid>
+      <guid>konmik.com/posts/code_simplicity_02/</guid>
       <description>&lt;p&gt;Use immutable data like a pro.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>The Code Simplicity Chart (c)</title>
-      <link>http://konmik.com/posts/code_simplicity_01/</link>
+      <link>konmik.com/posts/code_simplicity_01/</link>
       <pubDate>Tue, 21 Nov 2017 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/code_simplicity_01/</guid>
+      <guid>konmik.com/posts/code_simplicity_01/</guid>
       <description>&lt;p&gt;How to understand if your code is simple or complex.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Is programming actually math?</title>
-      <link>http://konmik.com/posts/is_programming_actually_math/</link>
+      <link>konmik.com/posts/is_programming_actually_math/</link>
       <pubDate>Mon, 24 Apr 2017 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/is_programming_actually_math/</guid>
+      <guid>konmik.com/posts/is_programming_actually_math/</guid>
       <description>&lt;p&gt;The main difference between programming and math is&amp;hellip;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>When to NOT use RxJava</title>
-      <link>http://konmik.com/posts/when_to_not_use_rxjava/</link>
+      <link>konmik.com/posts/when_to_not_use_rxjava/</link>
       <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/when_to_not_use_rxjava/</guid>
-      <description>&lt;p&gt;RxJava is very powerful.
-It solves a great amount of tasks easily.
-But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.
-Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/when_to_not_use_rxjava/</guid>
+      <description>&lt;p&gt;RxJava is very powerful.&#xA;It solves a great amount of tasks easily.&#xA;But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.&#xA;Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Managing state reactive way</title>
-      <link>http://konmik.com/posts/managing_state_reactive_way/</link>
+      <link>konmik.com/posts/managing_state_reactive_way/</link>
       <pubDate>Sun, 25 Dec 2016 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/managing_state_reactive_way/</guid>
-      <description>&lt;p&gt;RxJava nice and easily covers our multithreading needs.
-But it provides only a half of the solution.
-While we can compose functions with RxJava, there is no safe way we can have
-our state (field variables) handled without race conditions and low-level synchronization blocks.&lt;/p&gt;
-&lt;p&gt;This article describes a simple and practical way for solving multithreading issues
-that appear even when we&#39;re using such advanced technology as RxJava.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/managing_state_reactive_way/</guid>
+      <description>&lt;p&gt;RxJava nice and easily covers our multithreading needs.&#xA;But it provides only a half of the solution.&#xA;While we can compose functions with RxJava, there is no safe way we can have&#xA;our state (field variables) handled without race conditions and low-level synchronization blocks.&lt;/p&gt;&#xA;&lt;p&gt;This article describes a simple and practical way for solving multithreading issues&#xA;that appear even when we&amp;rsquo;re using such advanced technology as RxJava.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Why lambdas matter (even on Android)</title>
-      <link>http://konmik.com/posts/why_lambdas_matter_even_on_android/</link>
+      <link>konmik.com/posts/why_lambdas_matter_even_on_android/</link>
       <pubDate>Wed, 06 Jan 2016 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/why_lambdas_matter_even_on_android/</guid>
-      <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;</description>
+      <guid>konmik.com/posts/why_lambdas_matter_even_on_android/</guid>
+      <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;&#xA;&lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>RxJava magic (finally) goes away</title>
-      <link>http://konmik.com/posts/rxjava_magic_finally_goes_away/</link>
+      <link>konmik.com/posts/rxjava_magic_finally_goes_away/</link>
       <pubDate>Tue, 08 Dec 2015 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/rxjava_magic_finally_goes_away/</guid>
-      <description>&lt;p&gt;There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.&lt;/p&gt;
-&lt;p&gt;Docs and tutorials are either too shallow or too complicated.&lt;/p&gt;
-&lt;p&gt;Here is the middle ground that is &lt;em&gt;essential&lt;/em&gt; to know before playing with RxJava.&lt;/p&gt;
-&lt;p&gt;In these tests we will take each RxJava part&amp;hellip; apart and explore how exactly it works.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/rxjava_magic_finally_goes_away/</guid>
+      <description>&lt;p&gt;There is too much &amp;ldquo;magic&amp;rdquo; inside of RxJava.&lt;/p&gt;&#xA;&lt;p&gt;Docs and tutorials are either too shallow or too complicated.&lt;/p&gt;&#xA;&lt;p&gt;Here is the middle ground that is &lt;em&gt;essential&lt;/em&gt; to know before playing with RxJava.&lt;/p&gt;&#xA;&lt;p&gt;In these tests we will take each RxJava part&amp;hellip; apart and explore how exactly it works.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>How to have 100% code coverage with tests and be sane</title>
-      <link>http://konmik.com/posts/how_to_have_100_percent_code_coverage/</link>
+      <link>konmik.com/posts/how_to_have_100_percent_code_coverage/</link>
       <pubDate>Sat, 19 Sep 2015 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/how_to_have_100_percent_code_coverage/</guid>
-      <description>&lt;p&gt;In this article I will discuss unit testing approaches,
-show a quick and elegant solution to unit tests complexity,
-benefits of having 100% code coverage with tests
-and how achieve it easily.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/how_to_have_100_percent_code_coverage/</guid>
+      <description>&lt;p&gt;In this article I will discuss unit testing approaches,&#xA;show a quick and elegant solution to unit tests complexity,&#xA;benefits of having 100% code coverage with tests&#xA;and how achieve it easily.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Introduction to Model View Presenter on Android</title>
-      <link>http://konmik.com/posts/introduction_to_model_view_presenter_on_android/</link>
+      <link>konmik.com/posts/introduction_to_model_view_presenter_on_android/</link>
       <pubDate>Mon, 23 Mar 2015 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/introduction_to_model_view_presenter_on_android/</guid>
-      <description>&lt;p&gt;This article is a step-by-step introduction to MVP on Android, from a simplest possible
-example to best practices. The article also introduces a new library
-that makes MVP on Android extremely simple.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/introduction_to_model_view_presenter_on_android/</guid>
+      <description>&lt;p&gt;This article is a step-by-step introduction to MVP on Android, from a simplest possible&#xA;example to best practices. The article also introduces a new library&#xA;that makes MVP on Android extremely simple.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Snorkeling with Dagger 2</title>
-      <link>http://konmik.com/posts/snorkeling_with_dagger_2/</link>
+      <link>konmik.com/posts/snorkeling_with_dagger_2/</link>
       <pubDate>Sun, 01 Feb 2015 00:00:00 +0000</pubDate>
-      
-      <guid>http://konmik.com/posts/snorkeling_with_dagger_2/</guid>
-      <description>&lt;p&gt;Dagger is a popular library for Java, it makes writing code much easier and more structured.
-In this article I will describe how can we benefit of using it,
-show some simple use cases and explore the generated code.
-As a bonus, I will show an advanced trick that makes Dagger 2 much more flexible.&lt;/p&gt;</description>
+      <guid>konmik.com/posts/snorkeling_with_dagger_2/</guid>
+      <description>&lt;p&gt;Dagger is a popular library for Java, it makes writing code much easier and more structured.&#xA;In this article I will describe how can we benefit of using it,&#xA;show some simple use cases and explore the generated code.&#xA;As a bonus, I will show an advanced trick that makes Dagger 2 much more flexible.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

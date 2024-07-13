@@ -2,14 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Konstantin Mikheev&#39;s programming blog</title>
-    <link>http://konmik.com/categories/</link>
+    <link>konmik.com/categories/</link>
     <description>Recent content in Categories on Konstantin Mikheev&#39;s programming blog</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
-    
-	<atom:link href="http://konmik.com/categories/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <atom:link href="konmik.com/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

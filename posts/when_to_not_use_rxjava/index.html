@@ -12,12 +12,12 @@
 <meta name="keywords"
   content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="http://konmik.com/posts/when_to_not_use_rxjava/" />
+<link rel="canonical" href="konmik.com/posts/when_to_not_use_rxjava/" />
 
 
-<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+<link rel="stylesheet" href="konmik.com/assets/style.css">
 
-<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+<link rel="stylesheet" href="konmik.com/assets/green.css">
 
 
 
@@ -25,9 +25,9 @@
 
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144"
-  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+  href="konmik.com/img/apple-touch-icon-144-precomposed.png">
 
-<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+<link rel="shortcut icon" href="konmik.com/img/favicon/green.png">
 
 
 
@@ -37,7 +37,7 @@
 <meta name="twitter:description"
   content="RxJava is very powerful. It solves a great amount of tasks easily. But using it in wrong places can turn any codebase into an unmaintainable and buggy mess. Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.
 " />
-<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:site" content="konmik.com/" />
 <meta name="twitter:creator" content="" />
 <meta name="twitter:image" content="">
 
@@ -49,7 +49,7 @@
 <meta property="og:description"
   content="RxJava is very powerful. It solves a great amount of tasks easily. But using it in wrong places can turn any codebase into an unmaintainable and buggy mess. Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.
 " />
-<meta property="og:url" content="http://konmik.com/posts/when_to_not_use_rxjava/" />
+<meta property="og:url" content="konmik.com/posts/when_to_not_use_rxjava/" />
 <meta property="og:site_name" content="When to NOT use RxJava" />
 <meta property="og:image" content="">
 <meta property="og:image:width" content="2048">
@@ -76,7 +76,7 @@
   <header class="header">
   <div class="header__inner">
     <div class="header__logo">
-      <a href="http://konmik.com/">
+      <a href="konmik.com/">
   <div class="logo">
     Konstantin Mikheev&#39;s programming blog
   </div>
@@ -90,15 +90,15 @@
     
       
         
-          <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+          <li><a href="konmik.com/index.xml">[RSS]</a></li>
         
       
         
-          <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+          <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
         
       
         
-          <li><a href="https://github.com/konmik">[GitHub]</a></li>
+          <li><a href="github.com/konmik">[GitHub]</a></li>
         
       
     
@@ -109,15 +109,15 @@
   <ul class="menu__inner menu__inner--mobile">
     
       
-        <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+        <li><a href="konmik.com/index.xml">[RSS]</a></li>
       
     
       
-        <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+        <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
       
     
       
-        <li><a href="https://github.com/konmik">[GitHub]</a></li>
+        <li><a href="github.com/konmik">[GitHub]</a></li>
       
     
     
@@ -132,7 +132,7 @@
     
 <div class="post">
   <h1 class="post-title">
-    <a href="http://konmik.com/posts/when_to_not_use_rxjava/">When to NOT use RxJava</a></h1>
+    <a href="konmik.com/posts/when_to_not_use_rxjava/">When to NOT use RxJava</a></h1>
   <div class="post-meta">
     
     <span class="post-date">
@@ -145,9 +145,9 @@
   
   <span class="post-tags">
     
-    #<a href="http://konmik.com/tags/java/">Java</a>&nbsp;
+    #<a href="konmik.com/tags/java/">Java</a>&nbsp;
     
-    #<a href="http://konmik.com/tags/android/">Android</a>&nbsp;
+    #<a href="konmik.com/tags/android/">Android</a>&nbsp;
     
   </span>
   
@@ -160,49 +160,49 @@ It solves a great amount of tasks easily.
 But using it in wrong places can turn any codebase into an unmaintainable and buggy mess.
 Here I will try to explain where RxJava can help and in which cases it is better to avoid using it.</p>
 <h2 id="basic-example">Basic example</h2>
-<p>Let's take a very simple and obvious example of a wrong RxJava
+<p>Let&rsquo;s take a very simple and obvious example of a wrong RxJava
 usage and go into theoretical details later.</p>
 <p>Often, people inspired with RxJava
 start turning everything into a stream.
 We even got a new mantra - &ldquo;Everything is a stream&rdquo;.</p>
-<p>Say, you need to implement <code>int max(int, int)</code> function (let's pretend it does not exist yet).
+<p>Say, you need to implement <code>int max(int, int)</code> function (let&rsquo;s pretend it does not exist yet).
 What will you think if you discover an implementation like this
-that was proudly created for you by a newbie who can't wait to apply the new magical hammer?</p>
+that was proudly created for you by a newbie who can&rsquo;t wait to apply the new magical hammer?</p>
 <h4 id="figure-a">Figure A.</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">max</span><span style="color:#f92672">(</span>Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> left<span style="color:#f92672">,</span> Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> right<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">return</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">zip</span><span style="color:#f92672">(</span>left<span style="color:#f92672">,</span> right<span style="color:#f92672">,</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">,</span> b<span style="color:#f92672">)</span> <span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span> a <span style="color:#f92672">&lt;</span> b <span style="color:#f92672">?</span> b <span style="color:#f92672">:</span> a<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>Interesting, yeah?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">max</span>(Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> left, Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> right) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Observable.<span style="color:#a6e22e">zip</span>(left, right, (a, b) <span style="color:#f92672">-&gt;</span> a <span style="color:#f92672">&lt;</span> b <span style="color:#f92672">?</span> b : a);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Interesting, yeah?</p>
 <blockquote>
 <p>&ldquo;When you have a hammer everything looks like a nail.&rdquo;</p>
 </blockquote>
 <p>A sane developer will probably say &ldquo;WTF??!&rdquo; and implement something
 less shiny and inspiring, but more practical:</p>
 <h4 id="figure-b">Figure B.</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">max</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> a<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> b<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">return</span> a <span style="color:#f92672">&lt;</span> b <span style="color:#f92672">?</span> b <span style="color:#f92672">:</span> a<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>There is even an option to refactor the old code like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">max</span>(<span style="color:#66d9ef">int</span> a, <span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a <span style="color:#f92672">&lt;</span> b <span style="color:#f92672">?</span> b : a;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>There is even an option to refactor the old code like this:</p>
 <h4 id="figure-c">Figure C.</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">max</span><span style="color:#f92672">(</span>Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> left<span style="color:#f92672">,</span> Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> right<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">return</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">zip</span><span style="color:#f92672">(</span>left<span style="color:#f92672">,</span> right<span style="color:#f92672">,</span> MyMath<span style="color:#f92672">:</span><span style="color:#f92672">:</span>max<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>But in practice such a weird <code>max</code> implementation is just a consequence of other
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">max</span>(Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> left, Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> right) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Observable.<span style="color:#a6e22e">zip</span>(left, right, MyMath::max);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>But in practice such a weird <code>max</code> implementation is just a consequence of other
 weird functions that for some reason will look better if <code>max</code> works with observables.</p>
 <p>This example can be easily scaled into any
 size &ndash; people turn into stream <em>everything</em> literally.</p>
 <p>You can easily discover code like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">getId</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">return</span> Observable<span style="color:#f92672">.</span><span style="color:#a6e22e">just</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">id</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>In a large codebase it happens all the time.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Observable<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">getId</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Observable.<span style="color:#a6e22e">just</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In a large codebase it happens all the time.</p>
 <p>Or you can find a 20-line function of operators
 that is doing a job that can easily be done without RxJava -
 with the same amount of code!
 Try debugging a flow of events when the person who wrote it
 did not even think about events.</p>
-<p>I'm not saying that mantras do not work.
-I hope that at this point that's pretty obvious. ;)</p>
+<p>I&rsquo;m not saying that mantras do not work.
+I hope that at this point that&rsquo;s pretty obvious. ;)</p>
 <h2 id="so-what-exactly-is-wrong-here">So what exactly is wrong here?</h2>
 <p>This entire rant is about simplicity.</p>
 <p><strong>Figure B.</strong> says:
@@ -215,7 +215,7 @@ and create another one that will wait unless both streams will emit at least one
 and return a value every time this happens, and the value should be
 the maximum of these two values, but if one of streams will return less values then
 you should wait unless it will emit something and you should buffer
-items of another stream while you're waiting.
+items of another stream while you&rsquo;re waiting.
 Keep in mind that I
 can subscribe any number of times and you need to create the new sequence every time.
 There is also a possibility to unsubscribe at any moment, so you will also need
@@ -227,9 +227,9 @@ Stop returned stream if one of incoming streams stops.&rdquo;</p>
 <p>The enthusiastic developer will probably say:
 &ldquo;But we will never have such conditions!
 Both streams will always have exact amount of values,
-and I'm not going to use multithreading here,
+and I&rsquo;m not going to use multithreading here,
 and&hellip; and&hellip;&rdquo;</p>
-<p>C'mon, tell this to your mother.</p>
+<p>C&rsquo;mon, tell this to your mother.</p>
 <p>Bugs happen all the time and one day one of these observables
 will NOT return any value and your app will just hang.
 And it will happen with 10% of all of your users.
@@ -238,7 +238,7 @@ Or you will get a stacktrace, but it will not change anything,
 because RxJava stacktraces are something special.</p>
 <h2 id="do-not">DO NOT</h2>
 <h4 id="the-absence-of-events">The absence of events</h4>
-<p><strong>Do not</strong> use RxJava if there is no &ldquo;event&rdquo;. Just don't.
+<p><strong>Do not</strong> use RxJava if there is no &ldquo;event&rdquo;. Just don&rsquo;t.
 If something does not say: &ldquo;this will happen at some point in time&rdquo;,
 do not create observables.</p>
 <p>RxJava is not a <em>data processing</em> library.
@@ -259,12 +259,12 @@ Your code will be much simpler and there will be less possibilities for bugs.</p
 <p>Say, you have <code>Screen</code> and <code>Button</code> objects.
 Both operate on one thread, both have the same life duration.</p>
 <p>There are two general ways to pass events between them in OOP.
-You can either set a callback or pass one object into another's
+You can either set a callback or pass one object into another&rsquo;s
 constructor arguments.</p>
 <p>Passing an object into constructor is usually simpler because
-this way you're strictly saying that the passed object's life duration
-is at least as long as the object's that is being created.</p>
-<pre><code>class Screen {
+this way you&rsquo;re strictly saying that the passed object&rsquo;s life duration
+is at least as long as the object&rsquo;s that is being created.</p>
+<pre tabindex="0"><code>class Screen {
     
     Button logoutButton;
     
@@ -279,7 +279,7 @@ is at least as long as the object's that is being created.</p>
 </code></pre><p>A callback without the possibility to uninstall it
 is another technique that can be used if you need to
 propagate events into another direction.</p>
-<pre><code>class Screen {
+<pre tabindex="0"><code>class Screen {
 
     Screen(Button logoutButton) {
         logoutButton.setCallback(() -&gt; doLogout());    
@@ -293,30 +293,30 @@ propagate events into another direction.</p>
 </code></pre><p>However, if <code>Button</code> already exposes an observable for click notifications,
 it is OK to use it as it will not require any
 additional lines of code to implement.</p>
-<pre><code>logoutButton.clicks()
+<pre tabindex="0"><code>logoutButton.clicks()
     .subscribe(() -&gt; doLogout());
 </code></pre><h4 id="reactive-spaghetti">Reactive spaghetti</h4>
-<p>Don't do like this (simplified example):</p>
-<pre><code>.switchMap(it -&gt; serverApi.login(name, password)
+<p>Don&rsquo;t do like this (simplified example):</p>
+<pre tabindex="0"><code>.switchMap(it -&gt; serverApi.login(name, password)
     .switchMap(loginResult -&gt; serverApi.requestChatToken(loginResult.loginToken)
         .switchMap(chatToken -&gt; serverApi.doOtherThingsAfter(chatToken))))
 </code></pre><p>Do like this:</p>
-<pre><code>LoginResult loginResult = serverApi.login(name, password);
+<pre tabindex="0"><code>LoginResult loginResult = serverApi.login(name, password);
 String chatToken = serverApi.requestChatToken(loginResult.loginToken);
 return serverApi.doOtherThingsAfter(chatToken);
 </code></pre><p>Why the second way is better?
-Because we're not trading ONE event into FOUR.
-When we're developing software we want to simplify things, not to complicate them.
+Because we&rsquo;re not trading ONE event into FOUR.
+When we&rsquo;re developing software we want to simplify things, not to complicate them.
 Events are more complex than linear code execution.</p>
 <p>It is easier to modify linear code as well.
 Imagine you decided to wrap <code>login</code> and <code>requestChatToken</code> into <code>synchronized</code> block
 to stop some other network interaction in-between.
 It is trivial to do when you have linear code
 but it is crazy hard to do when every your network call can be triggered by something
-you can't control.</p>
+you can&rsquo;t control.</p>
 <p>Write spaghetti only when there are no other ways.</p>
 <h4 id="returning-lambdas-implementing-functional-interfaces-by-objects">Returning lambdas, implementing functional interfaces by objects</h4>
-<p>If you're doing something the title says,
+<p>If you&rsquo;re doing something the title says,
 there is a very high chance that there are simpler ways
 implementing the required functionality.</p>
 <p>We <em>can</em> replace <em>all</em> methods in OOP using RxJava.
@@ -347,8 +347,8 @@ for example <code>print</code> that prints information to console creates a side
 and if you will call several <code>print</code> in wrong order you will get wrong output.
 If you modify variables in wrong order you will also likely have bugs.</p>
 <p>RxJava has very clear semantic for using it with functions which
-create side-effects. This is useful when you're trying to
-understand someone's code, and it can also save you from having
+create side-effects. This is useful when you&rsquo;re trying to
+understand someone&rsquo;s code, and it can also save you from having
 more bugs.</p>
 <p>Use <code>subscribe</code> function callbacks &ndash; they are intentionally designed for doing this.
 You can also use <code>do*</code> operators (<code>doOnNext</code>, <code>doOnError</code>, etc) in case you
@@ -359,7 +359,7 @@ There are more functions which fit this purpose,
 look at <code>Observable</code> definition.</p>
 <p>It is wrong to use other functions (<code>Observable.map</code> for example)
 for creating side-effects
-because it assumes that you're just transforming one value into another.
+because it assumes that you&rsquo;re just transforming one value into another.
 A developer who will try to modify your code
 will think that it is OK to place this transformation into
 a different place, put it into another thread
@@ -404,7 +404,7 @@ be slower than you can afford.</p>
     <div class="pagination__buttons">
       
       <span class="button previous">
-        <a href="http://konmik.com/posts/is_programming_actually_math/">
+        <a href="konmik.com/posts/is_programming_actually_math/">
           <span class="button__icon">←</span>
           <span class="button__text">Is programming actually math?</span>
         </a>
@@ -412,7 +412,7 @@ be slower than you can afford.</p>
       
       
       <span class="button next">
-        <a href="http://konmik.com/posts/managing_state_reactive_way/">
+        <a href="konmik.com/posts/managing_state_reactive_way/">
           <span class="button__text">Managing state reactive way</span>
           <span class="button__icon">→</span>
         </a>
@@ -437,8 +437,8 @@ be slower than you can afford.</p>
     </div>
 </footer>
 
-<script src="http://konmik.com/assets/main.js"></script>
-<script src="http://konmik.com/assets/prism.js"></script>
+<script src="konmik.com/assets/main.js"></script>
+<script src="konmik.com/assets/prism.js"></script>
 
 
 

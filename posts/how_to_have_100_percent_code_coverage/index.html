@@ -12,12 +12,12 @@
 <meta name="keywords"
   content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="http://konmik.com/posts/how_to_have_100_percent_code_coverage/" />
+<link rel="canonical" href="konmik.com/posts/how_to_have_100_percent_code_coverage/" />
 
 
-<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+<link rel="stylesheet" href="konmik.com/assets/style.css">
 
-<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+<link rel="stylesheet" href="konmik.com/assets/green.css">
 
 
 
@@ -25,9 +25,9 @@
 
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144"
-  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+  href="konmik.com/img/apple-touch-icon-144-precomposed.png">
 
-<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+<link rel="shortcut icon" href="konmik.com/img/favicon/green.png">
 
 
 
@@ -37,7 +37,7 @@
 <meta name="twitter:description"
   content="In this article I will discuss unit testing approaches, show a quick and elegant solution to unit tests complexity, benefits of having 100% code coverage with tests and how achieve it easily.
 " />
-<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:site" content="konmik.com/" />
 <meta name="twitter:creator" content="" />
 <meta name="twitter:image" content="">
 
@@ -49,7 +49,7 @@
 <meta property="og:description"
   content="In this article I will discuss unit testing approaches, show a quick and elegant solution to unit tests complexity, benefits of having 100% code coverage with tests and how achieve it easily.
 " />
-<meta property="og:url" content="http://konmik.com/posts/how_to_have_100_percent_code_coverage/" />
+<meta property="og:url" content="konmik.com/posts/how_to_have_100_percent_code_coverage/" />
 <meta property="og:site_name" content="How to have 100% code coverage with tests and be sane" />
 <meta property="og:image" content="">
 <meta property="og:image:width" content="2048">
@@ -76,7 +76,7 @@
   <header class="header">
   <div class="header__inner">
     <div class="header__logo">
-      <a href="http://konmik.com/">
+      <a href="konmik.com/">
   <div class="logo">
     Konstantin Mikheev&#39;s programming blog
   </div>
@@ -90,15 +90,15 @@
     
       
         
-          <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+          <li><a href="konmik.com/index.xml">[RSS]</a></li>
         
       
         
-          <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+          <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
         
       
         
-          <li><a href="https://github.com/konmik">[GitHub]</a></li>
+          <li><a href="github.com/konmik">[GitHub]</a></li>
         
       
     
@@ -109,15 +109,15 @@
   <ul class="menu__inner menu__inner--mobile">
     
       
-        <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+        <li><a href="konmik.com/index.xml">[RSS]</a></li>
       
     
       
-        <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+        <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
       
     
       
-        <li><a href="https://github.com/konmik">[GitHub]</a></li>
+        <li><a href="github.com/konmik">[GitHub]</a></li>
       
     
     
@@ -132,7 +132,7 @@
     
 <div class="post">
   <h1 class="post-title">
-    <a href="http://konmik.com/posts/how_to_have_100_percent_code_coverage/">How to have 100% code coverage with tests and be sane</a></h1>
+    <a href="konmik.com/posts/how_to_have_100_percent_code_coverage/">How to have 100% code coverage with tests and be sane</a></h1>
   <div class="post-meta">
     
     <span class="post-date">
@@ -145,7 +145,7 @@
   
   <span class="post-tags">
     
-    #<a href="http://konmik.com/tags/java/">Java</a>&nbsp;
+    #<a href="konmik.com/tags/java/">Java</a>&nbsp;
     
   </span>
   
@@ -175,9 +175,9 @@ and it will be reached with less efforts than using the usual approach.</p>
 People write this fact as an advice that is nice to follow but the fact is that we
 will <em>never</em> come any close to a decent coverage within a reasonable amount of time
 by testing methods.</p>
-<p>Let's be engineers, let's count how we can have a reasonable amount of coverage
+<p>Let&rsquo;s be engineers, let&rsquo;s count how we can have a reasonable amount of coverage
 within a reasonable amount of time. What good engineers do? They measure and <em>estimate</em>.</p>
-<p>Let's estimate how much code we need to test a unit with 5 methods, each of them will have
+<p>Let&rsquo;s estimate how much code we need to test a unit with 5 methods, each of them will have
 2 <strong>if</strong> statements. Two <strong>if</strong> statements will normally give 3 possible cases.</p>
 <p>Every time we have an <strong>if</strong> statement we need to supply a different unit test environment
 (a combination of unit dependencies and commands issued to the unit)
@@ -187,7 +187,7 @@ just for one freaking unit with 5 methods! Such a waste of time! No, this is a d
 <p><img src="/images/100-coverage-trap.png" alt=""></p>
 <p>OK, now it should become very clear that testing methods is not the best idea.
 So probably we need to test <em>units</em>? We write <em>unit tests</em> after all, so this should be better, yeah?</p>
-<p>How about a little estimation? Let's count all logical cases within the entire unit.
+<p>How about a little estimation? Let&rsquo;s count all logical cases within the entire unit.
 5 methods in the unit, each has 2 <strong>if</strong> statement, 5 methods * 3 cases = we need 15 test environments.
 Did you notice a difference? Why the hell there should be a difference at all? We can, <em>potentially</em> test with less environments number if our <strong>if</strong>s are repetitive, but this is a rare case that should normally be eliminated by the Strategy pattern.</p>
 <h3 id="unit-tests-are-sick">Unit tests are sick</h3>
@@ -198,11 +198,11 @@ a guarantee that they will work <em>together</em>.</p>
 variables and <strong>if</strong> statements and he will try to test it (god save him). Someone other will create a
 lots of three-line methods that operate on immutable data almost without <strong>if</strong> statements
 and each unit will have 1-5 methods.</p>
-<p>Should that two different guys use the same approach for testing? The first guy didn't
-get what &ldquo;decomposition&rdquo; word mean so let's let him alone, but the second guy will not benefit from unit testing
+<p>Should that two different guys use the same approach for testing? The first guy didn&rsquo;t
+get what &ldquo;decomposition&rdquo; word mean so let&rsquo;s let him alone, but the second guy will not benefit from unit testing
 as he could because most of his code consist of inter-unit connections and he will need to
 setup a testing environment for each line, which is not effective.</p>
-<p>Another thing that is sick is unit's internal dependencies. If, for example, unit <code>A</code> depends on unit <code>B</code> and unit <code>B</code> is not used in any other place of the application, then there is no reason to write <code>new A(new B())</code>. Especially if <code>B</code> internally depends on <code>C</code>, so we in fact must instantiate <code>A</code> by writing <code>new A(new B(new C(), new D()), new E())</code> to keep <code>A</code> testable. Imagine instantiation of some root class that depends on the entire application's object graph. Yes we have dependency injection pattern, we have static method constructors, but this is just another complication to handle our weak unit testing strategy.</p>
+<p>Another thing that is sick is unit&rsquo;s internal dependencies. If, for example, unit <code>A</code> depends on unit <code>B</code> and unit <code>B</code> is not used in any other place of the application, then there is no reason to write <code>new A(new B())</code>. Especially if <code>B</code> internally depends on <code>C</code>, so we in fact must instantiate <code>A</code> by writing <code>new A(new B(new C(), new D()), new E())</code> to keep <code>A</code> testable. Imagine instantiation of some root class that depends on the entire application&rsquo;s object graph. Yes we have dependency injection pattern, we have static method constructors, but this is just another complication to handle our weak unit testing strategy.</p>
 <p>Formal unit tests:</p>
 <ul>
 <li>
@@ -212,13 +212,13 @@ setup a testing environment for each line, which is not effective.</p>
 <p>Do not guarantee a correct code behavior because they do not test inter-unit communications.</p>
 </li>
 <li>
-<p>Hinder refactoring. Once we wrote a test for a unit, the test will stick to the unit and we can't refactor the unit without refactoring the test. All unit dependencies also become written in the test, so we can't even change unit implementation details without touching its test.</p>
+<p>Hinder refactoring. Once we wrote a test for a unit, the test will stick to the unit and we can&rsquo;t refactor the unit without refactoring the test. All unit dependencies also become written in the test, so we can&rsquo;t even change unit implementation details without touching its test.</p>
 </li>
 <li>
 <p>Overcomplicated when it comes to dealing with unit dependencies.</p>
 </li>
 <li>
-<p>A line-by-line reproduction of code in tests does not test anything. Do method-by-method tests test something? Do unit-by-unit tests test? What we're testing at all?</p>
+<p>A line-by-line reproduction of code in tests does not test anything. Do method-by-method tests test something? Do unit-by-unit tests test? What we&rsquo;re testing at all?</p>
 </li>
 </ul>
 <p>So, there is a problem and there should be a solution.</p>
@@ -227,12 +227,12 @@ setup a testing environment for each line, which is not effective.</p>
 But is this advice important? What people mean when they say &ldquo;test features&rdquo; (&ldquo;test use cases&rdquo;)?
 Do they mean &ldquo;test features of units&rdquo;?
 &ldquo;Feature&rdquo; in an abstraction without context, it is completely useless.</p>
-<p>Let's be engineers, let's estimate. I'm taking my ruler again&hellip;
+<p>Let&rsquo;s be engineers, let&rsquo;s estimate. I&rsquo;m taking my ruler again&hellip;
 How testing <em>features</em> can be more effective than testing methods? I finally came to this schema:</p>
 <p><img src="/images/100-coverage-feature-test.png" alt=""></p>
 <p>If we will test <em>subsystem</em> features then each test will cover <em>several</em> <strong>if</strong> cases and the test coverage will be very effective. Given this <em>case map</em> we can even select specific features that will touch the maximum amount of code lines. The amount of test environments that need to be created for such testing type is minimal.</p>
 <p>When I say &ldquo;subsystem&rdquo; I mean a <em>group of units</em> that serve one purpose and can be taken as a separate part of an application. In example, a data access layer is one of such subsystems. While it should be tested without actual writes to a database it can, <em>internally</em> consist of tens of units.</p>
-<p>Assumption here is that if a subsystem satisfies given requirements this mean that subsystem's internal structure satisfies that requirements as well. If a test is a requirement then why require a specific line-by-line solution?</p>
+<p>Assumption here is that if a subsystem satisfies given requirements this mean that subsystem&rsquo;s internal structure satisfies that requirements as well. If a test is a requirement then why require a specific line-by-line solution?</p>
 <p>Surprisingly, testing subsystem features also gives a total freedom for refactoring inside the subsystem.</p>
 <h3 id="cross-check">Cross-check</h3>
 <p>There is also a consideration about cross-checking.
@@ -244,9 +244,9 @@ Does this guarantee something? No.</p>
 <li>Code: &ldquo;Trowing a ball.&rdquo;</li>
 <li>Duplication test: &ldquo;Is the code throwing a ball?&rdquo;</li>
 <li>Functional test: &ldquo;Was a ball thrown?&rdquo;</li>
-<li>Cross-check test: &ldquo;Hey Joe, I don't believe my own eyes (my own code), could you please go and check if there is a ball <em>in the basket</em>?&rdquo;</li>
+<li>Cross-check test: &ldquo;Hey Joe, I don&rsquo;t believe my own eyes (my own code), could you please go and check if there is a ball <em>in the basket</em>?&rdquo;</li>
 </ul>
-<p>The duplication test can't prove that the code satisfies the task requirement.
+<p>The duplication test can&rsquo;t prove that the code satisfies the task requirement.
 The functional test is better but it does not guarantee the task requirement satisfaction as well.
 The cross-check can give the guarantee.</p>
 <p>The strongest argument about writing classical unit tests I met was that they can go through
@@ -275,9 +275,9 @@ it is also a good <em>tool</em> for keeping codebase clean.</p>
 <p>One should not stop testing when he sees a 100% test coverage. In example, <code>?:</code> operator, written in one
 line will be presented as &ldquo;covered line&rdquo; by a coverage tool, but in fact there are two cases that need to be tested.</p>
 <p>A good goal is to test each subsystem <em>feature</em> and (when it is required) edge cases. Feature test is a strict requirement to the subsystem. This is also a known idea, but rethinking old ideas is as important as learning new. Testing features rather than units gives more profit and requires less efforts. Such tests are also easier to support.</p>
-<p>P.S. If you're interested, the experiment project I was talking about is
+<p>P.S. If you&rsquo;re interested, the experiment project I was talking about is
 <a href="https://github.com/konmik/proxypref">ProxyPreferences</a>.
-It is not perfect when it comes to tests yet. I'm too lazy
+It is not perfect when it comes to tests yet. I&rsquo;m too lazy
 to clean up all of them, so there are probably more tests than is actually needed.</p>
   </div>
 
@@ -296,7 +296,7 @@ to clean up all of them, so there are probably more tests than is actually neede
     <div class="pagination__buttons">
       
       <span class="button previous">
-        <a href="http://konmik.com/posts/rxjava_magic_finally_goes_away/">
+        <a href="konmik.com/posts/rxjava_magic_finally_goes_away/">
           <span class="button__icon">←</span>
           <span class="button__text">RxJava magic (finally) goes away</span>
         </a>
@@ -304,7 +304,7 @@ to clean up all of them, so there are probably more tests than is actually neede
       
       
       <span class="button next">
-        <a href="http://konmik.com/posts/introduction_to_model_view_presenter_on_android/">
+        <a href="konmik.com/posts/introduction_to_model_view_presenter_on_android/">
           <span class="button__text">Introduction to Model View Presenter on Android</span>
           <span class="button__icon">→</span>
         </a>
@@ -329,8 +329,8 @@ to clean up all of them, so there are probably more tests than is actually neede
     </div>
 </footer>
 
-<script src="http://konmik.com/assets/main.js"></script>
-<script src="http://konmik.com/assets/prism.js"></script>
+<script src="konmik.com/assets/main.js"></script>
+<script src="konmik.com/assets/prism.js"></script>
 
 
 

@@ -8,17 +8,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <meta name="description"
   content="RxJava nice and easily covers our multithreading needs. But it provides only a half of the solution. While we can compose functions with RxJava, there is no safe way we can have our state (field variables) handled without race conditions and low-level synchronization blocks.
-This article describes a simple and practical way for solving multithreading issues that appear even when we&#39;re using such advanced technology as RxJava.
+This article describes a simple and practical way for solving multithreading issues that appear even when we&amp;rsquo;re using such advanced technology as RxJava.
 " />
 <meta name="keywords"
   content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="http://konmik.com/posts/managing_state_reactive_way/" />
+<link rel="canonical" href="konmik.com/posts/managing_state_reactive_way/" />
 
 
-<link rel="stylesheet" href="http://konmik.com/assets/style.css">
+<link rel="stylesheet" href="konmik.com/assets/style.css">
 
-<link rel="stylesheet" href="http://konmik.com/assets/green.css">
+<link rel="stylesheet" href="konmik.com/assets/green.css">
 
 
 
@@ -26,9 +26,9 @@ This article describes a simple and practical way for solving multithreading iss
 
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144"
-  href="http://konmik.com/img/apple-touch-icon-144-precomposed.png">
+  href="konmik.com/img/apple-touch-icon-144-precomposed.png">
 
-<link rel="shortcut icon" href="http://konmik.com/img/favicon/green.png">
+<link rel="shortcut icon" href="konmik.com/img/favicon/green.png">
 
 
 
@@ -37,9 +37,9 @@ This article describes a simple and practical way for solving multithreading iss
   content="Managing state reactive way :: Konstantin Mikheev&#39;s programming blog — " />
 <meta name="twitter:description"
   content="RxJava nice and easily covers our multithreading needs. But it provides only a half of the solution. While we can compose functions with RxJava, there is no safe way we can have our state (field variables) handled without race conditions and low-level synchronization blocks.
-This article describes a simple and practical way for solving multithreading issues that appear even when we&#39;re using such advanced technology as RxJava.
+This article describes a simple and practical way for solving multithreading issues that appear even when we&amp;rsquo;re using such advanced technology as RxJava.
 " />
-<meta name="twitter:site" content="http://konmik.com/" />
+<meta name="twitter:site" content="konmik.com/" />
 <meta name="twitter:creator" content="" />
 <meta name="twitter:image" content="">
 
@@ -50,9 +50,9 @@ This article describes a simple and practical way for solving multithreading iss
   content="Managing state reactive way :: Konstantin Mikheev&#39;s programming blog — ">
 <meta property="og:description"
   content="RxJava nice and easily covers our multithreading needs. But it provides only a half of the solution. While we can compose functions with RxJava, there is no safe way we can have our state (field variables) handled without race conditions and low-level synchronization blocks.
-This article describes a simple and practical way for solving multithreading issues that appear even when we&#39;re using such advanced technology as RxJava.
+This article describes a simple and practical way for solving multithreading issues that appear even when we&amp;rsquo;re using such advanced technology as RxJava.
 " />
-<meta property="og:url" content="http://konmik.com/posts/managing_state_reactive_way/" />
+<meta property="og:url" content="konmik.com/posts/managing_state_reactive_way/" />
 <meta property="og:site_name" content="Managing state reactive way" />
 <meta property="og:image" content="">
 <meta property="og:image:width" content="2048">
@@ -79,7 +79,7 @@ This article describes a simple and practical way for solving multithreading iss
   <header class="header">
   <div class="header__inner">
     <div class="header__logo">
-      <a href="http://konmik.com/">
+      <a href="konmik.com/">
   <div class="logo">
     Konstantin Mikheev&#39;s programming blog
   </div>
@@ -93,15 +93,15 @@ This article describes a simple and practical way for solving multithreading iss
     
       
         
-          <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+          <li><a href="konmik.com/index.xml">[RSS]</a></li>
         
       
         
-          <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+          <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
         
       
         
-          <li><a href="https://github.com/konmik">[GitHub]</a></li>
+          <li><a href="github.com/konmik">[GitHub]</a></li>
         
       
     
@@ -112,15 +112,15 @@ This article describes a simple and practical way for solving multithreading iss
   <ul class="menu__inner menu__inner--mobile">
     
       
-        <li><a href="http://konmik.com/index.xml">[RSS]</a></li>
+        <li><a href="konmik.com/index.xml">[RSS]</a></li>
       
     
       
-        <li><a href="https://twitter.com/sirstripy">[Twitter]</a></li>
+        <li><a href="twitter.com/sirstripy">[Twitter]</a></li>
       
     
       
-        <li><a href="https://github.com/konmik">[GitHub]</a></li>
+        <li><a href="github.com/konmik">[GitHub]</a></li>
       
     
     
@@ -135,7 +135,7 @@ This article describes a simple and practical way for solving multithreading iss
     
 <div class="post">
   <h1 class="post-title">
-    <a href="http://konmik.com/posts/managing_state_reactive_way/">Managing state reactive way</a></h1>
+    <a href="konmik.com/posts/managing_state_reactive_way/">Managing state reactive way</a></h1>
   <div class="post-meta">
     
     <span class="post-date">
@@ -148,9 +148,9 @@ This article describes a simple and practical way for solving multithreading iss
   
   <span class="post-tags">
     
-    #<a href="http://konmik.com/tags/java/">Java</a>&nbsp;
+    #<a href="konmik.com/tags/java/">Java</a>&nbsp;
     
-    #<a href="http://konmik.com/tags/android/">Android</a>&nbsp;
+    #<a href="konmik.com/tags/android/">Android</a>&nbsp;
     
   </span>
   
@@ -163,7 +163,7 @@ But it provides only a half of the solution.
 While we can compose functions with RxJava, there is no safe way we can have
 our state (field variables) handled without race conditions and low-level synchronization blocks.</p>
 <p>This article describes a simple and practical way for solving multithreading issues
-that appear even when we're using such advanced technology as RxJava.</p>
+that appear even when we&rsquo;re using such advanced technology as RxJava.</p>
 <h2 id="state-what-is-it">State, what is it?</h2>
 <blockquote>
 <p>&ldquo;State - all the stored information, at a given instant in time,
@@ -177,13 +177,13 @@ State can also be limited to a subsystem, an object, even a function can have st
 When an external event happens, or when a background thread finishes
 its execution (at best), it simply mutates the graph.
 The downside of such approach is that complexity of such modifications is horrifying.</p>
-<p>You're calling <code>getUserProfile()</code> and you have no idea what will happen next
+<p>You&rsquo;re calling <code>getUserProfile()</code> and you have no idea what will happen next
 and which variables will be changed during the call.
 It may read database and update profile,
 it may update your network token,
 it may download new list of unread messages,
-it may change user's age and so on.</p>
-<p>You didn't want all of that while composing &ldquo;Hello, %username%&rdquo; string isn't it?
+it may change user&rsquo;s age and so on.</p>
+<p>You didn&rsquo;t want all of that while composing &ldquo;Hello, %username%&rdquo; string isn&rsquo;t it?
 Especially if you was doing it while filling the profile view and you got an update
 callback while processing a previous callback?
 All these events, especially while happening concurrently, can give grey heir to anyone!</p>
@@ -203,7 +203,7 @@ What about the other side - state?
 Can functional programming teach us more?
 Sure.</p>
 <p>In real functional languages like <a href="https://clojure.org/">Clojure</a>, state is immutable.</p>
-<p>That's it - if you have <code>Rect</code> data structure, you can't just change it's <code>x</code> and <code>width</code>.
+<p>That&rsquo;s it - if you have <code>Rect</code> data structure, you can&rsquo;t just change it&rsquo;s <code>x</code> and <code>width</code>.
 The only way you can have some state changed - is to make a copy of the
 data structure with new values of fields.
 Want to modify a list? Make a copy of it.</p>
@@ -215,7 +215,7 @@ And the new graph is assigned to the <em>single</em> variable which holds the ro
 But in practice the difference is not so big, and what we get in exchange for
 a negligible performance hit is outstanding reliability.
 And you still can use mutable data in performance-critical parts.
-Remember the Knuth's cite? It can totally be applied here.</p>
+Remember the Knuth&rsquo;s cite? It can totally be applied here.</p>
 <blockquote>
 <p>&ldquo;We should forget about small efficiencies, say about 97% of the time:
 premature optimization is the root of all evil.
@@ -223,56 +223,56 @@ Yet we should not pass up our opportunities in that critical 3%.&rdquo;
 &ndash; Donald Knuth</p>
 </blockquote>
 <p>Because data is immutable
-you don't have to make deep copy of the entire data graph.
-You're not copying <code>String</code> values while passing them around, isn't it?
+you don&rsquo;t have to make deep copy of the entire data graph.
+You&rsquo;re not copying <code>String</code> values while passing them around, isn&rsquo;t it?
 Because <code>String</code> is immutable, it is absolutely safe to pass it anywhere.
 So we only need to allocate the difference between the old and the new graphs.</p>
-<p>Let's take an example.
+<p>Let&rsquo;s take an example.
 Here is the representation of state in a currency selection dialog:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CurrencySelectionState</span> <span style="color:#f92672">{</span>
-
-    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> List<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> currencies<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> Optional<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> selected<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> Optional<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> networkError<span style="color:#f92672">;</span>
-
-    CurrencySelectionState<span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">this</span><span style="color:#f92672">(</span>emptyList<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">,</span> empty<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">,</span> empty<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    CurrencySelectionState<span style="color:#f92672">(</span>List<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> currencies<span style="color:#f92672">,</span>
-            Optional<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> selected<span style="color:#f92672">,</span> Optional<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> networkError<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">currencies</span> <span style="color:#f92672">=</span> currencies<span style="color:#f92672">;</span>
-        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">selected</span> <span style="color:#f92672">=</span> selected<span style="color:#f92672">;</span>
-        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">networkError</span> <span style="color:#f92672">=</span> networkError<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    CurrencySelectionState <span style="color:#a6e22e">withCurrencies</span><span style="color:#f92672">(</span>List<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> currencies<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> CurrencySelectionState<span style="color:#f92672">(</span>currencies<span style="color:#f92672">,</span> selected<span style="color:#f92672">,</span> networkError<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    CurrencySelectionState <span style="color:#a6e22e">withSelected</span><span style="color:#f92672">(</span>Optional<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> selected<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> CurrencySelectionState<span style="color:#f92672">(</span>currencies<span style="color:#f92672">,</span> selected<span style="color:#f92672">,</span> networkError<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>When user selects another currency, we only create a new instance
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CurrencySelectionState</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> List<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> currencies;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> Optional<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> selected;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> Optional<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> networkError;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    CurrencySelectionState() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>(emptyList(), empty(), empty());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    CurrencySelectionState(List<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> currencies,
+</span></span><span style="display:flex;"><span>            Optional<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> selected, Optional<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> networkError) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">currencies</span> <span style="color:#f92672">=</span> currencies;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">selected</span> <span style="color:#f92672">=</span> selected;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">networkError</span> <span style="color:#f92672">=</span> networkError;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    CurrencySelectionState <span style="color:#a6e22e">withCurrencies</span>(List<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> currencies) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> CurrencySelectionState(currencies, selected, networkError);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    CurrencySelectionState <span style="color:#a6e22e">withSelected</span>(Optional<span style="color:#f92672">&lt;</span>CurrencyInfo<span style="color:#f92672">&gt;</span> selected) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> CurrencySelectionState(currencies, selected, networkError);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When user selects another currency, we only create a new instance
 of <code>CurrencySelectionState</code> with the old list and new <code>selected</code> field.
-We don't need to copy the currency list itself because it was not changed.
+We don&rsquo;t need to copy the currency list itself because it was not changed.
 The list is immutable so we can safely reference it from the new state instance.</p>
 <p>It can look tedious to write lots of <code>with-</code> methods, but in practice it does
-not take too much time. If you're free in selection of libraries for your
+not take too much time. If you&rsquo;re free in selection of libraries for your
 project, you can try automatic code generators for such purposes, for example
 <a href="https://github.com/gabrielittner/auto-value-with">AutoValue: With Extension</a>.</p>
 <p>We can also stack such &ldquo;modifications&rdquo; by calling them in a chain:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">CurrencySelectionState newViewState <span style="color:#f92672">=</span> oldViewState
-    <span style="color:#f92672">.</span><span style="color:#a6e22e">withCurrencies</span><span style="color:#f92672">(</span>newList<span style="color:#f92672">)</span>
-    <span style="color:#f92672">.</span><span style="color:#a6e22e">withSelected</span><span style="color:#f92672">(</span>selectedItem<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-</code></pre></div><p>After getting a new <code>CurrencySelectionState</code> instance,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>CurrencySelectionState newViewState <span style="color:#f92672">=</span> oldViewState
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">withCurrencies</span>(newList)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">withSelected</span>(selectedItem);
+</span></span></code></pre></div><p>After getting a new <code>CurrencySelectionState</code> instance,
 all we need is to call our <code>currencySelectionDialog.update(newViewState)</code>
 to refresh view and the job is done.</p>
 <p>This solution with immutable state and separation
 of state and its representation also becomes very popular
 in web development.</p>
-<p>When we're creating the new immutable
+<p>When we&rsquo;re creating the new immutable
 data structure which represents some state,
 there are just no places where unpredictable things can happen.
 Your jugging ball does not suddenly turn into a rat or a bird,
@@ -286,8 +286,8 @@ And it is better to have the truth immutable, just to avoid having some grey hai
 from functional languages? Of course not!
 All the previous discussion was just to prepare you,
 dear reader, to hit the next episode with some ideas about what &ldquo;reliable&rdquo;, &ldquo;predictable&rdquo;
-words mean when we're talking about state.</p>
-<p>Let's adopt this model to our reactive multithreading environment,
+words mean when we&rsquo;re talking about state.</p>
+<p>Let&rsquo;s adopt this model to our reactive multithreading environment,
 so we could have a reliable and predictable state management for our
 lovely RxJava.</p>
 <p>What we really want is to have these things:</p>
@@ -298,13 +298,13 @@ lovely RxJava.</p>
 <li>Of course, our solution must be dead simple</li>
 <li>Reusable</li>
 </ul>
-<p>Let's take the example we already have with the selection of currency.
+<p>Let&rsquo;s take the example we already have with the selection of currency.
 While user is scrolling we want to get next page of currencies from server
 in background and when we receive it, we want it to be added to our list of already displayed
 currencies. And when we do this we want to have a callback to update our view.</p>
 <p>In RxJava we have a similar feature &ndash; <code>BehaviorSubject</code>.
 Unfortunately, it does not guarantee sequential emission of items on one thread.
-(What if you call it's <code>onNext</code> on different threads? Hint: a race condition.)
+(What if you call it&rsquo;s <code>onNext</code> on different threads? Hint: a race condition.)
 It does not have thread-safe way to get current value and to emit a new - everything
 is in hands of the user.</p>
 <p>Why race conditions and wrong emission order is an issue?</p>
@@ -313,42 +313,42 @@ and when user scrolls down, we want to show a progress bar instead of the last i
 on the bottom, and when we get the next page of items, we want to add them to the list.</p>
 <p>In case of a race condition we can get items first and then progress bar without new items next.
 This is not the most frequent case, but it will happen sometimes, especially
-if you're using some tricky caching mechanics.</p>
-<p>There can be much worse cases. Say if we're creating a messaging app
+if you&rsquo;re using some tricky caching mechanics.</p>
+<p>There can be much worse cases. Say if we&rsquo;re creating a messaging app
 where items can be paged up and down, cached in a database, modified, animated, updated -
 we must be very precise and should always get the updated list of items in the right sequence.</p>
 <h2 id="usage-example">Usage example</h2>
-<p>Here is how we're going to use it:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CurrencySelection</span> <span style="color:#f92672">{</span>
-
-    <span style="color:#75715e">// The state itself.
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// We&#39;re providing the initial value for it.
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// We also need to specify a scheduler where we want to observe
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// emitted values.
-</span><span style="color:#75715e"></span>    RxState<span style="color:#f92672">&lt;</span>CurrencySelectionState<span style="color:#f92672">&gt;</span> state <span style="color:#f92672">=</span>
-         <span style="color:#66d9ef">new</span> RxState<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> CurrencySelectionState<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">,</span> mainThread<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-
-    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCreate</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        state<span style="color:#f92672">.</span><span style="color:#a6e22e">observable</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span>
-            <span style="color:#f92672">.</span><span style="color:#a6e22e">subscribe</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">:</span><span style="color:#f92672">:</span>updateView<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#75715e">// Call it from ANY thread, all the multithreading
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// will be handled by RxState.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onPagingUp</span><span style="color:#f92672">(</span>List<span style="color:#f92672">&lt;</span>Currency<span style="color:#f92672">&gt;</span> newItems<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        state<span style="color:#f92672">.</span><span style="color:#a6e22e">apply</span><span style="color:#f92672">(</span>old <span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
-            <span style="color:#75715e">// Do not modify the old state, create a new one!
-</span><span style="color:#75715e"></span>            ArrayList<span style="color:#f92672">&lt;</span>Currency<span style="color:#f92672">&gt;</span> newList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-            newList<span style="color:#f92672">.</span><span style="color:#a6e22e">addAll</span><span style="color:#f92672">(</span>newItems<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-            newList<span style="color:#f92672">.</span><span style="color:#a6e22e">addAll</span><span style="color:#f92672">(</span>old<span style="color:#f92672">.</span><span style="color:#a6e22e">currencies</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-            <span style="color:#66d9ef">return</span> old<span style="color:#f92672">.</span><span style="color:#a6e22e">withCurrencies</span><span style="color:#f92672">(</span>unmodifiableList<span style="color:#f92672">(</span>newList<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>This pattern perfectly fits into any architecture.
-You can keep <code>RxState</code> in a view if you're adhering to &ldquo;I don't care&rdquo; architecture,
+<p>Here is how we&rsquo;re going to use it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CurrencySelection</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// The state itself.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// We&#39;re providing the initial value for it.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// We also need to specify a scheduler where we want to observe</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// emitted values.</span>
+</span></span><span style="display:flex;"><span>    RxState<span style="color:#f92672">&lt;</span>CurrencySelectionState<span style="color:#f92672">&gt;</span> state <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">new</span> RxState<span style="color:#f92672">&lt;&gt;</span>(<span style="color:#66d9ef">new</span> CurrencySelectionState(), mainThread());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCreate</span>() {
+</span></span><span style="display:flex;"><span>        state.<span style="color:#a6e22e">observable</span>()
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">subscribe</span>(<span style="color:#66d9ef">this</span>::updateView);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Call it from ANY thread, all the multithreading</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// will be handled by RxState.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onPagingUp</span>(List<span style="color:#f92672">&lt;</span>Currency<span style="color:#f92672">&gt;</span> newItems) {
+</span></span><span style="display:flex;"><span>        state.<span style="color:#a6e22e">apply</span>(old <span style="color:#f92672">-&gt;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Do not modify the old state, create a new one!</span>
+</span></span><span style="display:flex;"><span>            ArrayList<span style="color:#f92672">&lt;</span>Currency<span style="color:#f92672">&gt;</span> newList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>            newList.<span style="color:#a6e22e">addAll</span>(newItems);
+</span></span><span style="display:flex;"><span>            newList.<span style="color:#a6e22e">addAll</span>(old.<span style="color:#a6e22e">currencies</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> old.<span style="color:#a6e22e">withCurrencies</span>(unmodifiableList(newList));
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This pattern perfectly fits into any architecture.
+You can keep <code>RxState</code> in a view if you&rsquo;re adhering to &ldquo;I don&rsquo;t care&rdquo; architecture,
 you can put it into a presenter when doing MVP,
-it can represent ViewModel when you're on MVVM,
+it can represent ViewModel when you&rsquo;re on MVVM,
 and it can be put into any singleton to represent
 a service state, etc.</p>
 <p>Hint: all these <code>addAll</code>, <code>unmodifiableList</code> can be too boring to type, so it is OK to write
@@ -359,7 +359,7 @@ library with all the primitive functions and immutable collections included:
 <p>There are currently two approaches I know about that provide similar functionality:</p>
 <ul>
 <li>You can go with plain RxJava and use <code>BehaviorSubject</code>.</li>
-<li>Or you can use Jake Wharton's
+<li>Or you can use Jake Wharton&rsquo;s
 <a href="https://github.com/JakeWharton/RxRelay">RxRelay</a>
 library to make it a little bit easier.</li>
 </ul>
@@ -370,11 +370,11 @@ Welcome to writing <code>subscribeOn(mainThread())</code> and spaghetti of
 operators to connect other operators together.</p>
 <p>B) There is also no guarantee that emitted values will be sequential relatively to each other.</p>
 <p>Say, you want to change values like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">int</span> currentValue <span style="color:#f92672">=</span> subject<span style="color:#f92672">.</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-subject<span style="color:#f92672">.</span><span style="color:#a6e22e">onNext</span><span style="color:#f92672">(</span>currentValue <span style="color:#f92672">+</span> 1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-</code></pre></div><p>In a concurrent environment something can change subject value between <code>getValue()</code> and <code>onNext()</code> calls
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> currentValue <span style="color:#f92672">=</span> subject.<span style="color:#a6e22e">getValue</span>();
+</span></span><span style="display:flex;"><span>subject.<span style="color:#a6e22e">onNext</span>(currentValue <span style="color:#f92672">+</span> 1);
+</span></span></code></pre></div><p>In a concurrent environment something can change subject value between <code>getValue()</code> and <code>onNext()</code> calls
 and the classical race condition will happen - you will get repeating numbers sometimes.
-So you need to write poor man's <code>synchronized</code> blocks to prevent this
+So you need to write poor man&rsquo;s <code>synchronized</code> blocks to prevent this
 or you can also limit yourself to one thread and write <code>subscribeOn(mainThread())</code>
 everywhere &ldquo;just to be sure&rdquo;.</p>
 <p>Not the best solutions in my opinion.
@@ -383,7 +383,7 @@ and stop constantly thinking about all the multithreading issues.</p>
 <h2 id="implementation">Implementation</h2>
 <p>Here is some implementation reasoning:</p>
 <ul>
-<li>We're making modification sequence strict by
+<li>We&rsquo;re making modification sequence strict by
 taking the old state to produce the new one</li>
 <li>We do state modification in a lock to prevent multiple modifications
 of state happening concurrently</li>
@@ -412,7 +412,7 @@ this is the only way we can guarantee their sequence</li>
     <div class="pagination__buttons">
       
       <span class="button previous">
-        <a href="http://konmik.com/posts/when_to_not_use_rxjava/">
+        <a href="konmik.com/posts/when_to_not_use_rxjava/">
           <span class="button__icon">←</span>
           <span class="button__text">When to NOT use RxJava</span>
         </a>
@@ -420,7 +420,7 @@ this is the only way we can guarantee their sequence</li>
       
       
       <span class="button next">
-        <a href="http://konmik.com/posts/why_lambdas_matter_even_on_android/">
+        <a href="konmik.com/posts/why_lambdas_matter_even_on_android/">
           <span class="button__text">Why lambdas matter (even on Android)</span>
           <span class="button__icon">→</span>
         </a>
@@ -445,8 +445,8 @@ this is the only way we can guarantee their sequence</li>
     </div>
 </footer>
 
-<script src="http://konmik.com/assets/main.js"></script>
-<script src="http://konmik.com/assets/prism.js"></script>
+<script src="konmik.com/assets/main.js"></script>
+<script src="konmik.com/assets/prism.js"></script>
 
 
 
