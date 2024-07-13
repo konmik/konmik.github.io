@@ -1,5 +1,5 @@
 title = "Konstantin Mikheev's programming blog"
-baseURL = "http://konmik.com/"
+baseURL = "konmik.com/"
 languageCode = "en-us"
 theme = "terminal"
 paginate = 5
@@ -19,16 +19,16 @@ copyright = "(c) Konstantin Mikheev 2020"
   [[menu.main]]
     identifier = "rss"
     name = "[RSS]"
-    url = "http://konmik.com/index.xml"
+    url = "konmik.com/index.xml"
     weight = 1
   [[menu.main]]
     identifier = "twitter"
     name = "[Twitter]"
-    url = "https://twitter.com/sirstripy"
+    url = "twitter.com/sirstripy"
     weight = 2
   [[menu.main]]
     identifier = "github"
     name = "[GitHub]"
-    url = "https://github.com/konmik"
+    url = "github.com/konmik"
     weight = 3
     
