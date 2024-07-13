@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Programming Culture on Konstantin Mikheev&#39;s programming blog</title>
-    <link>konmik.com/tags/programming-culture/</link>
+    <link>https://konmik.com/tags/programming-culture/</link>
     <description>Recent content in Programming Culture on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
     <lastBuildDate>Wed, 08 Jan 2020 00:00:00 +0000</lastBuildDate>
-    <atom:link href="konmik.com/tags/programming-culture/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://konmik.com/tags/programming-culture/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Impostor Syndrome for Software Developers</title>
-      <link>konmik.com/posts/impostor_syndrome/</link>
+      <link>https://konmik.com/posts/impostor_syndrome/</link>
       <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
-      <guid>konmik.com/posts/impostor_syndrome/</guid>
+      <guid>https://konmik.com/posts/impostor_syndrome/</guid>
       <description>&lt;p&gt;I often see recommendations on Twitter about how to deal with impostor syndrome.&#xA;It is almost always something like &amp;ldquo;just convince yourself that you&amp;rsquo;re not an impostor&amp;rdquo;.&#xA;It is hard to do if you have a conscience.&lt;/p&gt;</description>
     </item>
   </channel>

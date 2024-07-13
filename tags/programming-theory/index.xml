@@ -2,32 +2,32 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Programming Theory on Konstantin Mikheev&#39;s programming blog</title>
-    <link>konmik.com/tags/programming-theory/</link>
+    <link>https://konmik.com/tags/programming-theory/</link>
     <description>Recent content in Programming Theory on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
     <lastBuildDate>Tue, 06 Feb 2018 00:00:00 +0000</lastBuildDate>
-    <atom:link href="konmik.com/tags/programming-theory/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://konmik.com/tags/programming-theory/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Immutable data is the main key to simple code</title>
-      <link>konmik.com/posts/code_simplicity_02/</link>
+      <link>https://konmik.com/posts/code_simplicity_02/</link>
       <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
-      <guid>konmik.com/posts/code_simplicity_02/</guid>
+      <guid>https://konmik.com/posts/code_simplicity_02/</guid>
       <description>&lt;p&gt;Use immutable data like a pro.&lt;/p&gt;</description>
     </item>
     <item>
       <title>The Code Simplicity Chart (c)</title>
-      <link>konmik.com/posts/code_simplicity_01/</link>
+      <link>https://konmik.com/posts/code_simplicity_01/</link>
       <pubDate>Tue, 21 Nov 2017 00:00:00 +0000</pubDate>
-      <guid>konmik.com/posts/code_simplicity_01/</guid>
+      <guid>https://konmik.com/posts/code_simplicity_01/</guid>
       <description>&lt;p&gt;How to understand if your code is simple or complex.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Why lambdas matter (even on Android)</title>
-      <link>konmik.com/posts/why_lambdas_matter_even_on_android/</link>
+      <link>https://konmik.com/posts/why_lambdas_matter_even_on_android/</link>
       <pubDate>Wed, 06 Jan 2016 00:00:00 +0000</pubDate>
-      <guid>konmik.com/posts/why_lambdas_matter_even_on_android/</guid>
+      <guid>https://konmik.com/posts/why_lambdas_matter_even_on_android/</guid>
       <description>&lt;p&gt;A little knowledge exchange from an active lambdas user.&lt;/p&gt;&#xA;&lt;p&gt;&lt;em&gt;Term: &lt;strong&gt;Lambda&lt;/strong&gt; is an anonymous function.&lt;/em&gt;&lt;/p&gt;</description>
     </item>
   </channel>

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Programming in General on Konstantin Mikheev&#39;s programming blog</title>
-    <link>konmik.com/tags/programming-in-general/</link>
+    <link>https://konmik.com/tags/programming-in-general/</link>
     <description>Recent content in Programming in General on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
     <lastBuildDate>Mon, 24 Apr 2017 00:00:00 +0000</lastBuildDate>
-    <atom:link href="konmik.com/tags/programming-in-general/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://konmik.com/tags/programming-in-general/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Is programming actually math?</title>
-      <link>konmik.com/posts/is_programming_actually_math/</link>
+      <link>https://konmik.com/posts/is_programming_actually_math/</link>
       <pubDate>Mon, 24 Apr 2017 00:00:00 +0000</pubDate>
-      <guid>konmik.com/posts/is_programming_actually_math/</guid>
+      <guid>https://konmik.com/posts/is_programming_actually_math/</guid>
       <description>&lt;p&gt;The main difference between programming and math is&amp;hellip;&lt;/p&gt;</description>
     </item>
   </channel>

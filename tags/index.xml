@@ -2,53 +2,53 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Konstantin Mikheev&#39;s programming blog</title>
-    <link>konmik.com/tags/</link>
+    <link>https://konmik.com/tags/</link>
     <description>Recent content in Tags on Konstantin Mikheev&#39;s programming blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) Konstantin Mikheev 2020</copyright>
     <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
-    <atom:link href="konmik.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://konmik.com/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Android</title>
-      <link>konmik.com/tags/android/</link>
+      <link>https://konmik.com/tags/android/</link>
       <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
-      <guid>konmik.com/tags/android/</guid>
+      <guid>https://konmik.com/tags/android/</guid>
       <description></description>
     </item>
     <item>
       <title>Kotlin</title>
-      <link>konmik.com/tags/kotlin/</link>
+      <link>https://konmik.com/tags/kotlin/</link>
       <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
-      <guid>konmik.com/tags/kotlin/</guid>
+      <guid>https://konmik.com/tags/kotlin/</guid>
       <description></description>
     </item>
     <item>
       <title>Programming Culture</title>
-      <link>konmik.com/tags/programming-culture/</link>
+      <link>https://konmik.com/tags/programming-culture/</link>
       <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
-      <guid>konmik.com/tags/programming-culture/</guid>
+      <guid>https://konmik.com/tags/programming-culture/</guid>
       <description></description>
     </item>
     <item>
       <title>Programming Theory</title>
-      <link>konmik.com/tags/programming-theory/</link>
+      <link>https://konmik.com/tags/programming-theory/</link>
       <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
-      <guid>konmik.com/tags/programming-theory/</guid>
+      <guid>https://konmik.com/tags/programming-theory/</guid>
       <description></description>
     </item>
     <item>
       <title>Programming in General</title>
-      <link>konmik.com/tags/programming-in-general/</link>
+      <link>https://konmik.com/tags/programming-in-general/</link>
       <pubDate>Mon, 24 Apr 2017 00:00:00 +0000</pubDate>
-      <guid>konmik.com/tags/programming-in-general/</guid>
+      <guid>https://konmik.com/tags/programming-in-general/</guid>
       <description></description>
     </item>
     <item>
       <title>Java</title>
-      <link>konmik.com/tags/java/</link>
+      <link>https://konmik.com/tags/java/</link>
       <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
-      <guid>konmik.com/tags/java/</guid>
+      <guid>https://konmik.com/tags/java/</guid>
       <description></description>
     </item>
   </channel>
